@@ -1,0 +1,9 @@
+// Runs a set of HTTP actions in sequence and displays results.
+// No automatic testing, but could be useful.
+
+@WebApplication1_HostAddress = https://localhost:7256
+
+GET {{WebApplication1_HostAddress}}/api/Example/GetMovies
+Accept: application/json
+
+###
