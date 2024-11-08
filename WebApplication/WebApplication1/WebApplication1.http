@@ -3,7 +3,29 @@
 
 @WebApplication1_HostAddress = https://localhost:7256
 
-GET {{WebApplication1_HostAddress}}/api/Example/GetMovies
+POST {{WebApplication1_HostAddress}}/account/register
 Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "abc@123.com",
+  "password": "Abc-123"
+}
+
+###
+
+POST {{WebApplication1_HostAddress}}/account/login?useCookies=false&useSessionCookies=false
+Content-Type: application/json
+
+{
+  "email": "abc@123.com",
+  "password": "Abc-123"
+}
+
+###
+
+GET {{WebApplication1_HostAddress}}/api/Example/GetMoviesAuthenticated
+Accept: application/json
+Authorization: Bearer CfDJ8BvVwP3lQlNFuFkbQbpxlaLywPX5WHX14hmln0R5yL4umNELyDykUs8juKpD5VSCtSwXfzSN6cGxWOopUGkERFAJQm3P7tT93DvvFIva5LycgtwIEvGd7klQXL3kmPRfkAwI4Zf9Tk8CrNPGwm7jt-vtxW-pY1887beqSiMnD7M-WuTRO31ez6PGCeVGBnvFj1L24H9o0Wv7J-1rlj6XiqbTtRKEEtB4kmHm4ai6g5vYYa3f8DcsoqoXq5uDgmrTph89Tn-0NLmU3SnoJAOClEs3MX4QtEREtj_20MGF-PkH-kRFwR8QCupEEIGCSrxk0jhAw03LWx2OJ-q46ovviN34nFxEiFSSFURn9OKJ1qzlSiw7HJoifrcrapjes-1RpnhW0CneV1ZmedUdy2AxMPi33nky8YbmNfbpK0erTMrQEqNYZAVai03Yzab9dL5vtRj1An4HibngJpwTRz_xPzNwiX8NLAWqI29iqyUzscvvX86jbrKeB_oLkas38Ql9Cbvab5JBUZvmbCkBVyQu5JuBeUOLUMyD13xvW309cgmN4Zg1SffGeqLqagwC6BDdODuXLbTkWL3hjPyvCczVv3W5sO8pUPKHvK28W8SvDEP5WnJmCFOztZVNSSxOn2ff1PrePG5Pvy9c_c5TIVK5I6DY-7Xl2iTBoZ62rgRE_4T-CnD0oZH-mxkEBoBcAFmH8A
 
 ###

@@ -1,0 +1,17 @@
+﻿.information-container {
+    display: none;
+}
+
+.scheme-container {
+    display: none;
+}
+
+#select {
+    height: 34px;
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}

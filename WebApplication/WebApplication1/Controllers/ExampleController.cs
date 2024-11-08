@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
@@ -5,12 +6,26 @@ using WebApplication1.Models;
 namespace WebApplication1.Controllers;
 
 [ApiController]
+[Tags("Movie Examples")]
 [Route("api/[controller]/[action]")]
 public class ExampleController(MovieContext dbContext) : ControllerBase
 {
+    [HttpGet, Authorize]
+    public async Task<ActionResult<IEnumerable<Movie>>> GetMoviesAuthenticated()
+    {
+        return await dbContext.Movies.ToListAsync();
+    }
+    [HttpGet, Authorize(Roles="Administrators")]
+    public async Task<ActionResult<IEnumerable<Movie>>> GetMoviesAuthorized()
+    {
+        return await dbContext.Movies.ToListAsync();
+    }
+    
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Movie>>> GetMovies()
     {
+        User.IsInRole("Administrators");
+        
         return await dbContext.Movies.ToListAsync();
     }
 
