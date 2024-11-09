@@ -32,6 +32,8 @@
         --selecter-bg-color: #313845;
         
         --code-bg-color: #1C1F26;
+        
+        --box-shadow-color: rgba(39, 44, 53, 1);
 
         /* text */
         --primary-text-color: rgb(179, 187, 201);

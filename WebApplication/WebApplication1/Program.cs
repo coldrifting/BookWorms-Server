@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using SwaggerThemes;
 using WebApplication1.Models;
 using WebApplication1.Swagger;
 
@@ -18,7 +17,8 @@ public static class Program
         // Add services to the container
         // Add our DB Context(s) here
         builder.Services.AddDbContext<MovieContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("MovieContext")));
+	        options.UseInMemoryDatabase("MovieDB"));
+            //options.UseSqlServer(builder.Configuration.GetConnectionString("MovieContext")));
         
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -37,7 +37,7 @@ public static class Program
 				Name = "Authorization",
 				Description = "Insert bearer token here without 'Bearer' prefix",
 				Type = SecuritySchemeType.Http,
-				Scheme = "Bearer"
+				Scheme = "Bearer",
 			});
 		});
         
@@ -51,7 +51,6 @@ public static class Program
 
         var app = builder.Build();
         
-
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
@@ -66,7 +65,7 @@ public static class Program
 				
 				// Other style tweaks
 				opt.InjectStylesheet("/Swagger/Themes/_custom.css");
-				opt.InjectJavascript("/Swagger/MoveAuthorizeBtn.js");
+				opt.InjectJavascript("/Swagger/AuthorizationTweaks.js");
 	            
 	            // Use Root URL
 				opt.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
