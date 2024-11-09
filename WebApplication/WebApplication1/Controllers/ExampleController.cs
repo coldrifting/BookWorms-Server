@@ -8,13 +8,16 @@ namespace WebApplication1.Controllers;
 [ApiController]
 [Tags("Movie Examples")]
 [Route("api/[controller]/[action]")]
-public class ExampleController(MovieContext dbContext) : ControllerBase
+public class ExampleController(RestDBContext dbContext) : ControllerBase
 {
     [HttpGet, Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     public async Task<ActionResult<IEnumerable<Movie>>> GetMoviesAuthenticated()
     {
         return await dbContext.Movies.ToListAsync();
     }
+    
     [HttpGet, Authorize(Roles="Administrators")]
     public async Task<ActionResult<IEnumerable<Movie>>> GetMoviesAuthorized()
     {

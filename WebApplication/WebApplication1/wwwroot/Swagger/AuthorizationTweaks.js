@@ -22,7 +22,6 @@
 function SetLoginVisibility(btn, invert = false) {
     const currentTokenVal = document.getElementById('auth-bearer-value');
     if (currentTokenVal) {
-        console.log(currentTokenVal);
         if (currentTokenVal.value === '') {
             return;
         }
@@ -124,7 +123,7 @@ function AuthPanel() {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "email": username,
+                "username": username,
                 "password": password
             })
         })
@@ -132,7 +131,6 @@ function AuthPanel() {
                 // Handle the response from the server
                 if (response.ok) {
                     console.log('ok');
-                    console.log(authErrors);
                     authErrors.classList.add("hidden");
 
                     response.json().then(x => {
@@ -142,7 +140,7 @@ function AuthPanel() {
                             return;
                         }
 
-                        tokenInput.setAttribute("value", x['accessToken']);
+                        tokenInput.setAttribute("value", x['token']);
                         tokenInput.dispatchEvent(new Event('change', {bubbles: true}));
 
                         document.getElementById('username').disabled = true;
@@ -153,7 +151,6 @@ function AuthPanel() {
                     });
                 } else {
                     console.log('not ok');
-                    console.log(authErrors);
                     authErrors.classList.remove("hidden");
                 }
             })

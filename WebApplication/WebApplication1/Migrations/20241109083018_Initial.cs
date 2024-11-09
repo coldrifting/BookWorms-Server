@@ -25,6 +25,22 @@ namespace WebApplication1.Migrations
                 {
                     table.PrimaryKey("PK_Movies", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Username = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
+                    Hash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    Salt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Roles = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Username);
+                });
         }
 
         /// <inheritdoc />
@@ -32,6 +48,9 @@ namespace WebApplication1.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Movies");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

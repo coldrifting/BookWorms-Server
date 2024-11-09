@@ -8,18 +8,20 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "email": "abc@123.com",
-  "password": "Abc-123"
+  "username": "abcdef",
+  "password": "123456",
+  "name": "name",
+  "email": "abc@123.com"
 }
 
 ###
 
-POST {{WebApplication1_HostAddress}}/account/login?useCookies=false&useSessionCookies=false
+POST {{WebApplication1_HostAddress}}/account/login
 Content-Type: application/json
 
 {
-  "email": "abc@123.com",
-  "password": "Abc-123"
+  "username": "abcdef",
+  "password": "123456"
 }
 
 ###

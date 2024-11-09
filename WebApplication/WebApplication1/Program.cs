@@ -1,8 +1,14 @@
-using Microsoft.AspNetCore.Identity;
+//using Microsoft.AspNetCore.Identity;
+
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using WebApplication1.Filters;
 using WebApplication1.Models;
-using WebApplication1.Swagger;
+using WebApplication1.Services;
 
 namespace WebApplication1;
 
@@ -13,14 +19,19 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
-        // Add services to the container
-        // Add our DB Context(s) here
-        builder.Services.AddDbContext<MovieContext>(options =>
-	        options.UseInMemoryDatabase("MovieDB"));
-            //options.UseSqlServer(builder.Configuration.GetConnectionString("MovieContext")));
         
-        builder.Services.AddControllers();
+        // Add services to the container
+        // Add our DB Context here
+        string? connString = builder.Configuration.GetConnectionString("DBContext");
+        builder.Services.AddDbContext<RestDBContext>(opt =>
+	        opt.UseSqlServer(connString));
+
+        // Use lowercase api endpoints
+        builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true); 
+        
+        builder.Services.AddControllers(opt => 
+	        opt.Filters.Add(new ProducesAttribute("application/json")));
+        
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         
@@ -42,13 +53,40 @@ public static class Program
 		});
         
         // Authorization & Authentication
-        builder.Services.AddDbContext<ApplicationDbContext>(
-        options => options.UseInMemoryDatabase("AppDb"));
-        builder.Services.AddAuthorization();
+		builder.Services
+		    .AddAuthentication(opt =>
+		    {
+		        opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+		        opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+		    })
+		    .AddJwtBearer(opt =>
+		    {
+		        opt.RequireHttpsMetadata = false;
+		        opt.SaveToken = true;
+		        opt.TokenValidationParameters = new()
+		        {
+			        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AuthService.Key)),
+			        ValidateIssuer = false,
+			        ValidateAudience = false
+		        };
+		        // Make authorization failure (401) responses consistent with other bad requests
+		        opt.Events = new()
+		        {
+					OnChallenge = context =>
+					{
+				        context.Response.OnStarting(async () =>
+				        {
+					        context.Response.Headers.Append("content-type", "application/json; charset=utf-8 ");
+				            ErrorDTO error = new("Unauthorized", "A valid token is required for this route");
+				            await context.Response.WriteAsync(error.Json());
+				        });
 
-        builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-	        .AddEntityFrameworkStores<ApplicationDbContext>();
-
+				        return Task.CompletedTask;
+					}
+		        };
+		    });
+		builder.Services.AddAuthorization();
+		
         var app = builder.Build();
         
         // Configure the HTTP request pipeline.
@@ -78,17 +116,10 @@ public static class Program
 
         app.UseHttpsRedirection();
 
-        // Actions can be split into separate files in the Controllers folder
+        // Endpoints can be split into separate files in the Controllers folder
         app.MapControllers();
         
-        // Map authorization API endpoints
-        app.UseAuthorization();
-        
-        // TODO - Can't customize these routes, replace?
-        // https://darko-subic.medium.com/how-to-disable-asp-net-core-identity-auto-generated-routes-6dbd09b5e815
-        // Copy and/or edit default code, see above link
-        app.MapGroup("/account").WithTags("User Account").MapIdentityApi<IdentityUser>();
-
         app.Run();
     }
+    
 }
