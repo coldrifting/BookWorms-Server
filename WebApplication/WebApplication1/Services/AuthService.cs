@@ -1,8 +1,7 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
+using System.Text.Json;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using WebApplication1.Models;
 
 namespace WebApplication1.Services;
@@ -11,42 +10,87 @@ public static class AuthService
 {
     // Generates a new secret JWT signing key each time the server is run
     // This simplifies things, and means that no secret keys will be accidentally uploaded,
-    // but it means that any signed-in users will need to resign in if the server is reset
-    public static readonly string Key = Convert.ToBase64String(new HMACSHA3_256().Key);
+    // but it also means that any signed-in users will need to re-sign-in if the server is reset
+    private static readonly string Secret = Utils.Hash.GenerateHash();
+    public static byte[] SecretBytes => Encoding.UTF8.GetBytes(Secret);
     
     // Expire time of generated JWT tokens in minutes
     public const int ExpireTime = 15; 
 
     public static string GenerateToken(User user)
     {
-        var secKeyBytes = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key));
+        long expTimestamp = DateTime.UtcNow.AddMinutes(ExpireTime).ToFileTimeUtc();
+        TokenHeaderDTO headerDTO = new();
+        TokenPayloadDTO payloadDTO = new("server", user.Username, expTimestamp, user.Roles);
 
-        var credentials = new SigningCredentials(secKeyBytes, SecurityAlgorithms.HmacSha256Signature);
-        var tokenDescriptor = new SecurityTokenDescriptor
+        JsonSerializerOptions serializeOptions = new()
         {
-            Subject = GenerateClaims(user),
-            Expires = DateTime.UtcNow.AddMinutes(ExpireTime),
-            SigningCredentials = credentials,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
+        
+        string header = JsonSerializer.Serialize(headerDTO, serializeOptions);
+        string payload = JsonSerializer.Serialize(payloadDTO, serializeOptions);
+        string signature = GenerateJWTSignature(header, payload);
 
-        var handler = new JwtSecurityTokenHandler();
-        var token = handler.CreateToken(tokenDescriptor);
-        return handler.WriteToken(token);
-    }
-
-    private static ClaimsIdentity GenerateClaims(User user)
-    {
-        var claims = new ClaimsIdentity();
-        claims.AddClaim(new Claim(ClaimTypes.Name, user.Email));
-
-        foreach (string role in user.Roles)
-            claims.AddClaim(new Claim(ClaimTypes.Role, role));
-
-        return claims;
+        return Utils.Hash.Base64Encode(header) + '.' + 
+               Utils.Hash.Base64Encode(payload) + '.' + 
+               signature;
     }
     
-    const int KeySize = 64;
-    const int Iterations = 350000;
+    // Generates a base64url encoded signature based on two strings
+    private static string GenerateJWTSignature(string header, string payload)
+    {
+        string encodedHeader = Utils.Hash.Base64Encode(header);
+        string encodedPayload = Utils.Hash.Base64Encode(payload);
+
+        var key = Encoding.UTF8.GetBytes(Secret);
+        var source = Encoding.UTF8.GetBytes(encodedHeader + '.' + encodedPayload);
+
+        return Utils.Hash.Base64EncodeBytes(HMACSHA256.HashData(key, source));
+    }
+    
+    // Customize error response body on 401 Unauthorized and 403 Forbidden
+    public static JwtBearerEvents BearerEvents()
+    {
+	    return new()
+	    {
+		    OnChallenge = context =>
+		    {
+			    context.Response.OnStarting(async () =>
+			    {
+				    context.Response.Headers.Append("content-type", "application/json; charset=utf-8");
+				    ErrorDTO error = new("Unauthenticated", "Valid token required for this route");
+				    await context.Response.WriteAsync(JsonSerializer.Serialize(error));
+			    });
+
+			    return Task.CompletedTask;
+		    },
+		    OnForbidden = context =>
+		    {
+			    context.Response.OnStarting(async () =>
+			    {
+				    context.Response.Headers.Append("content-type", "application/json; charset=utf-8");
+				    ErrorDTO error = new("Unauthorized", "User is not authorized to perform this action");
+				    await context.Response.WriteAsync(JsonSerializer.Serialize(error));
+			    });
+
+			    return Task.CompletedTask;
+		    }
+	    };
+    }
+    
+    //
+    // Password generation / verification
+    //
+    
+    public static bool VerifyPassword(string password, byte[] hash, byte[] salt)
+    {
+        byte[] hashToCompare = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithmName.SHA512, KeySize);
+        return CryptographicOperations.FixedTimeEquals(hashToCompare, hash);
+    }
+
+    private const int KeySize = 64;
+    private const int Iterations = 350000;
     public static byte[] HashPassword(string password, out byte[] salt)
     {
         salt = RandomNumberGenerator.GetBytes(KeySize);
@@ -57,11 +101,5 @@ public static class AuthService
             HashAlgorithmName.SHA512,
             KeySize);
          return hash;
-    }
-    
-    public static bool VerifyPassword(string password, byte[] hash, byte[] salt)
-    {
-        byte[] hashToCompare = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithmName.SHA512, KeySize);
-        return CryptographicOperations.FixedTimeEquals(hashToCompare, hash);
     }
 }

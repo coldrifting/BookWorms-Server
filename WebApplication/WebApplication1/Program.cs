@@ -1,6 +1,3 @@
-//using Microsoft.AspNetCore.Identity;
-
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +15,7 @@ public static class Program
 {
     public static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         
         // Add services to the container
         // Add our DB Context here
@@ -46,9 +43,9 @@ public static class Program
 			opt.AddSecurityDefinition("Bearer", new()
 			{
 				Name = "Authorization",
-				Description = "Insert bearer token here without 'Bearer' prefix",
+				Description = "Enter API Token Here",
 				Type = SecuritySchemeType.Http,
-				Scheme = "Bearer",
+				Scheme = "Bearer"
 			});
 		});
         
@@ -65,29 +62,16 @@ public static class Program
 		        opt.SaveToken = true;
 		        opt.TokenValidationParameters = new()
 		        {
-			        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AuthService.Key)),
+			        IssuerSigningKey = new SymmetricSecurityKey(AuthService.SecretBytes),
 			        ValidateIssuer = false,
 			        ValidateAudience = false
 		        };
 		        // Make authorization failure (401) responses consistent with other bad requests
-		        opt.Events = new()
-		        {
-					OnChallenge = context =>
-					{
-				        context.Response.OnStarting(async () =>
-				        {
-					        context.Response.Headers.Append("content-type", "application/json; charset=utf-8 ");
-				            ErrorDTO error = new("Unauthorized", "A valid token is required for this route");
-				            await context.Response.WriteAsync(error.Json());
-				        });
-
-				        return Task.CompletedTask;
-					}
-		        };
+		        opt.Events = AuthService.BearerEvents();
 		    });
 		builder.Services.AddAuthorization();
 		
-        var app = builder.Build();
+        WebApplication app = builder.Build();
         
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -121,5 +105,4 @@ public static class Program
         
         app.Run();
     }
-    
 }

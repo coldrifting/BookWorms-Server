@@ -18,7 +18,7 @@ public class ExampleController(RestDBContext dbContext) : ControllerBase
         return await dbContext.Movies.ToListAsync();
     }
     
-    [HttpGet, Authorize(Roles="Administrators")]
+    [HttpGet, Authorize(Roles="admin")]
     public async Task<ActionResult<IEnumerable<Movie>>> GetMoviesAuthorized()
     {
         return await dbContext.Movies.ToListAsync();

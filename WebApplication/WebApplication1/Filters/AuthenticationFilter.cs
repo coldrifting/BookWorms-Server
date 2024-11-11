@@ -10,7 +10,7 @@ public class AuthenticationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        IList<object> actionMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata;
+        var actionMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata;
         bool isAuthorized = actionMetadata.Any(metadataItem => metadataItem is AuthorizeAttribute);
         bool allowAnonymous = actionMetadata.Any(metadataItem => metadataItem is AllowAnonymousAttribute);
 
@@ -18,19 +18,25 @@ public class AuthenticationFilter : IOperationFilter
         {
             return;
         }
+
         operation.Parameters ??= new List<OpenApiParameter>();
 
         operation.Security = new List<OpenApiSecurityRequirement>();
 
-        var item = new OpenApiSecurityRequirement()
-        { { new()
-        {                            
-            Reference = new()
-            {                  
-                Id = "Bearer",             
-                Type = ReferenceType.SecurityScheme
+        OpenApiSecurityRequirement item = new()
+        {
+            {
+                new()
+                {
+                    Reference = new()
+                    {
+                        Id = "Bearer",
+                        Type = ReferenceType.SecurityScheme
+                    }
+                },
+                Array.Empty<string>()
             }
-        }, Array.Empty<string>() } };
+        };
         operation.Security.Add(item
         );
     }
