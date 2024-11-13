@@ -73,7 +73,7 @@ namespace WebApplication1.Migrations
                 name: "Teachers",
                 columns: table => new
                 {
-                    Username = table.Column<string>(type: "varchar(64)", nullable: false)
+                    Username = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")

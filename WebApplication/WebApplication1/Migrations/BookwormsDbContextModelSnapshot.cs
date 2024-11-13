@@ -118,6 +118,7 @@ namespace WebApplication1.Migrations
             modelBuilder.Entity("WebApplication1.Models.Teacher", b =>
                 {
                     b.Property<string>("Username")
+                        .HasMaxLength(64)
                         .HasColumnType("varchar(64)");
 
                     b.Property<string>("ClassroomCode")

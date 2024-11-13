@@ -12,7 +12,7 @@ using WebApplication1.Models;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
-    [Migration("20241113093653_Initial")]
+    [Migration("20241113095120_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -121,6 +121,7 @@ namespace WebApplication1.Migrations
             modelBuilder.Entity("WebApplication1.Models.Teacher", b =>
                 {
                     b.Property<string>("Username")
+                        .HasMaxLength(64)
                         .HasColumnType("varchar(64)");
 
                     b.Property<string>("ClassroomCode")

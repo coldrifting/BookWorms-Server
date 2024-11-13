@@ -5,7 +5,7 @@ namespace WebApplication1.Models;
 
 public class Teacher
 {
-    [Key]
+    [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     public string Username { get; set; } = null!;
     
     [ForeignKey(nameof(Username))]

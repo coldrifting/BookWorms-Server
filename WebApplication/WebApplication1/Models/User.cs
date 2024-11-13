@@ -1,16 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApplication1.Models;
 
 /// <summary>
 /// Main user object, stored in DB via Entity Framework 
+/// </summary>
 /// <param name="username"></param>
 /// <param name="hash"></param>
 /// <param name="salt"></param>
 /// <param name="name"></param>
 /// <param name="email"></param>
-/// </summary>
 public class User(string username, byte[] hash, byte[] salt, string name, string email)
 {
     [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]

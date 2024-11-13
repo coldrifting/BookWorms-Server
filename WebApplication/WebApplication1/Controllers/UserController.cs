@@ -1,5 +1,4 @@
-﻿using System.Net.Mime;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
 using WebApplication1.Services;
@@ -17,8 +16,6 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     public ActionResult<UserLoginSuccessDTO> Login(UserLoginDTO payload)
     {
         IQueryable<User> userMatch = dbContext.Users.Where(u => u.Username == payload.Username);
-
-        var x = userMatch.FirstOrDefault();
         
         if (userMatch.FirstOrDefault() is not { } candidateUser)
             return BadRequest(new ErrorDTO("Invalid Credentials", "Incorrect username and/or password"));
