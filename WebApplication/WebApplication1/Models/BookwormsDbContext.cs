@@ -11,5 +11,4 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     public DbSet<Classroom> Classrooms { get; set; }
     public DbSet<Completed> Completeds { get; set; }
     public DbSet<Reading> Readings { get; set; }
-    
 }

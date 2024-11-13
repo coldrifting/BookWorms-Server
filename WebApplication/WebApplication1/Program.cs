@@ -16,26 +16,34 @@ public static class Program
 {
     public static void Main(string[] args)
     {
-	    var mysqlContainer = new ContainerBuilder()
-		    .WithImage("mysql:8.4.2")
-		    .WithName("mysql-container")
-		    .WithPortBinding(32770, 3306)
-		    .WithEnvironment("MYSQL_DATABASE", "mysql-db")
-		    .WithEnvironment("MYSQL_USER", "postmaster")
-		    .WithEnvironment("MYSQL_PASSWORD", "password")
-		    .WithEnvironment("MYSQL_ROOT_PASSWORD", "rootpassword")
-		    .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(3306))
-		    .Build();
-
-	    Task.Run(async () => await mysqlContainer.StartAsync()).Wait();
-	    
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        
+	    bool useDocker = builder.Configuration.GetValue<bool>("UseDocker");
+
+	    if (useDocker)
+	    {
+		    var mysqlContainer = new ContainerBuilder()
+			    .WithImage("mysql:8.4.2")
+			    .WithName("mysql-container")
+			    .WithPortBinding(32770, 3306)
+			    .WithEnvironment("MYSQL_DATABASE", "mysql-db")
+			    .WithEnvironment("MYSQL_USER", "postmaster")
+			    .WithEnvironment("MYSQL_PASSWORD", "password")
+			    .WithEnvironment("MYSQL_ROOT_PASSWORD", "root")
+			    .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(3306))
+			    .Build();
+
+		    Task.Run(async () => await mysqlContainer.StartAsync()).Wait();
+	    }
+	    
+        
+        var serverVersion = new MySqlServerVersion(new Version(8, 4, 2));
         
         // Add services to the container
         // Add our DB Context here
-        string? connString = builder.Configuration.GetConnectionString("DBContext");
-        builder.Services.AddDbContext<BookwormsDbContext>(opt =>
-	        opt.UseMySQL(connString!));
+	    string? connString = builder.Configuration.GetConnectionString(useDocker ? "Docker" : "Local");
+        builder.Services.AddDbContext<BookwormsDbContext>(o =>
+	        o.UseMySql(connString, serverVersion));
 
         // Use lowercase api endpoints
         builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true); 

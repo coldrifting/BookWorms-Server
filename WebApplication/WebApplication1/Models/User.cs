@@ -1,35 +1,31 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
-using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace WebApplication1.Models;
 
 /// <summary>
 /// Main user object, stored in DB via Entity Framework 
-/// </summary>
 /// <param name="username"></param>
 /// <param name="hash"></param>
 /// <param name="salt"></param>
 /// <param name="name"></param>
 /// <param name="email"></param>
-/// <param name="roles"></param>
-public class User(string username, byte[] hash, byte[] salt, string name, string email, string[] roles)
+/// </summary>
+public class User(string username, byte[] hash, byte[] salt, string name, string email)
 {
-    [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 6)]
-    public string Username { get; init; } = username;
-    
-    public byte[] Hash { get; init; } = hash;
-    public byte[] Salt { get; init; } = salt;
+    [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
+    public string Username { get; set; } = username;
+
+    public byte[] Hash { get; set; } = hash;
+    public byte[] Salt { get; set; } = salt;
 
     [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)]
-    public string Name { get; init; } = name;
-    
+    public string Name { get; set; } = name;
+
     [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     public string Email { get; set; } = email;
 
-    public string[] Roles { get; set; } = roles;
+    public string[] Roles { get; set; } = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,10 +39,10 @@ public class User(string username, byte[] hash, byte[] salt, string name, string
 /// <param name="email"></param>
 public class UserRegisterDTO(string username, string password, string name, string email) 
 {
-    [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 6)]
+    [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     public string Username { get; init; } = username;
     
-    [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 6)]
+    [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     public string Password { get; init; } = password;
 
     [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)]
@@ -56,6 +52,8 @@ public class UserRegisterDTO(string username, string password, string name, stri
     public string Email { get; init; } = email;
 }
 
+public record UserRegisterSuccessDTO(string Username, string Name, string Email, DateTime CreatedAt);
+
 /// <summary>
 /// 
 /// </summary>
@@ -63,10 +61,10 @@ public class UserRegisterDTO(string username, string password, string name, stri
 /// <param name="password"></param>
 public class UserLoginDTO(string username, string password)
 {
-    [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 6)]
+    [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     public string Username { get; init; } = username;
     
-    [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 6)]
+    [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     public string Password { get; init; } = password;
 }
 
