@@ -1,3 +1,4 @@
+using DotNet.Testcontainers.Builders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,13 +16,26 @@ public static class Program
 {
     public static void Main(string[] args)
     {
+	    var mysqlContainer = new ContainerBuilder()
+		    .WithImage("mysql:8.4.2")
+		    .WithName("mysql-container")
+		    .WithPortBinding(32770, 3306)
+		    .WithEnvironment("MYSQL_DATABASE", "mysql-db")
+		    .WithEnvironment("MYSQL_USER", "postmaster")
+		    .WithEnvironment("MYSQL_PASSWORD", "password")
+		    .WithEnvironment("MYSQL_ROOT_PASSWORD", "rootpassword")
+		    .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(3306))
+		    .Build();
+
+	    Task.Run(async () => await mysqlContainer.StartAsync()).Wait();
+	    
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         
         // Add services to the container
         // Add our DB Context here
         string? connString = builder.Configuration.GetConnectionString("DBContext");
-        builder.Services.AddDbContext<RestDBContext>(opt =>
-	        opt.UseSqlServer(connString));
+        builder.Services.AddDbContext<BookwormsDbContext>(opt =>
+	        opt.UseMySQL(connString!));
 
         // Use lowercase api endpoints
         builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true); 
@@ -72,6 +86,12 @@ public static class Program
 		builder.Services.AddAuthorization();
 		
         WebApplication app = builder.Build();
+        
+        // Ensure the database is migrated
+        using (var serviceScope = app.Services.CreateScope()) {
+	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<BookwormsDbContext>();
+	        dbContext.Database.Migrate();
+        }
         
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

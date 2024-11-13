@@ -8,7 +8,7 @@ namespace WebApplication1.Controllers;
 [ApiController]
 [Tags("Accounts")]
 [Route("account/[action]")]
-public class UserController(RestDBContext dbContext) : ControllerBase
+public class UserController(BookwormsDbContext dbContext) : ControllerBase
 {
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -40,7 +40,7 @@ public class UserController(RestDBContext dbContext) : ControllerBase
         }
 
         byte[] hash = AuthService.HashPassword(payload.Password, out byte[] salt);
-        User x = new User(payload.Username, hash, salt, payload.Name, payload.Email, []);
+        User x = new User(payload.Username, hash, salt, payload.Name, payload.Email, [""]);
 
         dbContext.Users.Add(x);
         dbContext.SaveChanges();
