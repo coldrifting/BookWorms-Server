@@ -1,8 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
-using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace WebApplication1.Models;
 
@@ -29,6 +26,7 @@ public class User(string username, byte[] hash, byte[] salt, string name, string
     [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     public string Email { get; set; } = email;
 
+    [Column(TypeName = "varchar(100)")]
     public string[] Roles { get; set; } = roles;
 }
 
