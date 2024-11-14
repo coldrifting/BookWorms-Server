@@ -2,7 +2,8 @@
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using WebApplication1.Models;
+using WebApplication1.Models.Data;
+using WebApplication1.Models.Entities;
 
 namespace WebApplication1.Services;
 

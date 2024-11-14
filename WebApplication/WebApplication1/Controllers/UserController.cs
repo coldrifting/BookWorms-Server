@@ -1,6 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Diagnostics;
+using AllOverIt.EntityFrameworkCore.Diagrams;
+using AllOverIt.EntityFrameworkCore.Diagrams.D2;
+using AllOverIt.EntityFrameworkCore.Diagrams.D2.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
+using WebApplication1.Models.Entities;
+using WebApplication1.Models.Data;
 using WebApplication1.Services;
 
 namespace WebApplication1.Controllers;
@@ -8,7 +14,7 @@ namespace WebApplication1.Controllers;
 [ApiController]
 [Tags("Accounts")]
 [Route("account/[action]")]
-public class UserController(BookwormsDbContext dbContext) : ControllerBase
+public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
 {
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -64,4 +70,60 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
 
         return users;
     }
+
+    
+	private static void AddEntityGroups(ErdOptions options)
+	{
+        //options.Group("web", "Web", new ShapeStyle(), entities =>
+        //{
+        //    entities
+        //        .Add<Book>()
+        //        .Add<Bookshelf>();
+        //});
+	}
+	
+    
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public ActionResult DiagramDB()
+    {
+        
+        
+	    var erdFormatter = ErdGenerator
+		    .Create<D2ErdGenerator>(options =>
+		    {
+			    options.Direction = ErdOptions.DiagramDirection.Right;
+
+			    AddEntityGroups(options);
+		    });
+        
+        
+        // This generates the diagram as text
+        var erd = erdFormatter.Generate(dbContext);
+        Console.WriteLine(erd);
+
+        // This generates the diagram, saves it as a text file and exports to SVG, PNG, PDF
+        var exportOptions = new D2ErdExportOptions
+        {      
+            DiagramFileName = "..\\..\\..\\Output Examples\\sample_erd.d2",
+            LayoutEngine = "elk",
+            Theme = Theme.Neutral,
+            Formats = [ExportFormat.Svg, ExportFormat.Png, ExportFormat.Pdf],
+            StandardOutputHandler = LogOutput,
+            ErrorOutputHandler = LogOutput          // Note: d2.exe seems to log everything to the error output
+        };
+
+        erdFormatter.ExportAsync(dbContext, exportOptions);
+
+        return Ok();
+    }
+    
+    private static void LogOutput(object sender, DataReceivedEventArgs e)
+    {
+        if (e.Data is not null)
+        {
+            Console.WriteLine(e.Data);
+        }
+    }
+    
 }

@@ -1,3 +1,7 @@
+using System.Diagnostics;
+using AllOverIt.EntityFrameworkCore.Diagrams;
+using AllOverIt.EntityFrameworkCore.Diagrams.D2;
+using AllOverIt.EntityFrameworkCore.Diagrams.D2.Extensions;
 using DotNet.Testcontainers.Builders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +46,7 @@ public static class Program
         // Add services to the container
         // Add our DB Context here
 	    string? connString = builder.Configuration.GetConnectionString(useDocker ? "Docker" : "Local");
-        builder.Services.AddDbContext<BookwormsDbContext>(o =>
+        builder.Services.AddDbContext<AllBookwormsDbContext>(o =>
 	        o.UseMySql(connString, serverVersion));
 
         // Use lowercase api endpoints
@@ -97,7 +101,7 @@ public static class Program
         
         // Ensure the database is migrated
         using (var serviceScope = app.Services.CreateScope()) {
-	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<BookwormsDbContext>();
+	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<AllBookwormsDbContext>();
 	        dbContext.Database.Migrate();
         }
         
