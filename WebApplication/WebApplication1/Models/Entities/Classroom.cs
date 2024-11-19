@@ -4,17 +4,17 @@ namespace WebApplication1.Models.Entities;
 
 public class Classroom(string classroomName)
 {
-    [Key, StringLength(6, MinimumLength = 6)]
-    public string ClassroomCode { get ; init; } = GenerateClassroomCode();
+    [Key, StringLength(6, MinimumLength = 6, ErrorMessage = "Classroom code must be exactly {0} characters long.")]
+    public string ClassroomCode { get ; set; } = GenerateClassroomCode();
 
-    [StringLength(256)]
+    [StringLength(256, ErrorMessage = "Classroom name cannot be longer than {0} characters.")]
     public string ClassroomName { get; set; } = classroomName;
     
     // Navigation
     
-    public virtual Teacher? Teacher { get; set; }
-    public virtual ICollection<BookshelfClassroom>? BookshelfClassrooms { get; set; }
-    public virtual ICollection<Child>? Children { get; set; }
+    public Teacher? Teacher { get; set; }
+    public ICollection<Child> Children { get; set; } = null!;
+    public ICollection<ClassroomBookshelf> Bookshelves { get; set; } = null!;
 
     private static string GenerateClassroomCode()
     {

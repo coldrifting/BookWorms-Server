@@ -8,9 +8,11 @@ public class Child(string name, DateOnly dateOfBirth, string parentUsername, str
     [Key]
     public Guid ChildId { get; set; }
     
-    [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)]
+    [StringLength(256, MinimumLength = 2, ErrorMessage = "Child name must be between {2} and {1} characters long.")]
     public string Name { get; set; } = name;
 
+    [Range(typeof(DateOnly), "01/01/1900", "01/01/2100",
+        ErrorMessage = "Child date of birth must fall between {1} and {2}.")]
     public DateOnly DateOfBirth { get; set; } = dateOfBirth;
     
     [StringLength(6)]
@@ -19,18 +21,18 @@ public class Child(string name, DateOnly dateOfBirth, string parentUsername, str
     [StringLength(64)]
     public string ParentUsername { get; set; } = parentUsername;
         
-    [StringLength(6)]
+    [StringLength(6, MinimumLength = 6, ErrorMessage = "Child classroom code must be exactly {0} characters long.")]
     public string? ClassroomCode { get; set; }
     
     // Navigation
     
     [ForeignKey(nameof(ParentUsername))]
-    public Parent Parent { get; set; } = null!;
+    public Parent? Parent { get; set; }
     
     [ForeignKey(nameof(ClassroomCode))]
-    public virtual Classroom? Classroom { get; init; }
+    public Classroom? Classroom { get; set; }
     
-    public virtual ICollection<Completed>? Completed { get; set; }
-    public virtual ICollection<Reading>? Reading { get; set; }
-    public virtual ICollection<BookshelfChild>? Bookshelves { get; set; }
+    public CompletedBookshelf? Completed { get; set; }
+    public InProgressBookshelf? InProgress { get; set; }
+    public ICollection<ChildBookshelf> Bookshelves { get; set; } = null!;
 }

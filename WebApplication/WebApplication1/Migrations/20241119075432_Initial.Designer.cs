@@ -12,7 +12,7 @@ using WebApplication1.Models;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(AllBookwormsDbContext))]
-    [Migration("20241114041923_Initial")]
+    [Migration("20241119075432_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -25,6 +25,21 @@ namespace WebApplication1.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("BookBookshelf", b =>
+                {
+                    b.Property<Guid>("BooksBookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookshelvesBookshelfId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("BooksBookId", "BookshelvesBookshelfId");
+
+                    b.HasIndex("BookshelvesBookshelfId");
+
+                    b.ToTable("BookBookshelf");
+                });
+
             modelBuilder.Entity("WebApplication1.Models.Entities.Book", b =>
                 {
                     b.Property<Guid>("BookId")
@@ -33,7 +48,8 @@ namespace WebApplication1.Migrations
 
                     b.Property<string>("Author")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("Isbn")
                         .IsRequired()
@@ -42,14 +58,16 @@ namespace WebApplication1.Migrations
 
                     b.Property<string>("Level")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)");
 
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
+                    b.Property<double>("StarRating")
+                        .HasColumnType("double");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("BookId");
 
@@ -69,7 +87,9 @@ namespace WebApplication1.Migrations
 
                     b.HasKey("BookshelfId");
 
-                    b.ToTable("Bookshelfs");
+                    b.ToTable("Bookshelves");
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entities.BookshelfBook", b =>
@@ -85,37 +105,6 @@ namespace WebApplication1.Migrations
                     b.HasIndex("BookId");
 
                     b.ToTable("BookshelfBooks");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Entities.BookshelfChild", b =>
-                {
-                    b.Property<Guid>("BookshelfId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("ChildId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("BookshelfId", "ChildId");
-
-                    b.HasIndex("ChildId");
-
-                    b.ToTable("BookshelfChildren");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Entities.BookshelfClassroom", b =>
-                {
-                    b.Property<Guid>("BookshelfId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("ClassroomCode")
-                        .HasMaxLength(6)
-                        .HasColumnType("varchar(6)");
-
-                    b.HasKey("BookshelfId", "ClassroomCode");
-
-                    b.HasIndex("ClassroomCode");
-
-                    b.ToTable("BookshelfClassrooms");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entities.Child", b =>
@@ -170,50 +159,6 @@ namespace WebApplication1.Migrations
                     b.ToTable("Classrooms");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.Entities.Completed", b =>
-                {
-                    b.Property<Guid>("ChildId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.HasKey("ChildId", "BookId");
-
-                    b.HasIndex("BookId");
-
-                    b.ToTable("Completeds");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Entities.Parent", b =>
-                {
-                    b.Property<string>("Username")
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
-
-                    b.HasKey("Username");
-
-                    b.ToTable("Parents");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Entities.Reading", b =>
-                {
-                    b.Property<Guid>("ChildId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("ChildId", "BookId");
-
-                    b.HasIndex("BookId");
-
-                    b.ToTable("Readings");
-                });
-
             modelBuilder.Entity("WebApplication1.Models.Entities.Review", b =>
                 {
                     b.Property<Guid>("ReviewId")
@@ -223,13 +168,13 @@ namespace WebApplication1.Migrations
                     b.Property<Guid>("BookId")
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("Details")
+                    b.Property<string>("ReviewText")
                         .IsRequired()
                         .HasMaxLength(4096)
                         .HasColumnType("varchar(4096)");
 
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
+                    b.Property<double?>("StarRating")
+                        .HasColumnType("double");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -245,29 +190,16 @@ namespace WebApplication1.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.Entities.Teacher", b =>
-                {
-                    b.Property<string>("Username")
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
-
-                    b.Property<string>("ClassroomCode")
-                        .HasMaxLength(6)
-                        .HasColumnType("varchar(6)");
-
-                    b.HasKey("Username");
-
-                    b.HasIndex("ClassroomCode")
-                        .IsUnique();
-
-                    b.ToTable("Teachers");
-                });
-
             modelBuilder.Entity("WebApplication1.Models.Entities.User", b =>
                 {
                     b.Property<string>("Username")
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("varchar(8)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -294,18 +226,117 @@ namespace WebApplication1.Migrations
                     b.HasKey("Username");
 
                     b.ToTable("Users");
+
+                    b.HasDiscriminator().HasValue("User");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Entities.ChildBookshelf", b =>
+                {
+                    b.HasBaseType("WebApplication1.Models.Entities.Bookshelf");
+
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("ChildId");
+
+                    b.HasIndex("ChildId");
+
+                    b.ToTable("ChildBookshelves");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Entities.ClassroomBookshelf", b =>
+                {
+                    b.HasBaseType("WebApplication1.Models.Entities.Bookshelf");
+
+                    b.Property<string>("ClassroomCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("varchar(6)");
+
+                    b.HasIndex("ClassroomCode");
+
+                    b.ToTable("ClassroomBookshelves");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Entities.CompletedBookshelf", b =>
+                {
+                    b.HasBaseType("WebApplication1.Models.Entities.Bookshelf");
+
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("ChildId");
+
+                    b.HasIndex("ChildId")
+                        .IsUnique();
+
+                    b.ToTable("CompletedBookshelves");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Entities.InProgressBookshelf", b =>
+                {
+                    b.HasBaseType("WebApplication1.Models.Entities.Bookshelf");
+
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("ChildId");
+
+                    b.HasIndex("ChildId")
+                        .IsUnique();
+
+                    b.ToTable("InProgressBookshelves");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Entities.Parent", b =>
+                {
+                    b.HasBaseType("WebApplication1.Models.Entities.User");
+
+                    b.ToTable("Users");
+
+                    b.HasDiscriminator().HasValue("Parent");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Entities.Teacher", b =>
+                {
+                    b.HasBaseType("WebApplication1.Models.Entities.User");
+
+                    b.Property<string>("ClassroomCode")
+                        .HasMaxLength(6)
+                        .HasColumnType("varchar(6)");
+
+                    b.HasIndex("ClassroomCode")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+
+                    b.HasDiscriminator().HasValue("Teacher");
+                });
+
+            modelBuilder.Entity("BookBookshelf", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Entities.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BooksBookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.Entities.Bookshelf", null)
+                        .WithMany()
+                        .HasForeignKey("BookshelvesBookshelfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entities.BookshelfBook", b =>
                 {
                     b.HasOne("WebApplication1.Models.Entities.Book", "Book")
-                        .WithMany("Bookshelves")
+                        .WithMany("BookshelfBooks")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebApplication1.Models.Entities.Bookshelf", "Bookshelf")
-                        .WithMany("Books")
+                        .WithMany("BookshelfBooks")
                         .HasForeignKey("BookshelfId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -313,44 +344,6 @@ namespace WebApplication1.Migrations
                     b.Navigation("Book");
 
                     b.Navigation("Bookshelf");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Entities.BookshelfChild", b =>
-                {
-                    b.HasOne("WebApplication1.Models.Entities.Bookshelf", "Bookshelf")
-                        .WithMany("ChildBookshelves")
-                        .HasForeignKey("BookshelfId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebApplication1.Models.Entities.Child", "Child")
-                        .WithMany("Bookshelves")
-                        .HasForeignKey("ChildId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bookshelf");
-
-                    b.Navigation("Child");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Entities.BookshelfClassroom", b =>
-                {
-                    b.HasOne("WebApplication1.Models.Entities.Bookshelf", "Bookshelf")
-                        .WithMany("ClassroomBookshelves")
-                        .HasForeignKey("BookshelfId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebApplication1.Models.Entities.Classroom", "Classroom")
-                        .WithMany("BookshelfClassrooms")
-                        .HasForeignKey("ClassroomCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bookshelf");
-
-                    b.Navigation("Classroom");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entities.Child", b =>
@@ -368,55 +361,6 @@ namespace WebApplication1.Migrations
                     b.Navigation("Classroom");
 
                     b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Entities.Completed", b =>
-                {
-                    b.HasOne("WebApplication1.Models.Entities.Book", "Book")
-                        .WithMany("Completeds")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebApplication1.Models.Entities.Child", "Child")
-                        .WithMany("Completed")
-                        .HasForeignKey("ChildId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Book");
-
-                    b.Navigation("Child");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Entities.Parent", b =>
-                {
-                    b.HasOne("WebApplication1.Models.Entities.User", "User")
-                        .WithOne("Parent")
-                        .HasForeignKey("WebApplication1.Models.Entities.Parent", "Username")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Entities.Reading", b =>
-                {
-                    b.HasOne("WebApplication1.Models.Entities.Book", "Book")
-                        .WithMany("Readings")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebApplication1.Models.Entities.Child", "Child")
-                        .WithMany("Reading")
-                        .HasForeignKey("ChildId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Book");
-
-                    b.Navigation("Child");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entities.Review", b =>
@@ -438,41 +382,93 @@ namespace WebApplication1.Migrations
                     b.Navigation("Reviewer");
                 });
 
+            modelBuilder.Entity("WebApplication1.Models.Entities.ChildBookshelf", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Entities.Bookshelf", null)
+                        .WithOne()
+                        .HasForeignKey("WebApplication1.Models.Entities.ChildBookshelf", "BookshelfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.Entities.Child", "Child")
+                        .WithMany("Bookshelves")
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Child");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Entities.ClassroomBookshelf", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Entities.Bookshelf", null)
+                        .WithOne()
+                        .HasForeignKey("WebApplication1.Models.Entities.ClassroomBookshelf", "BookshelfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.Entities.Classroom", "Classroom")
+                        .WithMany("Bookshelves")
+                        .HasForeignKey("ClassroomCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Classroom");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Entities.CompletedBookshelf", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Entities.Bookshelf", null)
+                        .WithOne()
+                        .HasForeignKey("WebApplication1.Models.Entities.CompletedBookshelf", "BookshelfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.Entities.Child", "Child")
+                        .WithOne("Completed")
+                        .HasForeignKey("WebApplication1.Models.Entities.CompletedBookshelf", "ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Child");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Entities.InProgressBookshelf", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Entities.Bookshelf", null)
+                        .WithOne()
+                        .HasForeignKey("WebApplication1.Models.Entities.InProgressBookshelf", "BookshelfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.Entities.Child", "Child")
+                        .WithOne("InProgress")
+                        .HasForeignKey("WebApplication1.Models.Entities.InProgressBookshelf", "ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Child");
+                });
+
             modelBuilder.Entity("WebApplication1.Models.Entities.Teacher", b =>
                 {
                     b.HasOne("WebApplication1.Models.Entities.Classroom", "Classroom")
                         .WithOne("Teacher")
                         .HasForeignKey("WebApplication1.Models.Entities.Teacher", "ClassroomCode");
 
-                    b.HasOne("WebApplication1.Models.Entities.User", "User")
-                        .WithOne("Teacher")
-                        .HasForeignKey("WebApplication1.Models.Entities.Teacher", "Username")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Classroom");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entities.Book", b =>
                 {
-                    b.Navigation("Bookshelves");
-
-                    b.Navigation("Completeds");
-
-                    b.Navigation("Readings");
+                    b.Navigation("BookshelfBooks");
 
                     b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entities.Bookshelf", b =>
                 {
-                    b.Navigation("Books");
-
-                    b.Navigation("ChildBookshelves");
-
-                    b.Navigation("ClassroomBookshelves");
+                    b.Navigation("BookshelfBooks");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entities.Child", b =>
@@ -481,30 +477,26 @@ namespace WebApplication1.Migrations
 
                     b.Navigation("Completed");
 
-                    b.Navigation("Reading");
+                    b.Navigation("InProgress");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entities.Classroom", b =>
                 {
-                    b.Navigation("BookshelfClassrooms");
+                    b.Navigation("Bookshelves");
 
                     b.Navigation("Children");
 
                     b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Entities.User", b =>
+                {
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entities.Parent", b =>
                 {
                     b.Navigation("Children");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Entities.User", b =>
-                {
-                    b.Navigation("Parent");
-
-                    b.Navigation("Reviews");
-
-                    b.Navigation("Teacher");
                 });
 #pragma warning restore 612, 618
         }
