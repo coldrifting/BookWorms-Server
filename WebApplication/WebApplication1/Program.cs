@@ -1,7 +1,3 @@
-using System.Diagnostics;
-using AllOverIt.EntityFrameworkCore.Diagrams;
-using AllOverIt.EntityFrameworkCore.Diagrams.D2;
-using AllOverIt.EntityFrameworkCore.Diagrams.D2.Extensions;
 using DotNet.Testcontainers.Builders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -14,41 +10,39 @@ using WebApplication1.Services;
 
 namespace WebApplication1;
 
-// The following URL is very helpful for understanding the basics of how ASP.Net works
-// https://medium.com/net-core/build-a-restful-web-api-with-asp-net-core-6-30747197e229
 public static class Program
 {
     public static void Main(string[] args)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         
-	    bool useDocker = builder.Configuration.GetValue<bool>("UseDocker");
+        
+        // Establish database context ----------------------------------------------------------------------------------
+        
+	    bool isDev = builder.Environment.IsDevelopment();
+	    string? connectionString = builder.Configuration.GetConnectionString(isDev ? "Dev" : "TestContainer");
+	    var serverVersion = new MySqlServerVersion(new Version(8, 4, 2));
 
-	    if (useDocker)
+	    if (!isDev)
 	    {
 		    var mysqlContainer = new ContainerBuilder()
 			    .WithImage("mysql:8.4.2")
 			    .WithName("mysql-container")
-			    .WithPortBinding(32770, 3306)
+			    .WithPortBinding(3306, 3306)
 			    .WithEnvironment("MYSQL_DATABASE", "mysql-db")
-			    .WithEnvironment("MYSQL_USER", "postmaster")
-			    .WithEnvironment("MYSQL_PASSWORD", "password")
-			    .WithEnvironment("MYSQL_ROOT_PASSWORD", "root")
+			    .WithEnvironment("MYSQL_ROOT_PASSWORD", "password")
 			    .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(3306))
 			    .Build();
 
 		    Task.Run(async () => await mysqlContainer.StartAsync()).Wait();
 	    }
-	    
-        
-        var serverVersion = new MySqlServerVersion(new Version(8, 4, 2));
-        
-        // Add services to the container
-        // Add our DB Context here
-	    string? connString = builder.Configuration.GetConnectionString(useDocker ? "Docker" : "Local");
-        builder.Services.AddDbContext<AllBookwormsDbContext>(o =>
-	        o.UseMySql(connString, serverVersion));
 
+	    builder.Services.AddDbContext<AllBookwormsDbContext>(o =>
+		    o.UseMySql(connectionString, serverVersion));
+
+	    
+	    // Configure Swagger -------------------------------------------------------------------------------------------
+	    
         // Use lowercase api endpoints
         builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true); 
         
@@ -65,8 +59,8 @@ public static class Program
 			opt.OperationFilter<AuthenticationFilter>();
 			
 			// Setup authorize box
-			opt.SwaggerDoc("v1", new() { Title = "MyAPI", Version = "v1" });
-			opt.AddSecurityDefinition("Bearer", new()
+			opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
+			opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
 			{
 				Name = "Authorization",
 				Description = "Enter API Token Here",
@@ -86,7 +80,7 @@ public static class Program
 		    {
 		        opt.RequireHttpsMetadata = false;
 		        opt.SaveToken = true;
-		        opt.TokenValidationParameters = new()
+		        opt.TokenValidationParameters = new TokenValidationParameters
 		        {
 			        IssuerSigningKey = new SymmetricSecurityKey(AuthService.SecretBytes),
 			        ValidateIssuer = false,
@@ -99,13 +93,18 @@ public static class Program
 		
         WebApplication app = builder.Build();
         
-        // Ensure the database is migrated
+        
+        // Ensure the database is migrated -----------------------------------------------------------------------------
+        
+        // (This is best done here, after the WebApplication has been created)
         using (var serviceScope = app.Services.CreateScope()) {
 	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<AllBookwormsDbContext>();
 	        dbContext.Database.Migrate();
         }
         
-        // Configure the HTTP request pipeline.
+        
+        // Configure the HTTP request pipeline -------------------------------------------------------------------------
+        
         if (app.Environment.IsDevelopment())
         {
 	        app.UseStaticFiles();
@@ -134,6 +133,9 @@ public static class Program
 
         // Endpoints can be split into separate files in the Controllers folder
         app.MapControllers();
+        
+        
+        // -------------------------------------------------------------------------------------------------------------
         
         app.Run();
     }
