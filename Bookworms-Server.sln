@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bookworms-Server", "Bookworms-Server\Bookworms-Server.csproj", "{A28E8ACD-463F-4E64-A074-97E7E6C45972}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bookworms-Server-Testing", "Bookworms-Server-Testing\Bookworms-Server-Testing.csproj", "{B0F2D56C-762A-493C-B940-5005DCEEA874}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A28E8ACD-463F-4E64-A074-97E7E6C45972}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A28E8ACD-463F-4E64-A074-97E7E6C45972}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A28E8ACD-463F-4E64-A074-97E7E6C45972}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A28E8ACD-463F-4E64-A074-97E7E6C45972}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0F2D56C-762A-493C-B940-5005DCEEA874}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0F2D56C-762A-493C-B940-5005DCEEA874}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0F2D56C-762A-493C-B940-5005DCEEA874}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0F2D56C-762A-493C-B940-5005DCEEA874}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {11B47DF6-0FF5-49B2-BE92-6CC7EBC5A294}
+	EndGlobalSection
+EndGlobal
