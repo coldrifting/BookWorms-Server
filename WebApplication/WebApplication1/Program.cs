@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MySqlConnector;
 using WebApplication1.Filters;
 using WebApplication1.Models;
 using WebApplication1.Services;
@@ -19,19 +20,30 @@ public static class Program
         
         // Establish database context ----------------------------------------------------------------------------------
         
-	    bool isDev = builder.Environment.IsDevelopment();
-	    string? connectionString = builder.Configuration.GetConnectionString(isDev ? "Dev" : "TestContainer");
-	    var serverVersion = new MySqlServerVersion(new Version(8, 4, 2));
+	    string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+	    string? databaseVersion = builder.Configuration.GetValue<string>("Database:Version");
 
-	    if (!isDev)
+	    if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(databaseVersion))
 	    {
+		    Console.Error.WriteLine("Please specify a valid connection string and MySQL database version in " +
+		                            $"appsettings.{builder.Environment.EnvironmentName}.json.");
+		    return;
+	    }
+	    
+	    var serverVersion = new MySqlServerVersion(new Version(databaseVersion));
+
+	    if (builder.Configuration.GetValue("Database:TestContainer:Use", false))
+	    {
+		    MySqlConnectionStringBuilder connString = new MySqlConnectionStringBuilder(connectionString);
+		    int hostPort = builder.Configuration.GetValue("Database:TestContainer:HostPort", 3306);
 		    var mysqlContainer = new ContainerBuilder()
-			    .WithImage("mysql:8.4.2")
+			    .WithImage($"mysql:{databaseVersion}")
 			    .WithName("mysql-container")
-			    .WithPortBinding(3306, 3306)
-			    .WithEnvironment("MYSQL_DATABASE", "mysql-db")
-			    .WithEnvironment("MYSQL_ROOT_PASSWORD", "password")
-			    .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(3306))
+			    .WithPortBinding(hostPort, (int)connString.Port)
+			    .WithEnvironment("MYSQL_DATABASE", connString.Database)
+			    .WithEnvironment("MYSQL_USER", connString.UserID)
+			    .WithEnvironment("MYSQL_ROOT_PASSWORD", connString.Password)
+			    .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(hostPort))
 			    .Build();
 
 		    Task.Run(async () => await mysqlContainer.StartAsync()).Wait();
