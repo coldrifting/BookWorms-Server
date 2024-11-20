@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BookwormsServer.Models.Entities;
 
 [Table("Books")]
-public class Book(string isbn, string title, string author, string level)
+public class Book(string bookId, string isbn, string title, string author, string level)
 {
     [Key]
-    public Guid BookId { get; set; }
+    [StringLength(20)]
+    public string BookId { get; set; } = bookId;
     
     [StringLength(14)] 
     public string Isbn { get; set; } = isbn;

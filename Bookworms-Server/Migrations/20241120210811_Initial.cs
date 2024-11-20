@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BookwormsServer
+namespace BookWormsServer.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -18,7 +18,8 @@ namespace BookwormsServer
                 name: "Books",
                 columns: table => new
                 {
-                    BookId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Isbn = table.Column<string>(type: "varchar(14)", maxLength: 14, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Title = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
@@ -68,7 +69,8 @@ namespace BookwormsServer
                 name: "BookBookshelf",
                 columns: table => new
                 {
-                    BooksBookId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BooksBookId = table.Column<string>(type: "varchar(20)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     BookshelvesBookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
@@ -94,7 +96,8 @@ namespace BookwormsServer
                 columns: table => new
                 {
                     BookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    BookId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                    BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -207,12 +210,13 @@ namespace BookwormsServer
                 columns: table => new
                 {
                     ReviewId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    BookId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Username = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ReviewText = table.Column<string>(type: "varchar(4096)", maxLength: 4096, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    StarRating = table.Column<double>(type: "double", nullable: true)
+                    StarRating = table.Column<double>(type: "double", nullable: false),
+                    ReviewText = table.Column<string>(type: "varchar(4096)", maxLength: 4096, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {

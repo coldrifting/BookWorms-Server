@@ -1,0 +1,16 @@
+﻿[
+  {
+    "ReviewId": "99b782a6-ecc6-43b2-b9ee-592367de4232",
+    "BookId": "1IleAgAAQBAJ",
+    "Username": "teacher1",
+    "StarRating": 5.0,
+    "ReviewText": "I like trees"
+  },
+  {
+    "ReviewId": "767910f9-d21d-4a8e-9fef-1e1c1489c778",
+    "BookId": "1IleAgAAQBAJ",
+    "Username": "parent1",
+    "StarRating": 4.5,
+    "ReviewText": "I like green"
+  }
+]
