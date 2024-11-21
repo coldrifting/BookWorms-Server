@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BookwormsServer
+namespace BookWormsServer.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -18,16 +18,19 @@ namespace BookwormsServer
                 name: "Books",
                 columns: table => new
                 {
-                    BookId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    Isbn = table.Column<string>(type: "varchar(14)", maxLength: 14, nullable: false)
+                    BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Isbn10 = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Isbn13 = table.Column<string>(type: "varchar(13)", maxLength: 13, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Title = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Author = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
+                    Authors = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Level = table.Column<string>(type: "varchar(16)", maxLength: 16, nullable: false)
+                    Level = table.Column<string>(type: "varchar(16)", maxLength: 16, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    StarRating = table.Column<double>(type: "double", nullable: false)
+                    StarRating = table.Column<double>(type: "double", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -68,7 +71,8 @@ namespace BookwormsServer
                 name: "BookBookshelf",
                 columns: table => new
                 {
-                    BooksBookId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BooksBookId = table.Column<string>(type: "varchar(20)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     BookshelvesBookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
@@ -94,7 +98,8 @@ namespace BookwormsServer
                 columns: table => new
                 {
                     BookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    BookId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                    BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -207,12 +212,13 @@ namespace BookwormsServer
                 columns: table => new
                 {
                     ReviewId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    BookId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Username = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ReviewText = table.Column<string>(type: "varchar(4096)", maxLength: 4096, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    StarRating = table.Column<double>(type: "double", nullable: true)
+                    StarRating = table.Column<double>(type: "double", nullable: false),
+                    ReviewText = table.Column<string>(type: "varchar(4096)", maxLength: 4096, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {

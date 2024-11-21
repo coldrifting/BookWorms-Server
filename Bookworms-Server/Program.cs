@@ -6,7 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MySqlConnector;
 using BookwormsServer.Filters;
+using BookwormsServer.Models.Entities;
 using BookwormsServer.Services;
+using BookwormsServer.Services.Interfaces;
+using Newtonsoft.Json;
 
 namespace BookwormsServer;
 
@@ -106,6 +109,15 @@ public partial class Program
 		        opt.Events = AuthService.BearerEvents();
 		    });
 		builder.Services.AddAuthorization();
+        
+        
+		// Register services -------------------------------------------------------------------------------------------
+		// (Dependency Injections)
+		
+		builder.Services.AddSingleton<IBookApiService, GoogleBooksApiService>();
+		
+		// -------------------------------------------------------------------------------------------------------------
+		
 		
         WebApplication app = builder.Build();
         
@@ -150,9 +162,34 @@ public partial class Program
         // Endpoints can be split into separate files in the Controllers folder
         app.MapControllers();
         
+        // Persist test data -------------------------------------------------------------------------------------------
+
+        using (var serviceScope = app.Services.CreateScope()) {
+	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<AllBookwormsDbContext>();
+	        try
+	        {
+		        PersistTestData(dbContext);
+	        }
+	        catch (Exception)
+	        {
+		        Console.WriteLine("Test data already in DB");
+	        }
+        }
         
         // -------------------------------------------------------------------------------------------------------------
         
         app.Run();
+    }
+
+    private static void PersistTestData(AllBookwormsDbContext dbContext)
+    {
+		List<User> users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText("TestData/UserEntities.json"))!;
+		List<Book> books = JsonConvert.DeserializeObject<List<Book>>(File.ReadAllText("TestData/BookEntities.json"))!;
+		List<Review> reviews = JsonConvert.DeserializeObject<List<Review>>(File.ReadAllText("TestData/ReviewEntities.json"))!;
+		
+		dbContext.Users.AddRange(users);
+		dbContext.Books.AddRange(books);
+		dbContext.Reviews.AddRange(reviews);
+		dbContext.SaveChanges();
     }
 }

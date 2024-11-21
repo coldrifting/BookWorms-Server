@@ -1,0 +1,18 @@
+﻿[
+  {
+    "Username": "teacher1",
+    "Hash": [175, 228, 76, 227, 141, 65, 221, 109, 84, 211],
+    "Salt": [233, 48, 52, 123, 197, 68, 87, 115, 111, 54],
+    "Name": "Sally Field",
+    "Email": "sallyfield@yahoo.com",
+    "Roles": ["User"]
+  },
+  {
+    "Username": "parent1",
+    "Hash": [23, 172, 136, 105, 151, 114, 115, 247, 102, 134],
+    "Salt": [49, 9, 61, 186, 202, 157, 197, 170, 100, 186],
+    "Name": "Audrey Hepburn",
+    "Email": "audreyhepburn@gmail.com",
+    "Roles": ["User"]
+  }
+]
