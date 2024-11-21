@@ -166,14 +166,10 @@ public partial class Program
 
         using (var serviceScope = app.Services.CreateScope()) {
 	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<AllBookwormsDbContext>();
-	        try
-	        {
-		        PersistTestData(dbContext);
-	        }
-	        catch (Exception)
-	        {
-		        Console.WriteLine("Test data already in DB");
-	        }
+	        dbContext.Users.ExecuteDelete();
+	        dbContext.Books.ExecuteDelete();
+	        dbContext.Reviews.ExecuteDelete();
+	        PersistTestData(dbContext);
         }
         
         // -------------------------------------------------------------------------------------------------------------
@@ -184,11 +180,14 @@ public partial class Program
     private static void PersistTestData(AllBookwormsDbContext dbContext)
     {
 		List<User> users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText("TestData/UserEntities.json"))!;
-		List<Book> books = JsonConvert.DeserializeObject<List<Book>>(File.ReadAllText("TestData/BookEntities.json"))!;
-		List<Review> reviews = JsonConvert.DeserializeObject<List<Review>>(File.ReadAllText("TestData/ReviewEntities.json"))!;
-		
 		dbContext.Users.AddRange(users);
+		dbContext.SaveChanges();
+		
+		List<Book> books = JsonConvert.DeserializeObject<List<Book>>(File.ReadAllText("TestData/BookEntities.json"))!;
 		dbContext.Books.AddRange(books);
+		dbContext.SaveChanges();
+		
+		List<Review> reviews = JsonConvert.DeserializeObject<List<Review>>(File.ReadAllText("TestData/ReviewEntities.json"))!;
 		dbContext.Reviews.AddRange(reviews);
 		dbContext.SaveChanges();
     }

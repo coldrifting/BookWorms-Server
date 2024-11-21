@@ -1,10 +1,168 @@
 ﻿[
   {
     "BookId": "1IleAgAAQBAJ",
-    "Isbn": "9780061965104",
+    "Isbn10": "0061965103",
+    "Isbn13": "9780061965104",
     "Title": "The Giving Tree",
-    "Author": "Shel Silverstein",
+    "Authors": [
+      "Shel Silverstein"
+    ],
     "Level": "A1",
     "StarRating": 4.3
+  },
+  {
+    "BookId": "VnAkAQAAMAAJ",
+    "Isbn10": "",
+    "Isbn13": "",
+    "Title": "The Three Robbers",
+    "Authors": [
+      "Tomi Ungerer"
+    ],
+    "Level": "B1",
+    "StarRating": 4.5
+  },
+  {
+    "BookId": "1YU0MQAACAAJ",
+    "Isbn10": "0448189119",
+    "Isbn13": "9780448189116",
+    "Title": "While the Clock Ticked",
+    "Authors": [
+      "Franklin W. Dixon"
+    ],
+    "Level": "F5",
+    "StarRating": 2.3
+  },
+  {
+    "BookId": "bSSW15rcQbsC",
+    "Isbn10": "0975986805",
+    "Isbn13": "9780975986806",
+    "Title": "The Giving Book",
+    "Authors": [
+      "Ellen Sabin"
+    ],
+    "Level": "C2",
+    "StarRating": 3.7
+  },
+  {
+    "BookId": "Sj5MWqEPsDkC",
+    "Isbn10": "0545000157",
+    "Isbn13": "9780545000154",
+    "Title": "The Silver Door",
+    "Authors": [
+      "Holly Lisle"
+    ],
+    "Level": "H5",
+    "StarRating": 3.3
+  },
+  {
+    "BookId": "a-0C_BKFmY4C",
+    "Isbn10": "1455615110",
+    "Isbn13": "9781455615117",
+    "Title": "The Magic of Giving",
+    "Authors": [
+      ""
+    ],
+    "Level": "T3",
+    "StarRating": 0.5
+  },
+  {
+    "BookId": "mF34zQEACAAJ",
+    "Isbn10": "1735966517",
+    "Isbn13": "9781735966519",
+    "Title": "The Little Book of Giving",
+    "Authors": [
+      "zack bush",
+      "Laurie Friedman"
+    ],
+    "Level": "G3",
+    "StarRating": 2.5
+  },
+  {
+    "BookId": "sQSDzQEACAAJ",
+    "Isbn10": "1951287339",
+    "Isbn13": "9781951287337",
+    "Title": "A Little SPOT of Giving",
+    "Authors": [
+      "Diane Alber"
+    ],
+    "Level": "J8",
+    "StarRating": 4.3
+  },
+  {
+    "BookId": "jXvSDwAAQBAJ",
+    "Isbn10": "1683359046",
+    "Isbn13": "9781683359043",
+    "Title": "The Giving Day",
+    "Authors": [
+      "Cori Doerrfeld"
+    ],
+    "Level": "Z2",
+    "StarRating": 3.3
+  },
+  {
+    "BookId": "IUnGtgEACAAJ",
+    "Isbn10": "0999026933",
+    "Isbn13": "9780999026939",
+    "Title": "The Giving Sack",
+    "Authors": [
+      ""
+    ],
+    "Level": "F9",
+    "StarRating": 5.0
+  },
+  {
+    "BookId": "_BxZ71b-u5QC",
+    "Isbn10": "1429980567",
+    "Isbn13": "9781429980562",
+    "Title": "A Boy Named Shel",
+    "Authors": [
+      "Lisa Rogak"
+    ],
+    "Level": "E8",
+    "StarRating": 3.8
+  },
+  {
+    "BookId": "XlrMDwAAQBAJ",
+    "Isbn10": "0062999699",
+    "Isbn13": "9780062999696",
+    "Title": "Falling Up",
+    "Authors": [
+      "Shel Silverstein"
+    ],
+    "Level": "J1",
+    "StarRating": 2.3
+  },
+  {
+    "BookId": "_kaGDwAAQBAJ",
+    "Isbn10": "1536204714",
+    "Isbn13": "9781536204711",
+    "Title": "My Sweet Orange Tree",
+    "Authors": [
+      "Jos\u00c3\u00a9 Mauro de Vasconcelos"
+    ],
+    "Level": "S1",
+    "StarRating": 1.0
+  },
+  {
+    "BookId": "KkIwzwEACAAJ",
+    "Isbn10": "0060256710",
+    "Isbn13": "9780060256715",
+    "Title": "The Missing Piece",
+    "Authors": [
+      "Shel Silverstein"
+    ],
+    "Level": "T2",
+    "StarRating": 1.0
+  },
+  {
+    "BookId": "aG-9DAAAQBAJ",
+    "Isbn10": "1338153609",
+    "Isbn13": "9781338153606",
+    "Title": "Old Turtle and the Broken Truth",
+    "Authors": [
+      "Douglas Wood"
+    ],
+    "Level": "L2",
+    "StarRating": 1.5
   }
 ]

@@ -1,18 +1,122 @@
 ﻿[
   {
-    "Username": "teacher1",
+    "Username": "teacher0",
     "Hash": [175, 228, 76, 227, 141, 65, 221, 109, 84, 211],
     "Salt": [233, 48, 52, 123, 197, 68, 87, 115, 111, 54],
     "Name": "Sally Field",
     "Email": "sallyfield@yahoo.com",
-    "Roles": ["User"]
+    "Roles": [
+      "Teacher"
+    ]
   },
   {
-    "Username": "parent1",
+    "Username": "parent0",
     "Hash": [23, 172, 136, 105, 151, 114, 115, 247, 102, 134],
     "Salt": [49, 9, 61, 186, 202, 157, 197, 170, 100, 186],
     "Name": "Audrey Hepburn",
     "Email": "audreyhepburn@gmail.com",
-    "Roles": ["User"]
+    "Roles": [
+      "Parent"
+    ]
+  },
+  {
+    "Username": "teacher1",
+    "Hash": "952828a7d903019855977a24dab123c4a5fe85f277729d49e04848d1cb2dc7abd84a54b6d5cc4eed2b4f6b2b70231a7a0a707f2f36fbe908355c153e410ea6d1",
+    "Salt": "c9dd36b88f7cc44acad70039171dde4c7b69cb92ad61c0f6a7c2ed0c2d7f5ddb2cd8a2451b37f4dfce4d32056b8e92de8d8becaaa7117ceab3516b6a6d5056cd",
+    "Name": "Emma Johnson",
+    "Email": "emma.johnson@yahoo.com",
+    "Roles": [
+      "Teacher"
+    ]
+  },
+  {
+    "Username": "parent1",
+    "Hash": "8f9601cb9955f378c92ec271c16bf9ea577709293019613b88dab0dddfcce08fb733a2372eb7547471c7e16047a8faf18813d0b94da3033a13c95b9edb48216b",
+    "Salt": "720ad4c4a3ee98c87c0bdb291a39d242420a674dbf540bf1b231b9b3308c4c2cd844695885dcdc89bc8531200ad95f9dd12bd6292584458784e911d67324f042",
+    "Name": "Liam Smith",
+    "Email": "liam.smith@hotmail.com",
+    "Roles": [
+      "Parent"
+    ]
+  },
+  {
+    "Username": "teacher2",
+    "Hash": "be046d52288edc7db287caaad062c0407d5cc5b50a7e6056d0e4c91c80b82a5bf7a847a6031d2dc1a13aec55563f095f28c81853401ab81662b3527983fc840d",
+    "Salt": "4f5f82af5f0c1b21c2d7d9c0520fd41d55f25f91df68c1e85b0fcd7f76b0d969aa3f47bd9bed0818aa7b7da0e52d58b7182e4a1e4813970fd18223210e5a0160",
+    "Name": "Olivia Brown",
+    "Email": "olivia.brown@aol.com",
+    "Roles": [
+      "Teacher"
+    ]
+  },
+  {
+    "Username": "parent2",
+    "Hash": "e66bba3f839589fc38a5da8fc38b88758299812d9a60c80c8153924b175b0c081311cba0acf629c8167ccbae758fb50af58bbd69609eefba9f09c3d0c654647f",
+    "Salt": "ec83d93c2711e3b65a94288d9126d1ddd9a741b39851bb6dd13d6197a1bccf9ed0fe66fc5348df9775bb8160e70c5328648d9b53844d0546275877d8ad55d4d1",
+    "Name": "Noah Davis",
+    "Email": "noah.davis@outlook.com",
+    "Roles": [
+      "Parent"
+    ]
+  },
+  {
+    "Username": "teacher3",
+    "Hash": "905280f757073b2b00732f99273ae1af1d8b8bfcc5bf4a205833dfbeec27d2f4a217d3de0e4792b8f8d19865e6381c1a36f2786a9b1e5223463dbfee784cc3da",
+    "Salt": "c4f80970a7e6abfec8e775e1ffaf20c0b8a4ccc0f5cebbd8c1afb1c9926232c211a1dfeafed3062ced364ee70c05110f3ee65fd366d58ebce35db66128b84862",
+    "Name": "Ava Wilson",
+    "Email": "ava.wilson@hotmail.com",
+    "Roles": [
+      "Teacher"
+    ]
+  },
+  {
+    "Username": "parent3",
+    "Hash": "10c1006937e89e1a5e5add6be46ce9922f3b0d739fe53937330965f7bc771fde58738aaf17d78e9667c677d75249e27348eac31b6ffcf1a7910803714a9f826b",
+    "Salt": "d0da3fb0de8dedd5a53552ec44bf3a819a02586a06e6791e6e0c776e7a216633661c19d646104dcc288c73fb3a5c02d240d4ac92da7f170c9c90a102c132f4f9",
+    "Name": "William Martinez",
+    "Email": "william.martinez@gmail.com",
+    "Roles": [
+      "Parent"
+    ]
+  },
+  {
+    "Username": "teacher4",
+    "Hash": "aba7242c62182e951f5c231f5bcfdefc0a642f48382cca8a27beeaa2e885ce107c241110c409d9235d6e4577808df9249df68096465529f472485816ba8695ea",
+    "Salt": "f8d47daf9d0c5b2c962771f30f241d7e69a30083a8f71b6a99f83f41077630bbaa754177d9a6158e78e499180c09667f9d339e139b3c95673bdc82ee80e732f9",
+    "Name": "Sophia Anderson",
+    "Email": "sophia.anderson@gmail.com",
+    "Roles": [
+      "Teacher"
+    ]
+  },
+  {
+    "Username": "parent4",
+    "Hash": "de0b6ff0677d154509da2ff4b522625407c517c893759e22056acbbefafe7b4f0e5a8ebd7174a05de9aef70d369a2d238143bdc107eed238284a350a688e04d8",
+    "Salt": "9639872f33ec3f6e4d58ac65885caf5c0b2ccdd6724bf1fd9321c82e7bad903bf49ccb7944fa37effde0cbae1ee2367bb9fe9358d9e85badb318f810fe885c59",
+    "Name": "James Taylor",
+    "Email": "james.taylor@gmail.com",
+    "Roles": [
+      "Parent"
+    ]
+  },
+  {
+    "Username": "teacher5",
+    "Hash": "cb05c81b3b4ecdca71e774d3a9e46feefe6854608c88838920c7fe3e73f6b9339f2e9b6a69f1cb10443ac8193c51db37b1ae4de430978c5dd394bd78c4a7c750",
+    "Salt": "18a5b188c92029cfe326a77cf9d89537a4767ef3e31238d9c5ab7448ed0893f89ddbe73871bcc060b6f4d3788b62e493ee3df478a6fe90ebc15eb00b931ee751",
+    "Name": "Isabella Thomas",
+    "Email": "isabella.thomas@aol.com",
+    "Roles": [
+      "Teacher"
+    ]
+  },
+  {
+    "Username": "parent5",
+    "Hash": "6dc7c25ac31f1349c23f2f6863be81ed22405872f1b1675bb22a76aa0a01b4179705e4fddfbce4bca0fb30b822d72fd916490310ebe1070cdb45f0ac8596b380",
+    "Salt": "042f46ad2a05932c2de1ea8c04402acedece54fa1cdc718bc74d052b64e409c56fd1ab0c23fae362df1ec5d71a4cb075223dab9c45892c535566c019f8ff6ae2",
+    "Name": "Benjamin Moore",
+    "Email": "benjamin.moore@gmail.com",
+    "Roles": [
+      "Parent"
+    ]
   }
 ]
