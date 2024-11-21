@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BookwormsServer.Models.Entities;
 
 [Table("Books")]
-public class Book(string bookId, string isbn, string title, string author, string level)
+public class Book(string bookId, string isbn, string title, List<string> authors)
 {
     [Key]
     [StringLength(20)]
@@ -16,14 +16,13 @@ public class Book(string bookId, string isbn, string title, string author, strin
     [StringLength(256, ErrorMessage = "Book title cannot be longer than {0} characters.")]
     public string Title { get; set; } = title;
     
-    [StringLength(256, ErrorMessage = "Author name cannot be longer than {0} characters.")]
-    public string Author { get; set; } = author;
+    public List<string> Authors { get; set; } = authors;
     
     [StringLength(16)]
-    public string Level { get; set; } = level;
+    public string? Level { get; set; }
 
     [Range(0, 5, ErrorMessage = "Star rating must be between {0} and {1}.")]
-    public double StarRating { get; set; }
+    public double? StarRating { get; set; }
     
     // Navigation
     

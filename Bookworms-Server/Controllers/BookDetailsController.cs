@@ -19,11 +19,17 @@ public class BookDetailsController(AllBookwormsDbContext dbContext, IBookApiServ
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult Get(string bookId)
     {
-        Book bookEntity = dbContext.Books
+        Book? bookEntity = dbContext.Books
             .Include(b => b.Reviews).ThenInclude(r => r.Reviewer)
-            .Single(b => b.BookId == bookId);
+            .SingleOrDefault(b => b.BookId == bookId);
+        if (bookEntity == null)
+            return NotFound();
+
+        string bookDataJson = bookApiService.GetData(bookId);
+        if (string.IsNullOrWhiteSpace(bookDataJson))
+            return NotFound();
         
-        JObject bookDetailsJson = JObject.Parse(bookApiService.GetData(bookId));
+        JObject bookDetailsJson = JObject.Parse(bookDataJson);
         var details = BookDetailsDTO.From(bookEntity, bookDetailsJson);
         return Ok(details);
     }
