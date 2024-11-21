@@ -20,15 +20,17 @@ namespace BookWormsServer.Migrations
                 {
                     BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Isbn = table.Column<string>(type: "varchar(14)", maxLength: 14, nullable: false)
+                    Isbn10 = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Isbn13 = table.Column<string>(type: "varchar(13)", maxLength: 13, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Title = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Author = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
+                    Authors = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Level = table.Column<string>(type: "varchar(16)", maxLength: 16, nullable: false)
+                    Level = table.Column<string>(type: "varchar(16)", maxLength: 16, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    StarRating = table.Column<double>(type: "double", nullable: false)
+                    StarRating = table.Column<double>(type: "double", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -43,22 +43,25 @@ namespace BookWormsServer.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
-                    b.Property<string>("Author")
+                    b.Property<string>("Authors")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("longtext");
 
-                    b.Property<string>("Isbn")
+                    b.Property<string>("Isbn10")
                         .IsRequired()
-                        .HasMaxLength(14)
-                        .HasColumnType("varchar(14)");
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<string>("Isbn13")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("varchar(13)");
 
                     b.Property<string>("Level")
-                        .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("varchar(16)");
 
-                    b.Property<double>("StarRating")
+                    b.Property<double?>("StarRating")
                         .HasColumnType("double");
 
                     b.Property<string>("Title")
