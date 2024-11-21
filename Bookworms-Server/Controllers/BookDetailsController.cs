@@ -17,7 +17,7 @@ public class BookDetailsController(AllBookwormsDbContext dbContext, IBookApiServ
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<BookDetailsDTO> Get(string bookId)
+    public IActionResult Get(string bookId)
     {
         Book bookEntity = dbContext.Books
             .Include(b => b.Reviews).ThenInclude(r => r.Reviewer)
