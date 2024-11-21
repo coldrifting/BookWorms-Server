@@ -32,4 +32,10 @@
     <Resource Include="wwwroot\Swagger\Themes\_base.css" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

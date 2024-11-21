@@ -10,16 +10,15 @@ using BookwormsServer.Services;
 
 namespace BookwormsServer;
 
-public static class Program
+public partial class Program
 {
     public static void Main(string[] args)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         
-        
         // Establish database context ----------------------------------------------------------------------------------
         
-	    string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        /*
 	    string? databaseVersion = builder.Configuration.GetValue<string>("Database:Version");
 
 	    if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(databaseVersion))
@@ -37,19 +36,25 @@ public static class Program
 		    int hostPort = builder.Configuration.GetValue("Database:TestContainer:HostPort", 3306);
 		    var mysqlContainer = new ContainerBuilder()
 			    .WithImage($"mysql:{databaseVersion}")
-			    .WithName("mysql-container")
-			    .WithPortBinding(hostPort, (int)connString.Port)
+			    .WithName("container-name")//"mysql-container-" + Guid.NewGuid())
 			    .WithEnvironment("MYSQL_DATABASE", connString.Database)
-			    .WithEnvironment("MYSQL_USER", connString.UserID)
 			    .WithEnvironment("MYSQL_ROOT_PASSWORD", connString.Password)
-			    .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(hostPort))
+			    .WithPortBinding(3306, true)
+			    .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(3306))
+			    .WithOutputConsumer(Consume.RedirectStdoutAndStderrToConsole())
 			    .Build();
 
 		    Task.Run(async () => await mysqlContainer.StartAsync()).Wait();
-	    }
+		    
+		    connectionString = connectionString.Replace("3306", mysqlContainer.GetMappedPublicPort(3306).ToString());
+	    } 
+	    
+	    Console.WriteLine("blah");
+	    */
 
+	    string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 	    builder.Services.AddDbContext<AllBookwormsDbContext>(o =>
-		    o.UseMySql(connectionString, serverVersion));
+		    o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 	    
 	    // Configure Swagger -------------------------------------------------------------------------------------------

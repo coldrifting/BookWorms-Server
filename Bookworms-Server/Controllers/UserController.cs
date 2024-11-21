@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Net;
+using System.Security.Claims;
 using AllOverIt.EntityFrameworkCore.Diagrams;
 using AllOverIt.EntityFrameworkCore.Diagrams.D2;
 using AllOverIt.EntityFrameworkCore.Diagrams.D2.Extensions;
@@ -18,7 +20,7 @@ public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
-    public ActionResult<UserLoginSuccessDTO> Login(UserLoginDTO payload)
+    public IActionResult Login(UserLoginDTO payload)
     {
         IQueryable<User> userMatch = dbContext.Users.Where(u => u.Username == payload.Username);
         
@@ -30,13 +32,13 @@ public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
         
         // Send JWT token to avoid expensive hash calls for each authenticated endpoint
         string token = AuthService.GenerateToken(userMatch.First());
-        return new UserLoginSuccessDTO(token, AuthService.ExpireTime);
+        return Ok(new UserLoginSuccessDTO(token, AuthService.ExpireTime));
     }
     
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorDTO))]
-    public ActionResult<UserRegisterSuccessDTO> Register(UserRegisterDTO payload)
+    public ActionResult Register(UserRegisterDTO payload)
     {
         IQueryable<User> userMatch = dbContext.Users.Where(l => l.Username == payload.Username);
         if (userMatch.Any())
@@ -44,18 +46,17 @@ public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
             return Conflict(new ErrorDTO("Invalid Credentials", "The specified Username already exists"));
         }
 
-        byte[] hash = AuthService.HashPassword(payload.Password, out byte[] salt);
-        User x = new User(payload.Username, hash, salt, payload.Name, payload.Email);
+        User user = UserService.CreateUser(payload.Username, payload.Password, payload.Name, payload.Email);
 
-        if (x.Username == "admin")
+        if (user.Username == "admin")
         {
-            x.Roles = ["admin"];
+            user.Roles = ["admin"];
         }
         
-        dbContext.Users.Add(x);
+        dbContext.Users.Add(user);
         dbContext.SaveChanges();
 
-        UserRegisterSuccessDTO dto = new(x.Username, x.Name, x.Email, DateTime.Now);
+        UserRegisterSuccessDTO dto = new(user.Username, user.Name, user.Email, DateTime.Now);
         return Created("/account/info", dto);
     }
 
@@ -63,11 +64,11 @@ public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    public ActionResult<List<User>> Users()
+    public IActionResult Users()
     {
         List<User> users = dbContext.Set<User>().ToList();
 
-        return users;
+        return Ok(users);
     }
 
     
@@ -84,10 +85,8 @@ public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
     
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult DiagramDB()
+    public IActionResult DiagramDB()
     {
-        
-        
 	    var erdFormatter = ErdGenerator
 		    .Create<D2ErdGenerator>(options =>
 		    {
@@ -123,6 +122,16 @@ public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
         {
             Console.WriteLine(e.Data);
         }
+    }
+
+    [HttpGet]
+    [Authorize]
+    public IActionResult GetUsername()
+    {
+        // Example of infering username from bearer token for authenticated routes
+        string? username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        return Ok(username);
     }
     
 }

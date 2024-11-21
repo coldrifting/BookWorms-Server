@@ -37,7 +37,6 @@ public class AuthenticationFilter : IOperationFilter
                 Array.Empty<string>()
             }
         };
-        operation.Security.Add(item
-        );
+        operation.Security.Add(item);
     }
 }
