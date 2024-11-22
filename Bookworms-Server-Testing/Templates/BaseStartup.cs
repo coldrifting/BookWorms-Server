@@ -2,13 +2,13 @@
 using DotNet.Testcontainers.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MySqlConnector;
 
-namespace BookwormsServerTesting;
+namespace BookwormsServerTesting.Templates;
 
 // Replaces server connection string 
 public class BaseStartup<TProgram>
