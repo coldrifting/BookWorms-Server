@@ -1,9 +1,4 @@
-﻿using System.Diagnostics;
-using System.Net;
-using System.Security.Claims;
-using AllOverIt.EntityFrameworkCore.Diagrams;
-using AllOverIt.EntityFrameworkCore.Diagrams.D2;
-using AllOverIt.EntityFrameworkCore.Diagrams.D2.Extensions;
+﻿using System.Security.Claims;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services;
@@ -70,60 +65,7 @@ public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
 
         return Ok(users);
     }
-
     
-	private static void AddEntityGroups(ErdOptions options)
-	{
-        //options.Group("web", "Web", new ShapeStyle(), entities =>
-        //{
-        //    entities
-        //        .Add<Book>()
-        //        .Add<Bookshelf>();
-        //});
-	}
-	
-    
-    [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult DiagramDB()
-    {
-	    var erdFormatter = ErdGenerator
-		    .Create<D2ErdGenerator>(options =>
-		    {
-			    options.Direction = ErdOptions.DiagramDirection.Right;
-
-			    AddEntityGroups(options);
-		    });
-        
-        
-        // This generates the diagram as text
-        var erd = erdFormatter.Generate(dbContext);
-        Console.WriteLine(erd);
-
-        // This generates the diagram, saves it as a text file and exports to SVG, PNG, PDF
-        var exportOptions = new D2ErdExportOptions
-        {      
-            DiagramFileName = "..\\..\\..\\Output Examples\\sample_erd.d2",
-            LayoutEngine = "elk",
-            Theme = Theme.Neutral,
-            Formats = [ExportFormat.Svg, ExportFormat.Png, ExportFormat.Pdf],
-            StandardOutputHandler = LogOutput,
-            ErrorOutputHandler = LogOutput          // Note: d2.exe seems to log everything to the error output
-        };
-
-        erdFormatter.ExportAsync(dbContext, exportOptions);
-
-        return Ok();
-    }
-    
-    private static void LogOutput(object sender, DataReceivedEventArgs e)
-    {
-        if (e.Data is not null)
-        {
-            Console.WriteLine(e.Data);
-        }
-    }
-
     [HttpGet]
     [Authorize]
     public IActionResult GetUsername()
