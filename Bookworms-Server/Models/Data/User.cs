@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using BookwormsServer.Models.Entities;
 
 namespace BookwormsServer.Models.Data;
 
@@ -12,19 +13,25 @@ namespace BookwormsServer.Models.Data;
 public class UserRegisterDTO(string username, string password, string name, string email) 
 {
     [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
-    public string Username { get; init; } = username;
+    public string Username { get; set; } = username;
     
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
-    public string Password { get; init; } = password;
+    public string Password { get; set; } = password;
 
     [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)]
-    public string Name { get; init; } = name;
+    public string Name { get; set; } = name;
         
     [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
-    public string Email { get; init; } = email;
+    public string Email { get; set; } = email;
 }
 
-public record UserRegisterSuccessDTO(string Username, string Name, string Email, DateTime CreatedAt);
+public record UserRegisterSuccessDTO(string Username, string Name, string Email, DateTime CreatedAt)
+{
+    public static UserRegisterSuccessDTO From(User user, DateTime createdAt)
+    {
+        return new(user.Username, user.Name, user.Email, createdAt);
+    }
+}
 
 /// <summary>
 /// 
@@ -34,10 +41,10 @@ public record UserRegisterSuccessDTO(string Username, string Name, string Email,
 public class UserLoginDTO(string username, string password)
 {
     [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
-    public string Username { get; init; } = username;
+    public string Username { get; set; } = username;
     
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
-    public string Password { get; init; } = password;
+    public string Password { get; set; } = password;
 }
 
 /// <summary>
@@ -46,3 +53,11 @@ public class UserLoginDTO(string username, string password)
 /// <param name="Token"></param>
 /// <param name="Timeout"></param>
 public record UserLoginSuccessDTO(string Token, int Timeout);
+
+public record UserInfoDTO(string Username, string Name, string Email)
+{
+    public static UserInfoDTO From(User user)
+    {
+        return new(user.Username, user.Name, user.Email);
+    }
+}

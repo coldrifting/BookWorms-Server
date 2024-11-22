@@ -7,12 +7,12 @@ using Newtonsoft.Json.Linq;
 namespace BookwormsServer.Controllers;
 
 [ApiController]
-[Route("[controller]")]
 public class SearchController(AllBookwormsDbContext dbContext, IBookApiService bookApiService) : ControllerBase
 {
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult Search(string query)
+    [Route("/search/title")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookDto>))]
+    public IActionResult ByName(string query)
     {
         List<Book> books = dbContext.Books
             .Where(b => b.Title.Contains(query))

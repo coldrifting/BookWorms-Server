@@ -1,9 +1,4 @@
-﻿using System.Diagnostics;
-using System.Net;
-using System.Security.Claims;
-using AllOverIt.EntityFrameworkCore.Diagrams;
-using AllOverIt.EntityFrameworkCore.Diagrams.D2;
-using AllOverIt.EntityFrameworkCore.Diagrams.D2.Extensions;
+﻿using System.Security.Claims;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services;
@@ -14,20 +9,18 @@ namespace BookwormsServer.Controllers;
 
 [ApiController]
 [Tags("Accounts")]
-[Route("account/[action]")]
+[Route("user/[action]")]
 public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
 {
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserLoginSuccessDTO))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
     public IActionResult Login(UserLoginDTO payload)
     {
-        IQueryable<User> userMatch = dbContext.Users.Where(u => u.Username == payload.Username);
+        var userMatch = dbContext.Users.Where(u => u.Username == payload.Username);
         
-        if (userMatch.FirstOrDefault() is not { } candidateUser)
-            return BadRequest(new ErrorDTO("Invalid Credentials", "Incorrect username and/or password"));
-        
-        if (!AuthService.VerifyPassword(payload.Password, candidateUser.Hash, candidateUser.Salt))
+        if (userMatch.FirstOrDefault() is not { } candidateUser || 
+            !AuthService.VerifyPassword(payload.Password, candidateUser.Hash, candidateUser.Salt))
             return BadRequest(new ErrorDTO("Invalid Credentials", "Incorrect username and/or password"));
         
         // Send JWT token to avoid expensive hash calls for each authenticated endpoint
@@ -36,102 +29,50 @@ public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
     }
     
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserRegisterSuccessDTO))]
     [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorDTO))]
-    public ActionResult Register(UserRegisterDTO payload)
+    public IActionResult Register(UserRegisterDTO payload)
     {
-        IQueryable<User> userMatch = dbContext.Users.Where(l => l.Username == payload.Username);
+        var userMatch = dbContext.Users.Where(l => l.Username == payload.Username);
         if (userMatch.Any())
         {
             return Conflict(new ErrorDTO("Invalid Credentials", "The specified Username already exists"));
         }
 
         User user = UserService.CreateUser(payload.Username, payload.Password, payload.Name, payload.Email);
-
-        if (user.Username == "admin")
-        {
-            user.Roles = ["admin"];
-        }
         
         dbContext.Users.Add(user);
         dbContext.SaveChanges();
 
-        UserRegisterSuccessDTO dto = new(user.Username, user.Name, user.Email, DateTime.Now);
-        return Created("/account/info", dto);
+        return Created("/account/info", UserRegisterSuccessDTO.From(user, DateTime.Now));
     }
 
-    [HttpGet, Authorize(Roles = "admin")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<User>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    public IActionResult Users()
+    public IActionResult All()
     {
-        List<User> users = dbContext.Set<User>().ToList();
+        var users = dbContext.Set<User>().ToList();
 
         return Ok(users);
     }
-
     
-	private static void AddEntityGroups(ErdOptions options)
-	{
-        //options.Group("web", "Web", new ShapeStyle(), entities =>
-        //{
-        //    entities
-        //        .Add<Book>()
-        //        .Add<Bookshelf>();
-        //});
-	}
-	
-    
-    [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult DiagramDB()
-    {
-	    var erdFormatter = ErdGenerator
-		    .Create<D2ErdGenerator>(options =>
-		    {
-			    options.Direction = ErdOptions.DiagramDirection.Right;
-
-			    AddEntityGroups(options);
-		    });
-        
-        
-        // This generates the diagram as text
-        var erd = erdFormatter.Generate(dbContext);
-        Console.WriteLine(erd);
-
-        // This generates the diagram, saves it as a text file and exports to SVG, PNG, PDF
-        var exportOptions = new D2ErdExportOptions
-        {      
-            DiagramFileName = "..\\..\\..\\Output Examples\\sample_erd.d2",
-            LayoutEngine = "elk",
-            Theme = Theme.Neutral,
-            Formats = [ExportFormat.Svg, ExportFormat.Png, ExportFormat.Pdf],
-            StandardOutputHandler = LogOutput,
-            ErrorOutputHandler = LogOutput          // Note: d2.exe seems to log everything to the error output
-        };
-
-        erdFormatter.ExportAsync(dbContext, exportOptions);
-
-        return Ok();
-    }
-    
-    private static void LogOutput(object sender, DataReceivedEventArgs e)
-    {
-        if (e.Data is not null)
-        {
-            Console.WriteLine(e.Data);
-        }
-    }
-
     [HttpGet]
     [Authorize]
     public IActionResult GetUsername()
     {
-        // Example of infering username from bearer token for authenticated routes
+        // Example of inferring username from bearer token for authenticated routes
         string? username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        return Ok(username);
+        User? user = dbContext.Users.FirstOrDefault(u => u.Username == username);
+        if (user is not null)
+        {
+            return Ok(UserInfoDTO.From(user));
+        }
+        
+        return BadRequest(new ErrorDTO("Bad Request", "Unable to find user details"));
     }
     
 }

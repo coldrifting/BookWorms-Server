@@ -8,20 +8,20 @@ using Newtonsoft.Json.Linq;
 namespace BookwormsServer.Controllers;
 
 [ApiController]
-[Tags("BookDetails")]
-[Route("[controller]")]
+[Tags("Book Details")]
 public class BookDetailsController(AllBookwormsDbContext dbContext, IBookApiService bookApiService) : ControllerBase
 {
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Route("/books/{bookid}/details")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsDTO))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public IActionResult Get(string bookId)
     {
         Book? bookEntity = dbContext.Books
-            .Include(b => b.Reviews).ThenInclude(r => r.Reviewer)
+            .Include(b => b.Reviews)
+            .ThenInclude(r => r.Reviewer)
             .SingleOrDefault(b => b.BookId == bookId);
+        
         if (bookEntity == null)
             return NotFound();
 
