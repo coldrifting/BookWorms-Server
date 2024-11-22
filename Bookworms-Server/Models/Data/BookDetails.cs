@@ -27,8 +27,8 @@ public record BookDetailsDTO(
         string image = bookDetails["image"]?.ToObject<string>() ?? "";
         string description = bookDetails["description"]?.ToObject<string>() ?? "";
         List<string> subjects = bookDetails["subjects"]?.ToObject<List<string>>() ?? [];
-        string isbn10 = bookDetails["industryIdentifiers"]?[1]?["identifier"]?.ToObject<string>() ?? "";
-        string isbn13 = bookDetails["industryIdentifiers"]?[0]?["identifier"]?.ToObject<string>() ?? "";
+        string isbn10 = GetIsbn(bookDetails, true);
+        string isbn13 = GetIsbn(bookDetails, false);
         string publisher = bookDetails["publisher"]?.ToObject<string>() ?? "";
         string publishedDate = bookDetails["publishedDate"]?.ToObject<string>() ?? "";
         int pageCount = bookDetails["pageCount"]!.ToObject<int>();
@@ -36,5 +36,19 @@ public record BookDetailsDTO(
         
         return new BookDetailsDTO(title, authors, rating, difficulty, image, description, subjects, isbn10, isbn13,
             publisher, publishedDate, pageCount, reviews); 
+    }
+
+    private static string GetIsbn(JObject bookDetails, bool useIsbn10)
+    {
+        int index = useIsbn10 ? 1 : 0;
+
+        try
+        {
+            return bookDetails["industryIdentifiers"]?[index]?["identifier"]?.ToObject<string>() ?? "";
+        }
+        catch
+        {
+            return "";
+        }
     }
 }

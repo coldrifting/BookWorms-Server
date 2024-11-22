@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using BookwormsServer.Models.Entities;
 
 namespace BookwormsServer.Models.Data;
 
@@ -24,7 +25,13 @@ public class UserRegisterDTO(string username, string password, string name, stri
     public string Email { get; set; } = email;
 }
 
-public record UserRegisterSuccessDTO(string Username, string Name, string Email, DateTime CreatedAt);
+public record UserRegisterSuccessDTO(string Username, string Name, string Email, DateTime CreatedAt)
+{
+    public static UserRegisterSuccessDTO From(User user, DateTime createdAt)
+    {
+        return new(user.Username, user.Name, user.Email, createdAt);
+    }
+}
 
 /// <summary>
 /// 
@@ -46,3 +53,11 @@ public class UserLoginDTO(string username, string password)
 /// <param name="Token"></param>
 /// <param name="Timeout"></param>
 public record UserLoginSuccessDTO(string Token, int Timeout);
+
+public record UserInfoDTO(string Username, string Name, string Email)
+{
+    public static UserInfoDTO From(User user)
+    {
+        return new(user.Username, user.Name, user.Email);
+    }
+}
