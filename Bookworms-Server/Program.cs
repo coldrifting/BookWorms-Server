@@ -20,45 +20,10 @@ public partial class Program
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         
         // Establish database context ----------------------------------------------------------------------------------
-        
-        /*
-	    string? databaseVersion = builder.Configuration.GetValue<string>("Database:Version");
-
-	    if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(databaseVersion))
-	    {
-		    Console.Error.WriteLine("Please specify a valid connection string and MySQL database version in " +
-		                            $"appsettings.{builder.Environment.EnvironmentName}.json.");
-		    return;
-	    }
-	    
-	    var serverVersion = new MySqlServerVersion(new Version(databaseVersion));
-
-	    if (builder.Configuration.GetValue("Database:TestContainer:Use", false))
-	    {
-		    MySqlConnectionStringBuilder connString = new MySqlConnectionStringBuilder(connectionString);
-		    int hostPort = builder.Configuration.GetValue("Database:TestContainer:HostPort", 3306);
-		    var mysqlContainer = new ContainerBuilder()
-			    .WithImage($"mysql:{databaseVersion}")
-			    .WithName("container-name")//"mysql-container-" + Guid.NewGuid())
-			    .WithEnvironment("MYSQL_DATABASE", connString.Database)
-			    .WithEnvironment("MYSQL_ROOT_PASSWORD", connString.Password)
-			    .WithPortBinding(3306, true)
-			    .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(3306))
-			    .WithOutputConsumer(Consume.RedirectStdoutAndStderrToConsole())
-			    .Build();
-
-		    Task.Run(async () => await mysqlContainer.StartAsync()).Wait();
-		    
-		    connectionString = connectionString.Replace("3306", mysqlContainer.GetMappedPublicPort(3306).ToString());
-	    } 
-	    
-	    Console.WriteLine("blah");
-	    */
 
 	    string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 	    builder.Services.AddDbContext<AllBookwormsDbContext>(o =>
 		    o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-
 	    
 	    // Configure Swagger -------------------------------------------------------------------------------------------
 	    
