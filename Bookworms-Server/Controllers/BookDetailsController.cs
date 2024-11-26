@@ -12,7 +12,7 @@ namespace BookwormsServer.Controllers;
 public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService bookApiService) : ControllerBase
 {
     [HttpGet]
-    [Route("/books/{bookid}/details")]
+    [Route("/books/{bookId}/details")]
     [ResponseCache(Duration = 60)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
