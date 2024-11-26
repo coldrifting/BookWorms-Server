@@ -2,10 +2,17 @@
 
 namespace BookwormsServer.Models.Data;
 
-public record ReviewDTO(string ReviewerUsername, string ReviewerName, double StarRating, string ReviewText)
+public record ReviewDTO(string ReviewerName, string ReviewerRole, UserIcon ReviewerIcon, double StarRating, string ReviewText)
 {
     public static ReviewDTO From(Review r)
     {
-        return new ReviewDTO(r.Reviewer!.Username, r.Reviewer.Name, r.StarRating, r.ReviewText ?? "");
+        return new(
+            r.Reviewer!.Name,
+            r.Reviewer.Roles.First(),
+            r.Reviewer.UserIcon,
+            r.StarRating, 
+            r.ReviewText ?? "");
     }
 }
+
+public record ReviewRequestDTO(double StarRating, string ReviewText);

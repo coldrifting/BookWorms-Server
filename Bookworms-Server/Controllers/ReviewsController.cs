@@ -11,13 +11,13 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
 {
     [HttpPost]
     [Route("/books/{bookId}/review")]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Review))]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ReviewDTO))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorDTO))]
-    public IActionResult Add(string bookId, [FromBody] ReviewDTO reviewDto)
+    public IActionResult Add(string bookId, string username, [FromBody] ReviewRequestDTO reviewDto)
     {
         if (!dbContext.Books.Any(b => b.BookId == bookId) ||
-            !dbContext.Users.Any(u => u.Username == reviewDto.ReviewerUsername))
+            !dbContext.Users.Any(u => u.Username == username))
         {
             return BadRequest(new ErrorDTO(
                 "Invalid book or user id", 
@@ -25,18 +25,20 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
         }
         
         Review? testExists = dbContext.Reviews.Include(r => r.Reviewer)
-            .FirstOrDefault(r => r.BookId == bookId && r.Reviewer!.Username == reviewDto.ReviewerUsername);
+            .FirstOrDefault(r => r.BookId == bookId && r.Reviewer!.Username == username);
         
         if (testExists is not null)
         {
             return Conflict(new ErrorDTO("Can not create review", "Review already exists"));
         }
 
-        Review review = new(bookId, reviewDto.ReviewerUsername, reviewDto.StarRating, reviewDto.ReviewText);
+        Review review = new(bookId, username, reviewDto.StarRating, reviewDto.ReviewText, DateTime.Now);
         dbContext.Reviews.Add(review);
         dbContext.SaveChanges();
 
-        return Created($"reviews/get/{review.ReviewId}", review);
+        var rx = dbContext.Reviews.Where(r => r.ReviewId == review.ReviewId).Include(r => r.Reviewer).FirstOrDefault();
+
+        return Created($"reviews/get/{review.ReviewId}", ReviewDTO.From(rx));
     }
     
     // TODO - Infer username when this becomes an authorized route
@@ -44,10 +46,10 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     [Route("/books/{bookId}/review")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Review))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
-    public IActionResult Update(string bookId, [FromBody] ReviewDTO reviewDto)
+    public IActionResult Update(string bookId, string username, [FromBody] ReviewRequestDTO reviewDto)
     {
         Review? review = dbContext.Reviews.Include(r => r.Reviewer)
-            .FirstOrDefault(r => r.BookId == bookId && r.Reviewer!.Username == reviewDto.ReviewerUsername);
+            .FirstOrDefault(r => r.BookId == bookId && r.Reviewer!.Username == username);
 
         if (review is null)
         {
@@ -69,10 +71,10 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     [Route("/books/{bookId}/review")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
-    public IActionResult Delete(string bookId, [FromBody] ReviewDTO reviewDto)
+    public IActionResult Delete(string bookId, string username)
     {
         Review? review = dbContext.Reviews.Include(r => r.Reviewer)
-            .FirstOrDefault(r => r.BookId == bookId && r.Reviewer!.Username == reviewDto.ReviewerUsername);
+            .FirstOrDefault(r => r.BookId == bookId && r.Reviewer!.Username == username);
 
         if (review is null)
         {

@@ -1,9 +1,9 @@
-﻿using BookwormsServer.Models.Data;
+﻿using System.Text.Json.Nodes;
+using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 
 namespace BookwormsServer.Controllers;
 
@@ -16,7 +16,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     [ResponseCache(Duration = 60)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult Get(string bookId)
+    public async Task<IActionResult> Get(string bookId)
     {
         Book? bookEntity = dbContext.Books
             .Include(b => b.Reviews)
@@ -25,13 +25,19 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
         
         if (bookEntity == null)
             return NotFound();
-
-        string bookDataJson = bookApiService.GetData(bookId);
-        if (string.IsNullOrWhiteSpace(bookDataJson))
-            return NotFound();
         
-        JObject bookDetailsJson = JObject.Parse(bookDataJson);
+        JsonObject bookDetailsJson = await bookApiService.GetData(bookId);
         var details = BookDetailsDTO.From(bookEntity, bookDetailsJson);
         return Ok(details);
+    }
+
+    [HttpGet]
+    [Route("/books/{bookId}/cover")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(File))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    public async Task<IActionResult> Image(string bookId)
+    {
+        byte[] b = await bookApiService.GetImage(bookId);
+        return File(b, "image/jpeg");
     }
 }

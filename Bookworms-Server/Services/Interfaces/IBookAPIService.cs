@@ -1,6 +1,9 @@
-﻿namespace BookwormsServer.Services.Interfaces;
+﻿using System.Text.Json.Nodes;
+
+namespace BookwormsServer.Services.Interfaces;
 
 public interface IBookApiService
 {
-    public string GetData(string bookId);
+    public Task<JsonObject> GetData(string bookId);
+    public Task<byte[]> GetImage(string bookId);
 }

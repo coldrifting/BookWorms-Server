@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BookwormsServer.Models.Entities;
 
 [Table("Reviews")]
-public class Review(string bookId, string username, double starRating, string? reviewText)
+public class Review(string bookId, string username, double starRating, string? reviewText, DateTime reviewDate)
 {
     [Key]
     public Guid ReviewId { get; set; }
@@ -20,7 +20,9 @@ public class Review(string bookId, string username, double starRating, string? r
 
     [StringLength(4096, ErrorMessage = "Review text must be shorter than {0} characters.")]
     public string? ReviewText { get; set; } = reviewText;
-    
+
+    public DateTime ReviewDate { get; set; } = reviewDate;
+
     // Navigation
     
     [ForeignKey(nameof(BookId))] 

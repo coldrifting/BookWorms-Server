@@ -1,14 +1,10 @@
-﻿using BookwormsServer.Models.Entities;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+using BookwormsServer.Models.Entities;
 
 namespace BookwormsServer.Models.Data;
 
 public record BookDetailsDTO(
-    string Title,
-    List<string> Authors,
-    double Rating,
-    string Difficulty,
-    string Image,
     string Description,
     List<string> Subjects,
     string Isbn10,
@@ -18,33 +14,32 @@ public record BookDetailsDTO(
     int PageCount,
     List<ReviewDTO> Reviews)
 {
-    public static BookDetailsDTO From(Book book, JObject bookDetails)
+    public static BookDetailsDTO From(Book book, JsonObject bookDetails)
     {
         string title = book.Title;
         List<string> authors = book.Authors;
         double rating = book.StarRating ?? -1;
         string difficulty = book.Level ?? "";
-        string image = bookDetails["image"]?.ToObject<string>() ?? "";
-        string description = bookDetails["description"]?.ToObject<string>() ?? "";
-        List<string> subjects = bookDetails["subjects"]?.ToObject<List<string>>() ?? [];
+        string description = bookDetails["description"]?.Deserialize<string>() ?? "";
+        List<string> subjects = bookDetails["subjects"]?.Deserialize<List<string>>() ?? [];
         string isbn10 = GetIsbn(bookDetails, true);
         string isbn13 = GetIsbn(bookDetails, false);
-        string publisher = bookDetails["publisher"]?.ToObject<string>() ?? "";
-        string publishedDate = bookDetails["publishedDate"]?.ToObject<string>() ?? "";
-        int pageCount = bookDetails["pageCount"]!.ToObject<int>();
+        string publisher = bookDetails["publisher"]?.Deserialize<string>() ?? "";
+        string publishedDate = bookDetails["publishedDate"]?.Deserialize<string>() ?? "";
+        int pageCount = bookDetails["pageCount"]?.Deserialize<int>() ?? -1;
         List<ReviewDTO> reviews = book.Reviews.Select(ReviewDTO.From).ToList();
         
-        return new BookDetailsDTO(title, authors, rating, difficulty, image, description, subjects, isbn10, isbn13,
+        return new BookDetailsDTO(description, subjects, isbn10, isbn13,
             publisher, publishedDate, pageCount, reviews); 
     }
 
-    private static string GetIsbn(JObject bookDetails, bool useIsbn10)
+    private static string GetIsbn(JsonObject bookDetails, bool useIsbn10)
     {
         int index = useIsbn10 ? 1 : 0;
 
         try
         {
-            return bookDetails["industryIdentifiers"]?[index]?["identifier"]?.ToObject<string>() ?? "";
+            return bookDetails["industryIdentifiers"]?[index]?["identifier"]?.Deserialize<string>() ?? "";
         }
         catch
         {
