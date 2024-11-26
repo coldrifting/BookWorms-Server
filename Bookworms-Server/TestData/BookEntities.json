@@ -1,168 +1,168 @@
 ﻿[
   {
-    "BookId": "1IleAgAAQBAJ",
-    "Isbn10": "0061965103",
-    "Isbn13": "9780061965104",
-    "Title": "The Giving Tree",
-    "Authors": [
+    "bookId": "1IleAgAAQBAJ",
+    "isbn10": "0061965103",
+    "isbn13": "9780061965104",
+    "title": "The Giving Tree",
+    "authors": [
       "Shel Silverstein"
     ],
-    "Level": "A1",
-    "StarRating": 4.3
+    "level": "A1",
+    "starRating": 4.3
   },
   {
-    "BookId": "VnAkAQAAMAAJ",
-    "Isbn10": "",
-    "Isbn13": "",
-    "Title": "The Three Robbers",
-    "Authors": [
+    "bookId": "VnAkAQAAMAAJ",
+    "isbn10": "",
+    "isbn13": "",
+    "title": "The Three Robbers",
+    "authors": [
       "Tomi Ungerer"
     ],
-    "Level": "B1",
-    "StarRating": 4.5
+    "level": "B1",
+    "starRating": 4.5
   },
   {
-    "BookId": "1YU0MQAACAAJ",
-    "Isbn10": "0448189119",
-    "Isbn13": "9780448189116",
-    "Title": "While the Clock Ticked",
-    "Authors": [
+    "bookId": "1yU0MQAACAAJ",
+    "isbn10": "0448189119",
+    "isbn13": "9780448189116",
+    "title": "While the Clock Ticked",
+    "authors": [
       "Franklin W. Dixon"
     ],
-    "Level": "F5",
-    "StarRating": 2.3
+    "level": "F5",
+    "starRating": 2.3
   },
   {
-    "BookId": "bSSW15rcQbsC",
-    "Isbn10": "0975986805",
-    "Isbn13": "9780975986806",
-    "Title": "The Giving Book",
-    "Authors": [
+    "bookId": "bSSW15rcQbsC",
+    "isbn10": "0975986805",
+    "isbn13": "9780975986806",
+    "title": "The Giving Book",
+    "authors": [
       "Ellen Sabin"
     ],
-    "Level": "C2",
-    "StarRating": 3.7
+    "level": "C2",
+    "starRating": 3.7
   },
   {
-    "BookId": "Sj5MWqEPsDkC",
-    "Isbn10": "0545000157",
-    "Isbn13": "9780545000154",
-    "Title": "The Silver Door",
-    "Authors": [
+    "bookId": "Sj5MWqEPsDkC",
+    "isbn10": "0545000157",
+    "isbn13": "9780545000154",
+    "title": "The Silver Door",
+    "authors": [
       "Holly Lisle"
     ],
-    "Level": "H5",
-    "StarRating": 3.3
+    "level": "H5",
+    "starRating": 3.3
   },
   {
-    "BookId": "a-0C_BKFmY4C",
-    "Isbn10": "1455615110",
-    "Isbn13": "9781455615117",
-    "Title": "The Magic of Giving",
-    "Authors": [
+    "bookId": "a-0C_BKFmY4C",
+    "isbn10": "1455615110",
+    "isbn13": "9781455615117",
+    "title": "The Magic of Giving",
+    "authors": [
       "Marc Dunston"
     ],
-    "Level": "T3",
-    "StarRating": 0.5
+    "level": "T3",
+    "starRating": 0.5
   },
   {
-    "BookId": "mF34zQEACAAJ",
-    "Isbn10": "1735966517",
-    "Isbn13": "9781735966519",
-    "Title": "The Little Book of Giving",
-    "Authors": [
+    "bookId": "mF34zQEACAAJ",
+    "isbn10": "1735966517",
+    "isbn13": "9781735966519",
+    "title": "The Little Book of Giving",
+    "authors": [
       "Zack Bush",
       "Laurie Friedman"
     ],
-    "Level": "G3",
-    "StarRating": 2.5
+    "level": "G3",
+    "starRating": 2.5
   },
   {
-    "BookId": "sQSDzQEACAAJ",
-    "Isbn10": "1951287339",
-    "Isbn13": "9781951287337",
-    "Title": "A Little SPOT of Giving",
-    "Authors": [
+    "bookId": "sQSDzQEACAAJ",
+    "isbn10": "1951287339",
+    "isbn13": "9781951287337",
+    "title": "A Little SPOT of Giving",
+    "authors": [
       "Diane Alber"
     ],
-    "Level": "J8",
-    "StarRating": 4.3
+    "level": "J8",
+    "starRating": 4.3
   },
   {
-    "BookId": "jXvSDwAAQBAJ",
-    "Isbn10": "1683359046",
-    "Isbn13": "9781683359043",
-    "Title": "The Giving Day",
-    "Authors": [
+    "bookId": "jXvSDwAAQBAJ",
+    "isbn10": "1683359046",
+    "isbn13": "9781683359043",
+    "title": "The Giving Day",
+    "authors": [
       "Cori Doerrfeld"
     ],
-    "Level": "Z2",
-    "StarRating": 3.3
+    "level": "Z2",
+    "starRating": 3.3
   },
   {
-    "BookId": "IUnGtgEACAAJ",
-    "Isbn10": "0999026933",
-    "Isbn13": "9780999026939",
-    "Title": "The Giving Sack",
-    "Authors": [
+    "bookId": "IUnGtgEACAAJ",
+    "isbn10": "0999026933",
+    "isbn13": "9780999026939",
+    "title": "The Giving Sack",
+    "authors": [
       "Leanne Hill"
     ],
-    "Level": "F9",
-    "StarRating": 5.0
+    "level": "F9",
+    "starRating": 5.0
   },
   {
-    "BookId": "_BxZ71b-u5QC",
-    "Isbn10": "1429980567",
-    "Isbn13": "9781429980562",
-    "Title": "A Boy Named Shel",
-    "Authors": [
+    "bookId": "_BxZ71b-u5QC",
+    "isbn10": "1429980567",
+    "isbn13": "9781429980562",
+    "title": "A Boy Named Shel",
+    "authors": [
       "Lisa Rogak"
     ],
-    "Level": "E8",
-    "StarRating": 3.8
+    "level": "E8",
+    "starRating": 3.8
   },
   {
-    "BookId": "XlrMDwAAQBAJ",
-    "Isbn10": "0062999699",
-    "Isbn13": "9780062999696",
-    "Title": "Falling Up",
-    "Authors": [
+    "bookId": "XlrMDwAAQBAJ",
+    "isbn10": "0062999699",
+    "isbn13": "9780062999696",
+    "title": "Falling Up",
+    "authors": [
       "Shel Silverstein"
     ],
-    "Level": "J1",
-    "StarRating": 2.3
+    "level": "J1",
+    "starRating": 2.3
   },
   {
-    "BookId": "_kaGDwAAQBAJ",
-    "Isbn10": "1536204714",
-    "Isbn13": "9781536204711",
-    "Title": "My Sweet Orange Tree",
-    "Authors": [
+    "bookId": "_kaGDwAAQBAJ",
+    "isbn10": "1536204714",
+    "isbn13": "9781536204711",
+    "title": "My Sweet Orange Tree",
+    "authors": [
       "José Mauro de Vasconcelos"
     ],
-    "Level": "S1",
-    "StarRating": 1.0
+    "level": "S1",
+    "starRating": 1.0
   },
   {
-    "BookId": "KkIwzwEACAAJ",
-    "Isbn10": "0060256710",
-    "Isbn13": "9780060256715",
-    "Title": "The Missing Piece",
-    "Authors": [
+    "bookId": "KkIwzwEACAAJ",
+    "isbn10": "0060256710",
+    "isbn13": "9780060256715",
+    "title": "The Missing Piece",
+    "authors": [
       "Shel Silverstein"
     ],
-    "Level": "T2",
-    "StarRating": 1.0
+    "level": "T2",
+    "starRating": 1.0
   },
   {
-    "BookId": "aG-9DAAAQBAJ",
-    "Isbn10": "1338153609",
-    "Isbn13": "9781338153606",
-    "Title": "Old Turtle and the Broken Truth",
-    "Authors": [
+    "bookId": "aG-9DAAAQBAJ",
+    "isbn10": "1338153609",
+    "isbn13": "9781338153606",
+    "title": "Old Turtle and the Broken Truth",
+    "authors": [
       "Douglas Wood"
     ],
-    "Level": "L2",
-    "StarRating": 1.5
+    "level": "L2",
+    "starRating": 1.5
   }
 ]

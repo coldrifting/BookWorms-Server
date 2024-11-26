@@ -1,4 +1,5 @@
 ﻿using BookwormsServer;
+using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -12,7 +13,7 @@ public abstract class BaseTest(WebApplicationFactory<Program> factory)
 {
     private AsyncServiceScope _scope;
     private IServiceProvider _services = null!;
-    protected AllBookwormsDbContext Context = null!;
+    protected BookwormsDbContext Context = null!;
     protected HttpClient Client = null!;
     
     public async Task InitializeAsync()
@@ -21,7 +22,7 @@ public abstract class BaseTest(WebApplicationFactory<Program> factory)
         Client.DefaultRequestHeaders.Add("Accept", "application/json");
         _scope = factory.Services.CreateAsyncScope();
         _services = _scope.ServiceProvider;
-        Context = _services.GetRequiredService<AllBookwormsDbContext>();
+        Context = _services.GetRequiredService<BookwormsDbContext>();
 
         await ResetDatabaseAsync();
     }
@@ -48,7 +49,7 @@ public abstract class BasicTest(WebApplicationFactory<Program> factory) : BaseTe
         bool hasAdminUser = await Context.Users.AnyAsync(x => x.Username == "basicUser");
         if (!hasAdminUser)
         {
-            User user = UserService.CreateUser("basicUser", "basicUser", "basicUser", "basicUser@gmail.com");
+            User user = UserService.CreateUser("basicUser", "basicUser", "basicUser", "basicUser@gmail.com", UserIcon.Icon1);
             Context.Users.Add(user);
         }
 

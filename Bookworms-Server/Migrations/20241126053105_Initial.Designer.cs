@@ -4,16 +4,19 @@ using BookwormsServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BookWormsServer.Migrations
+namespace BookwormsServer.Migrations
 {
-    [DbContext(typeof(AllBookwormsDbContext))]
-    partial class AllBookwormsDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(BookwormsDbContext))]
+    [Migration("20241126053105_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,6 +174,9 @@ namespace BookWormsServer.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
+                    b.Property<DateTime>("ReviewDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("ReviewText")
                         .HasMaxLength(4096)
                         .HasColumnType("varchar(4096)");
@@ -224,6 +230,10 @@ namespace BookWormsServer.Migrations
                     b.Property<byte[]>("Salt")
                         .IsRequired()
                         .HasColumnType("longblob");
+
+                    b.Property<string>("UserIcon")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Username");
 

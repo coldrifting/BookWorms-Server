@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BookwormsServer.Models.Data;
 
 namespace BookwormsServer.Models.Entities;
 
@@ -11,7 +12,7 @@ namespace BookwormsServer.Models.Entities;
  */
 
 [Table("Users")]
-public class User(string username, byte[] hash, byte[] salt, string name, string email)
+public class User(string username, byte[] hash, byte[] salt, string name, string email, UserIcon userIcon)
 {
     [Key, StringLength(64, MinimumLength = 5, ErrorMessage = "User username must be between {2} and {1} characters long.")]
     public string Username { get; set; } = username;
@@ -27,22 +28,25 @@ public class User(string username, byte[] hash, byte[] salt, string name, string
     public string Email { get; set; } = email;
 
     public string[] Roles { get; set; } = [];
-    
+
+    [Column(TypeName = "nvarchar(64)")]
+    public UserIcon UserIcon { get; set; } = userIcon;
+
     // Navigation
 
     public ICollection<Review> Reviews { get; set; } = null!;
 }
 
-public class Parent(string username, byte[] hash, byte[] salt, string name, string email)
-    : User(username, hash, salt, name, email)
+public class Parent(string username, byte[] hash, byte[] salt, string name, string email, UserIcon userIcon)
+    : User(username, hash, salt, name, email, userIcon)
 {
     // Navigation
     
     public ICollection<Child> Children { get; set; } = null!;
 }
 
-public class Teacher(string username, byte[] hash, byte[] salt, string name, string email)
-    : User(username, hash, salt, name, email)
+public class Teacher(string username, byte[] hash, byte[] salt, string name, string email, UserIcon userIcon)
+    : User(username, hash, salt, name, email, userIcon)
 {
     [StringLength(6, MinimumLength = 6, ErrorMessage = "Teacher classroom code must be exactly {0} characters long.")]
     public string? ClassroomCode { get; set; }
