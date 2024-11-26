@@ -51,19 +51,10 @@ public class GoogleBooksApiService(IHttpClientFactory factory, IMemoryCache cach
 
         var response = await _client.GetAsync(endpoint);
 
-        try
-        {
-            response.EnsureSuccessStatusCode();
-            byte[] inputBytes = await response.Content.ReadAsByteArrayAsync();
+        response.EnsureSuccessStatusCode();
+        byte[] inputBytes = await response.Content.ReadAsByteArrayAsync();
 
-            cache.Set(endpoint, inputBytes, TimeSpan.FromMinutes(60));
-            return inputBytes;
-
-        }
-        catch (HttpRequestException ex)
-        {
-            // TODO
-            return [];
-        }
+        cache.Set(endpoint, inputBytes, TimeSpan.FromMinutes(60));
+        return inputBytes;
     }
 }

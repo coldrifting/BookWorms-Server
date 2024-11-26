@@ -37,7 +37,15 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public async Task<IActionResult> Image(string bookId)
     {
-        byte[] b = await bookApiService.GetImage(bookId);
-        return File(b, "image/jpeg");
+        try
+        {
+            byte[] b = await bookApiService.GetImage(bookId);
+            return File(b, "image/jpeg");
+        }
+        catch (HttpRequestException)
+        {
+            return NotFound(new ErrorDTO("Not Found",
+                "Could not find the requested book cover on the external API server"));
+        }
     }
 }
