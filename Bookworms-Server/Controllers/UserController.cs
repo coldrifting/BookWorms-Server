@@ -10,7 +10,7 @@ namespace BookwormsServer.Controllers;
 [ApiController]
 [Tags("Accounts")]
 [Route("user/[action]")]
-public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
+public class UserController(BookwormsDbContext dbContext) : ControllerBase
 {
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserLoginSuccessDTO))]
@@ -39,7 +39,7 @@ public class UserController(AllBookwormsDbContext dbContext) : ControllerBase
             return Conflict(new ErrorDTO("Invalid Credentials", "The specified Username already exists"));
         }
 
-        User user = UserService.CreateUser(payload.Username, payload.Password, payload.Name, payload.Email);
+        User user = UserService.CreateUser(payload.Username, payload.Password, payload.Name, payload.Email, UserIcon.Icon1);
         
         dbContext.Users.Add(user);
         dbContext.SaveChanges();

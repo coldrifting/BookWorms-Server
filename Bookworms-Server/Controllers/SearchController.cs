@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 namespace BookwormsServer.Controllers;
 
 [ApiController]
-public class SearchController(AllBookwormsDbContext dbContext, IBookApiService bookApiService) : ControllerBase
+public class SearchController(BookwormsDbContext dbContext, IBookApiService bookApiService) : ControllerBase
 {
     [HttpGet]
     [Route("/search/title")]

@@ -7,7 +7,7 @@ namespace BookwormsServer.Controllers;
 
 [ApiController]
 [Tags("Reviews")]
-public class ReviewsController(AllBookwormsDbContext dbContext) : ControllerBase
+public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
 {
     [HttpPost]
     [Route("/books/{bookId}/review")]

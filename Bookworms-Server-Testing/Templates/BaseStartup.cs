@@ -51,9 +51,9 @@ public class BaseStartup<TProgram>
 		builder.UseEnvironment("Development");
 	    builder.ConfigureServices(services =>
 	    {
-		    services.RemoveAll(typeof(DbContextOptions<AllBookwormsDbContext>));
+		    services.RemoveAll(typeof(DbContextOptions<BookwormsDbContext>));
 		    
-		    services.AddDbContext<AllBookwormsDbContext>(o =>
+		    services.AddDbContext<BookwormsDbContext>(o =>
 			    o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 		    
 			services.BuildServiceProvider();

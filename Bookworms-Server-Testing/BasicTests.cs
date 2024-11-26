@@ -61,7 +61,7 @@ public class BasicTests(BaseStartup<Program> factory) : BaseTest(factory)
     public async Task TestPost_Review(string bookId, string username, double rating, string reviewText)
     {
         HttpResponseMessage response = await Client.PostAsJsonAsync($"/books/{bookId}/review", 
-            new ReviewDTO(username, username, rating, reviewText));
+            new ReviewDTO(username, "teacher", UserIcon.Icon1, rating, reviewText));
         
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         

@@ -3,7 +3,7 @@ using BookwormsServer.Models.Entities;
 
 namespace BookwormsServer;
 
-public class AllBookwormsDbContext(DbContextOptions<AllBookwormsDbContext> options) : DbContext(options)
+public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : DbContext(options)
 {
     public DbSet<Book> Books { get; set; }
     public DbSet<Bookshelf> Bookshelves { get; set; }

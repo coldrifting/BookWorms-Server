@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BookWormsServer.Migrations
+namespace BookwormsServer.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -159,6 +159,7 @@ namespace BookWormsServer.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Roles = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserIcon = table.Column<string>(type: "nvarchar(64)", nullable: false),
                     Discriminator = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
@@ -218,7 +219,8 @@ namespace BookWormsServer.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     StarRating = table.Column<double>(type: "double", nullable: false),
                     ReviewText = table.Column<string>(type: "varchar(4096)", maxLength: 4096, nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ReviewDate = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {

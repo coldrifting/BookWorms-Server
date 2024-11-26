@@ -9,10 +9,11 @@ namespace BookwormsServer.Controllers;
 
 [ApiController]
 [Tags("Book Details")]
-public class BookDetailsController(AllBookwormsDbContext dbContext, IBookApiService bookApiService) : ControllerBase
+public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService bookApiService) : ControllerBase
 {
     [HttpGet]
     [Route("/books/{bookid}/details")]
+    [ResponseCache(Duration = 60)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public IActionResult Get(string bookId)

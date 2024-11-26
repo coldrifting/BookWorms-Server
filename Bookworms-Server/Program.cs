@@ -1,15 +1,14 @@
-using DotNet.Testcontainers.Builders;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using MySqlConnector;
 using BookwormsServer.Filters;
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services;
 using BookwormsServer.Services.Interfaces;
-using Newtonsoft.Json;
 
 namespace BookwormsServer;
 
@@ -22,7 +21,7 @@ public partial class Program
         // Establish database context ----------------------------------------------------------------------------------
 
 	    string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-	    builder.Services.AddDbContext<AllBookwormsDbContext>(o =>
+	    builder.Services.AddDbContext<BookwormsDbContext>(o =>
 		    o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 	    
 	    // Configure Swagger -------------------------------------------------------------------------------------------
@@ -32,6 +31,8 @@ public partial class Program
         
         builder.Services.AddControllers(opt => 
 	        opt.Filters.Add(new ProducesAttribute("application/json")));
+        
+		builder.Services.AddResponseCaching();
         
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
@@ -80,6 +81,19 @@ public partial class Program
 		// (Dependency Injections)
 		
 		builder.Services.AddSingleton<IBookApiService, GoogleBooksApiService>();
+		//builder.Services.AddSingleton<IBookApiService, TestDataApiService>();
+
+		builder.Services.AddHttpClient();
+		builder.Services.AddMemoryCache();
+		
+		// Return enums in response bodies as strings, not numbers
+		builder.Services.AddControllers().AddJsonOptions(options =>
+		{
+		   options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+
+		   options.JsonSerializerOptions.DefaultIgnoreCondition =
+		       JsonIgnoreCondition.WhenWritingNull;
+		});
 		
 		// -------------------------------------------------------------------------------------------------------------
 		
@@ -91,7 +105,7 @@ public partial class Program
         
         // (This is best done here, after the WebApplication has been created)
         using (var serviceScope = app.Services.CreateScope()) {
-	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<AllBookwormsDbContext>();
+	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<BookwormsDbContext>();
 	        dbContext.Database.Migrate();
         }
         
@@ -124,13 +138,16 @@ public partial class Program
 
         app.UseHttpsRedirection();
 
+        // Enable endpoint caching
+		app.UseResponseCaching();
+
         // Endpoints can be split into separate files in the Controllers folder
         app.MapControllers();
         
         // Persist test data -------------------------------------------------------------------------------------------
 
         using (var serviceScope = app.Services.CreateScope()) {
-	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<AllBookwormsDbContext>();
+	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<BookwormsDbContext>();
 	        PersistTestData(dbContext);
         }
         
@@ -139,19 +156,29 @@ public partial class Program
         app.Run();
     }
 
-    public static void PersistTestData(AllBookwormsDbContext dbContext)
+    public static void PersistTestData(BookwormsDbContext dbContext)
     {
-		List<User> users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText("TestData/UserEntities.json"))!;
+	    JsonSerializerOptions jso = new()
+	    {
+		    PropertyNameCaseInsensitive = true,
+			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+			Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+	    };
+
+	    string userData = File.ReadAllText("TestData/UserEntities.json");
+		List<User> users = JsonSerializer.Deserialize<List<User>>(userData, jso)!;
 	    dbContext.Users.ExecuteDelete();
 		dbContext.Users.AddRange(users);
 		dbContext.SaveChanges();
 		
-		List<Book> books = JsonConvert.DeserializeObject<List<Book>>(File.ReadAllText("TestData/BookEntities.json"))!;
+	    string bookData = File.ReadAllText("TestData/BookEntities.json");
+		List<Book> books = JsonSerializer.Deserialize<List<Book>>(bookData, jso)!;
 	    dbContext.Books.ExecuteDelete();
 		dbContext.Books.AddRange(books);
 		dbContext.SaveChanges();
 		
-		List<Review> reviews = JsonConvert.DeserializeObject<List<Review>>(File.ReadAllText("TestData/ReviewEntities.json"))!;
+	    string reviewData = File.ReadAllText("TestData/ReviewEntities.json");
+		List<Review> reviews = JsonSerializer.Deserialize<List<Review>>(reviewData, jso)!;
 	    dbContext.Reviews.ExecuteDelete();
 		dbContext.Reviews.AddRange(reviews);
 		dbContext.SaveChanges();
