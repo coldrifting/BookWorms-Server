@@ -35,7 +35,7 @@ public record BookDetailsDTO(
 
     private static string GetIsbn(JsonObject bookDetails, bool useIsbn10)
     {
-        int index = useIsbn10 ? 1 : 0;
+        int index = useIsbn10 ? 0 : 1;
 
         try
         {

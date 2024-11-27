@@ -20,25 +20,35 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
             !dbContext.Users.Any(u => u.Username == username))
         {
             return BadRequest(new ErrorDTO(
-                "Invalid book or user id", 
+                "Invalid book or user id",
                 "Review could not be created as the book or user id does not exist"));
         }
-        
+
         Review? testExists = dbContext.Reviews.Include(r => r.Reviewer)
             .FirstOrDefault(r => r.BookId == bookId && r.Reviewer!.Username == username);
-        
+
         if (testExists is not null)
         {
             return Conflict(new ErrorDTO("Can not create review", "Review already exists"));
         }
 
-        Review review = new(bookId, username, reviewDto.StarRating, reviewDto.ReviewText, DateTime.Now);
+        if (reviewDto.StarRating is null)
+        {
+            return BadRequest(new ErrorDTO("Invalid review data", "Star rating is required"));
+        }
+
+        if (reviewDto.ReviewText is null)
+        {
+            return BadRequest(new ErrorDTO("Invalid review data", "Review text is required"));
+        }
+
+        Review review = new(bookId, username, reviewDto.StarRating.Value, reviewDto.ReviewText, DateTime.Now);
         dbContext.Reviews.Add(review);
         dbContext.SaveChanges();
 
         var rx = dbContext.Reviews.Where(r => r.ReviewId == review.ReviewId).Include(r => r.Reviewer).FirstOrDefault();
 
-        return Created($"reviews/get/{review.ReviewId}", ReviewDTO.From(rx));
+        return Created($"reviews/{review.ReviewId}", ReviewDTO.From(rx!));
     }
     
     // TODO - Infer username when this becomes an authorized route
@@ -58,11 +68,25 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
                 "Review could not be updated as the book or user id does not exist"));
         }
 
-        review.StarRating = reviewDto.StarRating;
-        review.ReviewText = reviewDto.ReviewText;
+        if (reviewDto.StarRating is null && reviewDto.ReviewText is null)
+        {
+            return BadRequest(new ErrorDTO("Invalid review data", 
+                "At least one of star rating and review text is required"));
+        }
+
+        if (reviewDto.StarRating is not null)
+        {
+            review.StarRating = reviewDto.StarRating.Value;
+        }
+        
+        if (reviewDto.ReviewText is not null)
+        {
+            review.ReviewText = reviewDto.ReviewText;    
+        }
         
         dbContext.SaveChanges();
-
+        
+        this.Response.Headers.Location = $"/reviews/{review.ReviewId}";
         return Ok();
     }
     
