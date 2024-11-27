@@ -15,4 +15,4 @@ public record ReviewDTO(string ReviewerName, string ReviewerRole, UserIcon Revie
     }
 }
 
-public record ReviewRequestDTO(double StarRating, string ReviewText);
+public record ReviewRequestDTO(double? StarRating, string? ReviewText);
