@@ -44,8 +44,8 @@ public static class AuthService
         string encodedHeader = Utils.Hash.Base64Encode(header);
         string encodedPayload = Utils.Hash.Base64Encode(payload);
 
-        var key = Encoding.UTF8.GetBytes(Secret);
-        var source = Encoding.UTF8.GetBytes(encodedHeader + '.' + encodedPayload);
+        byte[] key = Encoding.UTF8.GetBytes(Secret);
+        byte[] source = Encoding.UTF8.GetBytes(encodedHeader + '.' + encodedPayload);
 
         return Utils.Hash.Base64EncodeBytes(HMACSHA256.HashData(key, source));
     }
@@ -60,8 +60,7 @@ public static class AuthService
 			    context.Response.OnStarting(async () =>
 			    {
 				    context.Response.Headers.Append("content-type", "application/json; charset=utf-8");
-				    ErrorDTO error = new("Unauthenticated", "Valid token required for this route");
-				    await context.Response.WriteAsync(JsonSerializer.Serialize(error));
+				    await context.Response.WriteAsync(JsonSerializer.Serialize(ErrorDTO.Unauthenticated));
 			    });
 
 			    return Task.CompletedTask;
@@ -71,8 +70,7 @@ public static class AuthService
 			    context.Response.OnStarting(async () =>
 			    {
 				    context.Response.Headers.Append("content-type", "application/json; charset=utf-8");
-				    ErrorDTO error = new("Unauthorized", "User is not authorized to perform this action");
-				    await context.Response.WriteAsync(JsonSerializer.Serialize(error));
+				    await context.Response.WriteAsync(JsonSerializer.Serialize(ErrorDTO.Unauthorized));
 			    });
 
 			    return Task.CompletedTask;

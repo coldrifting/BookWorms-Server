@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServer.Models.Entities;
 
 [Table("Reviews")]
+[Index(nameof(BookId), nameof(Username), IsUnique = true)]
 public class Review(string bookId, string username, double starRating, string? reviewText, DateTime reviewDate)
 {
     [Key]

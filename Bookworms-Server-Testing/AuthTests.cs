@@ -10,7 +10,7 @@ namespace BookwormsServerTesting;
 public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
 {
     [Fact]
-    public async Task CreateUser()
+    public async Task Test_CreateNewUser()
     {
         HttpResponseMessage registerResponse = await Client.PostAsJsonAsync("/user/register",
             new UserRegisterDTO("user42", "improbable", "42", "user@42.com"));
@@ -19,7 +19,7 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
 
     [Fact]
-    public async Task Login()
+    public async Task Test_LoginBasic()
     {
         HttpResponseMessage loginResponse = await Client.PostAsJsonAsync("/user/login", 
             new UserLoginDTO("teacher1", "teacher1"));
@@ -30,9 +30,51 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
         Assert.NotNull(token);
         Assert.NotEmpty(token.Token);
     }
+
+    [Fact]
+    public async Task Test_LoginBadUsername()
+    {
+        HttpResponseMessage loginResponse = await Client.PostAsJsonAsync("/user/login", 
+            new UserLoginDTO("userdoesnotexist", "improbable"));
+        
+        Assert.Equal(HttpStatusCode.BadRequest, loginResponse.StatusCode);
+
+        var content = await loginResponse.Content.ReadFromJsonAsync<ErrorDTO>();
+        Assert.NotNull(content);
+
+        Assert.Equal(ErrorDTO.LoginFailure, content);
+    }
+
+    [Fact]
+    public async Task Test_LoginBadPassword()
+    {
+        HttpResponseMessage loginResponse = await Client.PostAsJsonAsync("/user/login", 
+            new UserLoginDTO("teacher0", "wrongpassword"));
+        
+        Assert.Equal(HttpStatusCode.BadRequest, loginResponse.StatusCode);
+
+        var content = await loginResponse.Content.ReadFromJsonAsync<ErrorDTO>();
+        Assert.NotNull(content);
+
+        Assert.Equal(ErrorDTO.LoginFailure, content);
+    }
+
+    [Fact]
+    public async Task Test_LoginBadUsernameAndPassword()
+    {
+        HttpResponseMessage loginResponse = await Client.PostAsJsonAsync("/user/login", 
+            new UserLoginDTO("wrongusername", "wrongpassword"));
+        
+        Assert.Equal(HttpStatusCode.BadRequest, loginResponse.StatusCode);
+
+        var content = await loginResponse.Content.ReadFromJsonAsync<ErrorDTO>();
+        Assert.NotNull(content);
+
+        Assert.Equal(ErrorDTO.LoginFailure, content);
+    }
     
     [Fact]
-    public async Task CreateUserAndLogin()
+    public async Task Test_CreateNewUserAndLogin()
     {
         HttpResponseMessage registerResponse = await Client.PostAsJsonAsync("/user/register",
             new UserRegisterDTO("user42", "improbable", "42", "user@42.com"));
@@ -48,12 +90,28 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
         Assert.NotNull(token);
         Assert.NotEmpty(token.Token);
     }
-    
+
     [Fact]
-    public async Task AdminLoginShouldReturnToken()
+    public async Task Test_CreateUserUsernameAlreadyExists()
+    {
+        HttpResponseMessage registerResponse = await Client.PostAsJsonAsync("/user/register",
+            new UserRegisterDTO("teacher0", "teacher0", "teacher0", "teacher0@gmail.com"));
+
+        Assert.Equal(HttpStatusCode.Conflict, registerResponse.StatusCode);
+        
+        ErrorDTO? loginError = await registerResponse.Content.ReadFromJsonAsync<ErrorDTO>();
+        Assert.NotNull(loginError);
+        Assert.NotEmpty(loginError.Error);
+        Assert.NotEmpty(loginError.Description);
+        Assert.Equal(ErrorDTO.UsernameAlreadyExists, loginError);
+    }
+    
+    [Theory]
+    [InlineData("admin", "admin")]
+    public async Task Test_LoginShouldReturnToken(string username, string password)
     {
         HttpResponseMessage response = await Client.PostAsJsonAsync("/user/login", 
-            new UserLoginDTO("admin", "admin"));
+            new UserLoginDTO(username, password));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         UserLoginSuccessDTO? token = await response.Content.ReadFromJsonAsync<UserLoginSuccessDTO>();

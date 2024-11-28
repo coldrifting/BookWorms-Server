@@ -17,11 +17,11 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
     public IActionResult Login(UserLoginDTO payload)
     {
-        var userMatch = dbContext.Users.Where(u => u.Username == payload.Username);
+        IQueryable<User> userMatch = dbContext.Users.Where(u => u.Username == payload.Username);
         
         if (userMatch.FirstOrDefault() is not { } candidateUser || 
             !AuthService.VerifyPassword(payload.Password, candidateUser.Hash, candidateUser.Salt))
-            return BadRequest(new ErrorDTO("Invalid Credentials", "Incorrect username and/or password"));
+            return BadRequest(ErrorDTO.LoginFailure);
         
         // Send JWT token to avoid expensive hash calls for each authenticated endpoint
         string token = AuthService.GenerateToken(userMatch.First());
@@ -33,10 +33,10 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorDTO))]
     public IActionResult Register(UserRegisterDTO payload)
     {
-        var userMatch = dbContext.Users.Where(l => l.Username == payload.Username);
+        IQueryable<User> userMatch = dbContext.Users.Where(l => l.Username == payload.Username);
         if (userMatch.Any())
         {
-            return Conflict(new ErrorDTO("Invalid Credentials", "The specified Username already exists"));
+            return Conflict(ErrorDTO.UsernameAlreadyExists);
         }
 
         User user = UserService.CreateUser(payload.Username, payload.Password, payload.Name, payload.Email, UserIcon.Icon1);
@@ -54,25 +54,20 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     public IActionResult All()
     {
-        var users = dbContext.Set<User>().ToList();
+        User[] users = dbContext.Set<User>().ToArray();
 
-        return Ok(users);
-    }
-    
-    [HttpGet]
-    [Authorize]
-    public IActionResult GetUsername()
-    {
         // Example of inferring username from bearer token for authenticated routes
-        string? username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        User? user = dbContext.Users.FirstOrDefault(u => u.Username == username);
-        if (user is not null)
+        if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value is { } loggedInUser)
         {
-            return Ok(UserInfoDTO.From(user));
+            for (int i = 0; i < users.Length; i++)
+            {
+                if (users[0].Username == loggedInUser)
+                {
+                    (users[i], users[0]) = (users[0], users[i]);
+                }
+            }
         }
         
-        return BadRequest(new ErrorDTO("Bad Request", "Unable to find user details"));
+        return Ok(users);
     }
-    
 }

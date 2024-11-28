@@ -23,10 +23,12 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
             .Include(b => b.Reviews)
             .ThenInclude(r => r.Reviewer)
             .SingleOrDefault(b => b.BookId == bookId);
-        
+
         if (bookEntity == null)
-            return NotFound();
-        
+        {
+            return NotFound(ErrorDTO.BookNotFound);
+        }
+
         JsonObject bookDetailsJson = await bookApiService.GetData(bookId);
         var details = BookDetailsDTO.From(bookEntity, bookDetailsJson);
         return Ok(details);
@@ -45,8 +47,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
         }
         catch (HttpRequestException)
         {
-            return NotFound(new ErrorDTO("Not Found",
-                "Could not find the requested book cover on the external API server"));
+            return NotFound(ErrorDTO.BookCoverNotFound);
         }
     }
 

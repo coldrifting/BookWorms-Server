@@ -9,44 +9,43 @@ namespace BookwormsServer.Controllers;
 [Tags("Reviews")]
 public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
 {
+    // TODO - Infer username when this becomes an authorized route
     [HttpPost]
     [Route("/books/{bookId}/review")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ReviewDTO))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorDTO))]
-    public IActionResult Add(string bookId, string username, [FromBody] ReviewRequestDTO reviewDto)
+    public IActionResult Add(string bookId, string username, [FromBody] ReviewCreateRequestDTO reviewDto)
     {
-        if (!dbContext.Books.Any(b => b.BookId == bookId) ||
-            !dbContext.Users.Any(u => u.Username == username))
+        if (!dbContext.Books.Any(b => b.BookId == bookId))
         {
-            return BadRequest(new ErrorDTO(
-                "Invalid book or user id",
-                "Review could not be created as the book or user id does not exist"));
+            return NotFound(ErrorDTO.BookNotFound);
+        } 
+        
+        // TODO - Replace with username inference
+        if (!dbContext.Users.Any(u => u.Username == username))
+        {
+            return NotFound(ErrorDTO.UsernameNotFound);
         }
 
-        Review? testExists = dbContext.Reviews.Include(r => r.Reviewer)
-            .FirstOrDefault(r => r.BookId == bookId && r.Reviewer!.Username == username);
+        Review? testExists = dbContext.Reviews
+            .Include(r => r.Reviewer)
+            .FirstOrDefault(r => r.BookId == bookId && 
+                                 r.Reviewer!.Username == username);
 
         if (testExists is not null)
         {
-            return Conflict(new ErrorDTO("Can not create review", "Review already exists"));
+            return Conflict(ErrorDTO.ReviewAlreadyExists);
         }
 
-        if (reviewDto.StarRating is null)
-        {
-            return BadRequest(new ErrorDTO("Invalid review data", "Star rating is required"));
-        }
-
-        if (reviewDto.ReviewText is null)
-        {
-            return BadRequest(new ErrorDTO("Invalid review data", "Review text is required"));
-        }
-
-        Review review = new(bookId, username, reviewDto.StarRating.Value, reviewDto.ReviewText, DateTime.Now);
+        Review review = new(bookId, username, reviewDto.StarRating, reviewDto.ReviewText, DateTime.Now);
         dbContext.Reviews.Add(review);
         dbContext.SaveChanges();
 
-        var rx = dbContext.Reviews.Where(r => r.ReviewId == review.ReviewId).Include(r => r.Reviewer).FirstOrDefault();
+        var rx = dbContext.Reviews
+            .Where(r => r.ReviewId == review.ReviewId)
+            .Include(r => r.Reviewer)
+            .FirstOrDefault();
 
         return Created($"reviews/{review.ReviewId}", ReviewDTO.From(rx!));
     }
@@ -56,22 +55,33 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     [Route("/books/{bookId}/review")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Review))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
-    public IActionResult Update(string bookId, string username, [FromBody] ReviewRequestDTO reviewDto)
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    public IActionResult Update(string bookId, string username, [FromBody] ReviewUpdateRequestDTO reviewDto)
     {
-        Review? review = dbContext.Reviews.Include(r => r.Reviewer)
-            .FirstOrDefault(r => r.BookId == bookId && r.Reviewer!.Username == username);
+        if (!dbContext.Books.Any(b => b.BookId == bookId))
+        {
+            return NotFound(ErrorDTO.BookNotFound);
+        } 
+        
+        // TODO - Replace with username inference
+        if (!dbContext.Users.Any(u => u.Username == username))
+        {
+            return NotFound(ErrorDTO.UsernameNotFound);
+        }
+        
+        Review? review = dbContext.Reviews
+            .Include(r => r.Reviewer)
+            .FirstOrDefault(r => r.BookId == bookId && 
+                                        r.Reviewer!.Username == username);
 
         if (review is null)
         {
-            return BadRequest(new ErrorDTO(
-                "Invalid book or user id", 
-                "Review could not be updated as the book or user id does not exist"));
+            return NotFound(ErrorDTO.ReviewNotFound);
         }
 
         if (reviewDto.StarRating is null && reviewDto.ReviewText is null)
         {
-            return BadRequest(new ErrorDTO("Invalid review data", 
-                "At least one of star rating and review text is required"));
+            return BadRequest(ErrorDTO.ReviewStarRatingOrTextRequired);
         }
 
         if (reviewDto.StarRating is not null)
@@ -94,75 +104,80 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     [HttpDelete]
     [Route("/books/{bookId}/review")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public IActionResult Delete(string bookId, string username)
     {
-        Review? review = dbContext.Reviews.Include(r => r.Reviewer)
-            .FirstOrDefault(r => r.BookId == bookId && r.Reviewer!.Username == username);
+        Review? review = dbContext.Reviews
+            .Include(r => r.Reviewer)
+            .FirstOrDefault(r => r.BookId == bookId && 
+                                        r.Reviewer!.Username == username);
 
         if (review is null)
         {
-            return BadRequest(new ErrorDTO(
-                "Invalid book or user id", 
-                "Review could not be deleted as the book or user id does not exist"));
+            return NotFound(ErrorDTO.BookNotFound);
         }
 
         dbContext.Remove(review);
-        
         dbContext.SaveChanges();
 
+        Response.Headers.Append("location", "");
+        
         return Ok();
     }
 
     [HttpGet]
     [Route("/books/{bookId}/reviews")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ReviewDTO>))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public IActionResult Book(string bookId, int start, int max)
     {
         Book? book = dbContext.Books
             .Include(book => book.Reviews)
             .FirstOrDefault(b => b.BookId == bookId);
-        
-        if (book is not null)
+
+        if (book is null)
         {
-            var output = new List<ReviewDTO>();
-
-            var x = dbContext.Reviews
-                .Include(review => review.Reviewer)
-                .Where(r => r.BookId == bookId).ToList();
-
-            for (int i = 0; i < x.Count; i++)
-            {
-                if (i >= start)
-                {
-                    output.Add(ReviewDTO.From(x[i]));
-                }
-
-                if (max > 0 && i >= start + max - 1)
-                {
-                    break;
-                }
-            }
-            
-            return Ok(output);
+            return NotFound(ErrorDTO.ReviewNotFound);
         }
+        
+        List<ReviewDTO> output = [];
 
-        return BadRequest(new ErrorDTO("Invalid reviewId", "Could not find a review matching the given id"));
+        List<Review> x = dbContext.Reviews
+            .Include(review => review.Reviewer)
+            .Where(r => r.BookId == bookId).ToList();
+
+        for (int i = 0; i < x.Count; i++)
+        {
+            if (i >= start)
+            {
+                output.Add(ReviewDTO.From(x[i]));
+            }
+
+            if (max > 0 && i >= start + max - 1)
+            {
+                break;
+            }
+        }
+            
+        return Ok(output);
+
     }
 
     [HttpGet]
     [Route("/reviews/{reviewId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReviewDTO))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public IActionResult Get(string reviewId)
     {
-        Review? review = dbContext.Reviews.Include(review => review.Reviewer).FirstOrDefault(r => r.ReviewId.ToString() == reviewId);
-        if (review is not null)
+        Review? review = dbContext.Reviews
+            .Include(review => review.Reviewer)
+            .FirstOrDefault(r => r.ReviewId.ToString() == reviewId);
+        
+        if (review is null)
         {
-            return Ok(ReviewDTO.From(review));
+            return NotFound(ErrorDTO.ReviewNotFound);
         }
 
-        return BadRequest(new ErrorDTO("Invalid reviewId", "Could not find a review matching the given id"));
+        return Ok(ReviewDTO.From(review));
     }
 }

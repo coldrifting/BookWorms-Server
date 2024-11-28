@@ -8,6 +8,7 @@ using BookwormsServer;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using BookwormsServerTesting.Templates;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServerTesting;
 
@@ -34,6 +35,19 @@ public class BasicTests(BaseStartup<Program> factory) : BaseTest(factory)
         Assert.NotNull(content);
         Assert.True(content.Description.IsNotNullOrEmpty());
         Assert.Equal(isbn13, content.Isbn13);
+    }
+
+    [Theory]
+    [InlineData("abc123")]
+    public async Task TestGet_BookDetailsBadBookId(string bookId)
+    {
+        HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/details");
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        
+        var content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
+        
+        Assert.NotNull(content);
+        Assert.Equal(ErrorDTO.BookNotFound, content);
     }
     
     [Theory]
@@ -72,7 +86,7 @@ public class BasicTests(BaseStartup<Program> factory) : BaseTest(factory)
     public async Task TestPost_Review(string bookId, string username, double rating, string reviewText)
     {
         HttpResponseMessage response = await this.Client.PostAsJsonAsync($"/books/{bookId}/review?username={username}", 
-            new ReviewRequestDTO(rating, reviewText));
+            new ReviewCreateRequestDTO(rating, reviewText));
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var content = await response.Content.ReadFromJsonAsync<ReviewDTO>(this._jso);
         Assert.NotNull(content);
@@ -93,12 +107,49 @@ public class BasicTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
 
     [Theory]
+    [InlineData("badBookId", "teacher1", 3.5, "some review text")]
+    public async Task TestPost_ReviewBadBookId(string bookId, string username, double rating, string reviewText)
+    {
+        HttpResponseMessage response = await this.Client.PostAsJsonAsync($"/books/{bookId}/review?username={username}", 
+            new ReviewCreateRequestDTO(rating, reviewText));
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        var content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
+        
+        Assert.NotNull(content);
+        Assert.Equal(ErrorDTO.BookNotFound, content);
+    }
+    
+    [Theory]
+    [InlineData("_kaGDwAAQBAJ", "teacher1", 4.5, "some review text", 3.5, "Made us smile with its charming tale.")]
+    public async Task TestPost_ReviewReviewAlreadyExists(string bookId, string username, double rating, string reviewText, double oldRating, string oldReviewText)
+    {
+        HttpResponseMessage response = await this.Client.PostAsJsonAsync($"/books/{bookId}/review?username={username}", 
+            new ReviewCreateRequestDTO(rating, reviewText));
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        
+        var content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
+        
+        Assert.NotNull(content);
+        Assert.Equal(ErrorDTO.ReviewAlreadyExists, content);
+        
+        Review? review = Context.Reviews
+            .Include(r => r.Reviewer)
+            .FirstOrDefault(r => r.BookId == bookId && 
+                                        r.Reviewer!.Username == username);
+
+        // Make sure review has not been updated
+        Assert.NotNull(review);
+        Assert.Equal(oldRating, review.StarRating);
+        Assert.Equal(oldReviewText, review.ReviewText);
+    }
+
+    [Theory]
     [InlineData("1IleAgAAQBAJ", "parent0", 1.0, "Didn't like it")]
     [InlineData("1IleAgAAQBAJ", "teacher0", 1.5, "Horrible")]
     public async Task TestPut_Review(string bookId, string username, double rating, string reviewText)
     {
         HttpResponseMessage response = await this.Client.PutAsJsonAsync($"/books/{bookId}/review?username={username}", 
-            new ReviewRequestDTO(rating, reviewText));
+            new ReviewUpdateRequestDTO(rating, reviewText));
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         
         HttpResponseMessage response2 = await this.Client.GetAsync(response.Headers.Location);
@@ -132,9 +183,9 @@ public class BasicTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
     
     [Theory]
-    [InlineData("1IleAgAAQBAJ",  0, -1, 7)]
+    [InlineData("1IleAgAAQBAJ",  0, -1, 5)]
     [InlineData("1IleAgAAQBAJ",  1, 3, 3)]
-    [InlineData("1IleAgAAQBAJ",  5, 3, 2)]
+    [InlineData("1IleAgAAQBAJ",  2, 4, 3)]
     public async Task TestGet_ReviewsByBook(string bookId, int start, int max, int expected)
     {
         HttpResponseMessage response = await this.Client.GetAsync($"/books/{bookId}/reviews?start={start}&max={max}");
