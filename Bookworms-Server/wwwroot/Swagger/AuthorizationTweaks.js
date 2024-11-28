@@ -116,7 +116,7 @@ function AuthPanel() {
         }
 
         // Get Token from login API
-        fetch("/account/login", {
+        fetch("/user/login", {
             method: "POST",
             headers: {
                 "accept": "application/json",
