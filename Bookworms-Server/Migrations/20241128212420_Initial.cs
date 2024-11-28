@@ -358,9 +358,10 @@ namespace BookwormsServer.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reviews_BookId",
+                name: "IX_Reviews_BookId_Username",
                 table: "Reviews",
-                column: "BookId");
+                columns: new[] { "BookId", "Username" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_Username",

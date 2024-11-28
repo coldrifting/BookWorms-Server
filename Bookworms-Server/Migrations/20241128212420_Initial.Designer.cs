@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookwormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
-    [Migration("20241126053105_Initial")]
+    [Migration("20241128212420_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -191,9 +191,10 @@ namespace BookwormsServer.Migrations
 
                     b.HasKey("ReviewId");
 
-                    b.HasIndex("BookId");
-
                     b.HasIndex("Username");
+
+                    b.HasIndex("BookId", "Username")
+                        .IsUnique();
 
                     b.ToTable("Reviews");
                 });

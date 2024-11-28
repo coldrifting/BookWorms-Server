@@ -182,32 +182,11 @@
     "reviewText": "Loved this fun adventure."
   },
   {
-    "reviewId": "dba65f16-1ad3-4884-8d2d-9cc4919850c9",
-    "bookId": "sQSDzQEACAAJ",
-    "username": "teacher4",
-    "starRating": 5.0,
-    "reviewText": "The illustrations were vibrant and engaging."
-  },
-  {
-    "reviewId": "3b0bcc87-3172-4f00-a0ad-2eba40d1ca5e",
-    "bookId": "VnAkAQAAMAAJ",
-    "username": "teacher4",
-    "starRating": 5.0,
-    "reviewText": "Couldn't get enough of this fantastic read."
-  },
-  {
     "reviewId": "5f9681bf-61ae-4bab-8955-1eb255142261",
     "bookId": "KkIwzwEACAAJ",
     "username": "parent3",
     "starRating": 1.5,
     "reviewText": "We had so much fun reading this together."
-  },
-  {
-    "reviewId": "96c1a03c-71cf-4aa8-b5fa-f97b263a4eed",
-    "bookId": "bSSW15rcQbsC",
-    "username": "parent4",
-    "starRating": 3.0,
-    "reviewText": "A heartwarming tale that we loved."
   },
   {
     "reviewId": "4d36a130-0fce-41a2-b404-30fc86f6a1b9",
@@ -259,13 +238,6 @@
     "reviewText": "A heartwarming book that we cherished."
   },
   {
-    "reviewId": "d2dd9d9d-4bef-4110-920c-2a2fa6e71caf",
-    "bookId": "Sj5MWqEPsDkC",
-    "username": "teacher5",
-    "starRating": 3.0,
-    "reviewText": "We loved the characters and the story."
-  },
-  {
     "reviewId": "21d21347-a310-4286-bbeb-e8e3d071b34b",
     "bookId": "VnAkAQAAMAAJ",
     "username": "teacher3",
@@ -294,39 +266,11 @@
     "reviewText": "A delightful book with a lot of heart."
   },
   {
-    "reviewId": "90d05cea-5ead-4b8a-9517-30fe61960ddb",
-    "bookId": "1IleAgAAQBAJ",
-    "username": "parent2",
-    "starRating": 2.0,
-    "reviewText": "Full of heart and delight."
-  },
-  {
-    "reviewId": "51c06088-7343-4ada-8f5f-e7f2e92020f7",
-    "bookId": "_kaGDwAAQBAJ",
-    "username": "teacher1",
-    "starRating": 0.5,
-    "reviewText": "We learned a lot from this book."
-  },
-  {
-    "reviewId": "fd4a08ad-c837-4982-9640-f08412445a9b",
-    "bookId": "IUnGtgEACAAJ",
-    "username": "teacher4",
-    "starRating": 5.0,
-    "reviewText": "An exciting adventure we couldn't put down."
-  },
-  {
     "reviewId": "4582543d-92d1-4bff-96c4-7bc80c6d2175",
     "bookId": "IUnGtgEACAAJ",
     "username": "teacher2",
     "starRating": 2.0,
     "reviewText": "A heartwarming tale that we loved."
-  },
-  {
-    "reviewId": "bef72030-81fb-4d03-b600-2ee35d5c4954",
-    "bookId": "mF34zQEACAAJ",
-    "username": "parent4",
-    "starRating": 2.0,
-    "reviewText": "All of us loved this delightful book."
   },
   {
     "reviewId": "9ece0b7d-0385-4c13-a78c-15126262d9a5",
@@ -371,13 +315,6 @@
     "reviewText": "Beautiful illustrations and a touching story."
   },
   {
-    "reviewId": "9b503785-7dde-4dc3-9efa-79bf645f331f",
-    "bookId": "_kaGDwAAQBAJ",
-    "username": "parent4",
-    "starRating": 2.0,
-    "reviewText": "We loved the characters and the story."
-  },
-  {
     "reviewId": "8cc784ec-a97e-4caf-a05e-17296e80aca2",
     "bookId": "sQSDzQEACAAJ",
     "username": "teacher3",
@@ -399,25 +336,11 @@
     "reviewText": "Lots of laughs in this fun book."
   },
   {
-    "reviewId": "eee97054-41c9-424a-a3c6-45be68060c39",
-    "bookId": "KkIwzwEACAAJ",
-    "username": "parent3",
-    "starRating": 2.0,
-    "reviewText": "Kept us engaged and entertained."
-  },
-  {
     "reviewId": "94d1e9b7-31e7-4b1c-bcc8-e8b76134aae8",
     "bookId": "Sj5MWqEPsDkC",
     "username": "teacher2",
     "starRating": 2.0,
     "reviewText": "We couldn't put this book down."
-  },
-  {
-    "reviewId": "410748d6-103f-443d-9468-6dc8b7a1911e",
-    "bookId": "1IleAgAAQBAJ",
-    "username": "parent2",
-    "starRating": 4.0,
-    "reviewText": "Magical and loved by us."
   },
   {
     "reviewId": "3dc8a573-954f-462b-818e-ef5755f204ca",

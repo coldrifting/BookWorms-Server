@@ -188,9 +188,10 @@ namespace BookwormsServer.Migrations
 
                     b.HasKey("ReviewId");
 
-                    b.HasIndex("BookId");
-
                     b.HasIndex("Username");
+
+                    b.HasIndex("BookId", "Username")
+                        .IsUnique();
 
                     b.ToTable("Reviews");
                 });
