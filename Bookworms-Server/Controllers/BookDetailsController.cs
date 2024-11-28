@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.IO.Compression;
+using System.Text.Json.Nodes;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services.Interfaces;
@@ -47,5 +48,26 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
             return NotFound(new ErrorDTO("Not Found",
                 "Could not find the requested book cover on the external API server"));
         }
+    }
+
+    [HttpPost]
+    [Route("/books/covers")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(File))]
+    public async Task<IActionResult> Images([FromBody] List<string> bookIds)
+    {
+        using var ms = new MemoryStream();
+        using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
+        {
+            foreach (var bookId in bookIds)
+            {
+                var zipEntry = archive.CreateEntry($"{bookId}_cover.jpg", CompressionLevel.Optimal);
+                byte[] imageBytes = await bookApiService.GetImage(bookId);
+
+                await using var zipStream = zipEntry.Open();
+                await zipStream.WriteAsync(imageBytes);
+            }
+        }
+        
+        return File(ms.ToArray(), "application/zip", "CoverImages.zip");
     }
 }
