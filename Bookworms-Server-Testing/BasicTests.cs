@@ -3,7 +3,6 @@ using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AllOverIt.Extensions;
 using BookwormsServer;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
@@ -33,7 +32,8 @@ public class BasicTests(BaseStartup<Program> factory) : BaseTest(factory)
         var content = await response.Content.ReadFromJsonAsync<BookDetailsDTO>(this._jso);
 
         Assert.NotNull(content);
-        Assert.True(content.Description.IsNotNullOrEmpty());
+        Assert.NotNull(content.Description);
+        Assert.NotEmpty(content.Description);
         Assert.Equal(isbn13, content.Isbn13);
     }
 

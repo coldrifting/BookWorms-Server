@@ -13,7 +13,7 @@ public class GoogleBooksApiService(IHttpClientFactory factory, IMemoryCache cach
         string endpoint =
             $"https://www.googleapis.com/books/v1/volumes/{bookId}";
         
-        string key = "&key=AIzaSyCMAFln3TxoTl0R9P-2IBPBer36d0HV7Ek";
+        //string key = "&key=AIzaSyCMAFln3TxoTl0R9P-2IBPBer36d0HV7Ek";
         
         if (cache.TryGetValue(endpoint, out JsonObject? cachedResponse))
         {
@@ -26,12 +26,15 @@ public class GoogleBooksApiService(IHttpClientFactory factory, IMemoryCache cach
         {
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadFromJsonAsync<JsonObject>();
+
+            if (content?["volumeInfo"] is not JsonObject volumeInfo) 
+                return [];
             
-            cache.Set(endpoint, content["volumeInfo"], TimeSpan.FromMinutes(60));
-            return content["volumeInfo"] as JsonObject;
+            cache.Set(endpoint, volumeInfo, TimeSpan.FromMinutes(60));
+            return volumeInfo;
 
         }
-        catch (HttpRequestException ex)
+        catch (HttpRequestException)
         {
             return [];
         }
@@ -42,7 +45,7 @@ public class GoogleBooksApiService(IHttpClientFactory factory, IMemoryCache cach
         string endpoint =
             $"https://books.google.com/books/publisher/content?id={bookId}&printsec=frontcover&img=1&zoom=1";
 
-        string key = "&key=AIzaSyCMAFln3TxoTl0R9P-2IBPBer36d0HV7Ek";
+        //string key = "&key=AIzaSyCMAFln3TxoTl0R9P-2IBPBer36d0HV7Ek";
         
         if (cache.TryGetValue(endpoint, out byte[]? cachedResponse))
         {

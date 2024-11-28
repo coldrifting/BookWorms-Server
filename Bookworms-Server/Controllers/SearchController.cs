@@ -11,7 +11,7 @@ public class SearchController(BookwormsDbContext dbContext, IBookApiService book
     [HttpGet]
     [Route("/search/title")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookDto>))]
-    public async Task<IActionResult> ByName(string query)
+    public Task<IActionResult> ByName(string query)
     {
         List<Book> books = dbContext.Books
             .Where(b => b.Title.Contains(query))
@@ -26,6 +26,6 @@ public class SearchController(BookwormsDbContext dbContext, IBookApiService book
             select BookDto.From(book, bookDetails)
         );
 
-        return Ok(bookDtos);
+        return Task.FromResult<IActionResult>(Ok(bookDtos));
     }
 }

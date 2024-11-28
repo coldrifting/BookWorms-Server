@@ -28,7 +28,7 @@ public class BaseStartup<TProgram>
 		    return;
 	    }
 
-	    string? connectionString = config.GetConnectionString("DefaultConnection");
+	    string connectionString = config.GetConnectionString("DefaultConnection") ?? "";
 	    string? databaseVersion = config.GetValue<string>("Database:Version");
 	    
 		MySqlConnectionStringBuilder connString = new MySqlConnectionStringBuilder(connectionString);
@@ -45,7 +45,7 @@ public class BaseStartup<TProgram>
 		    
         Task.Run(async () => await container.StartAsync()).Wait();
 
-        connectionString = connectionString.Replace("3306", container.GetMappedPublicPort(3306).ToString());
+        string newConnectionString = connectionString.Replace("3306", container.GetMappedPublicPort(3306).ToString());
         
 	    // Override DB Context to use docker mysql instance
 		builder.UseEnvironment("Development");
@@ -54,7 +54,7 @@ public class BaseStartup<TProgram>
 		    services.RemoveAll(typeof(DbContextOptions<BookwormsDbContext>));
 		    
 		    services.AddDbContext<BookwormsDbContext>(o =>
-			    o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+			    o.UseMySql(newConnectionString, ServerVersion.AutoDetect(newConnectionString)));
 		    
 			services.BuildServiceProvider();
 	    });
