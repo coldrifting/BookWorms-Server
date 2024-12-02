@@ -135,3 +135,7 @@ $RECYCLE.BIN
 .DS_Store
 
 _NCrunch
+
+# Ignore JetBrains Rider settings files
+*.sln.DotSettings
+*.sln.DotSettings.user
