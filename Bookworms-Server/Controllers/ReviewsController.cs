@@ -101,7 +101,8 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
 
         List<Review> x = dbContext.Reviews
             .Include(review => review.Reviewer)
-            .Where(r => r.BookId == bookId).ToList();
+            .Where(r => r.BookId == bookId)
+            .OrderByDescending(r => r.ReviewDate).ToList();
 
         for (int i = 0; i < x.Count; i++)
         {
