@@ -106,7 +106,12 @@ public partial class Program
         // (This is best done here, after the WebApplication has been created)
         using (var serviceScope = app.Services.CreateScope()) {
 	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<BookwormsDbContext>();
-	        dbContext.Database.Migrate();
+	        
+	        // If running the application or the tests fails here, you need to drop your database and then try again
+	        if (dbContext.Database.EnsureCreated())
+	        {
+				dbContext.Database.Migrate();
+	        }
         }
         
         
