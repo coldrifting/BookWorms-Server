@@ -1,5 +1,7 @@
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using BookwormsServer.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +11,7 @@ using BookwormsServer.Filters;
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services;
 using BookwormsServer.Services.Interfaces;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace BookwormsServer;
 
@@ -52,7 +55,14 @@ public partial class Program
 				Type = SecuritySchemeType.Http,
 				Scheme = "Bearer"
 			});
+			
+			opt.ExampleFilters();
+
+			var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+			opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 		});
+
+		builder.Services.AddSwaggerExamplesFromAssemblyOf<ImagesRequestBodyExample>();
         
         // Authorization & Authentication
 		builder.Services
@@ -131,6 +141,7 @@ public partial class Program
 				// Other style tweaks
 				opt.InjectStylesheet("/Swagger/Themes/_custom.css");
 				opt.InjectJavascript("/Swagger/AuthorizationTweaks.js");
+				opt.InjectJavascript("/Swagger/ResponseTweaks.js");
 	            
 	            // Use Root URL
 				opt.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");

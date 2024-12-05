@@ -9,6 +9,16 @@ namespace BookwormsServer.Controllers;
 [Tags("Reviews")]
 public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
 {
+    /// <summary>
+    /// Adds/updates the review for the specified book and user
+    /// </summary>
+    /// <param name="bookId">The Google Books ID of the book to target</param>
+    /// <param name="username">The username of the user leaving the review</param>
+    /// <param name="reviewDto">The data with which to populate the new/updated review</param>
+    /// <returns>The newly created or updated review</returns>
+    /// <response code="200">Returns the updated review</response>
+    /// <response code="201">Returns the newly created review</response>
+    /// <response code="404">If the specified book or user is not found</response>
     // TODO - Infer username when this becomes an authorized route
     [HttpPut]
     [Route("/books/{bookId}/review")]
@@ -57,6 +67,13 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
         return StatusCode(statusCode, ReviewDTO.From(rx!));
     }
     
+    /// <summary>
+    /// Removes the review for the specified book and user
+    /// </summary>
+    /// <param name="bookId">The Google Books ID of the book to target</param>
+    /// <param name="username">The username of the user who left the review</param>
+    /// <response code="200">If the review was removed successfully</response>
+    /// <response code="404">If the specified book, user, or review is not found</response>
     // TODO - Infer username when this becomes an authorized route
     [HttpDelete]
     [Route("/books/{bookId}/review")]
@@ -82,6 +99,15 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Gets reviews for the specified book
+    /// </summary>
+    /// <param name="bookId">The Google Books ID of the book to target</param>
+    /// <param name="start" default="0">The start index from which to start returning reviews (first is 0)</param>
+    /// <param name="max" default="-1">The maximum number of reviews to return (use -1 for unconstrained)</param>
+    /// <returns>The list of reviews</returns>
+    /// <response code="200">Returns the list of requested reviews</response>
+    /// <response code="404">If the specified book is not found</response>
     [HttpGet]
     [Route("/books/{bookId}/reviews")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ReviewDTO>))]

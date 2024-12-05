@@ -12,6 +12,13 @@ namespace BookwormsServer.Controllers;
 [Route("user/[action]")]
 public class UserController(BookwormsDbContext dbContext) : ControllerBase
 {
+    /// <summary>
+    /// Logs in a user using the given login payload
+    /// </summary>
+    /// <param name="payload">The user login data payload</param>
+    /// <returns>The now-logged-in user's JWT token and session timeout</returns>
+    /// <response code="200">Returns the session data</response>
+    /// <response code="400">If the provided credentials are invalid</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserLoginSuccessDTO))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
@@ -28,6 +35,13 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
         return Ok(new UserLoginSuccessDTO(token, AuthService.ExpireTime));
     }
     
+    /// <summary>
+    /// Registers a new user 
+    /// </summary>
+    /// <param name="payload">The data with which to register the new user</param>
+    /// <returns>The now-registered user's data</returns>
+    /// <response code="201">Returns the now-registered user's data</response>
+    /// <response code="409">If the specified username is already taken</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserRegisterSuccessDTO))]
     [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorDTO))]
@@ -47,6 +61,13 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
         return Created("/account/info", UserRegisterSuccessDTO.From(user, DateTime.Now));
     }
 
+    /// <summary>
+    /// Returns all the registered users
+    /// </summary>
+    /// <returns>A list of Users</returns>
+    /// <response code="200">Returns the list of users</response>
+    /// <response code="401">If the current user is not logged in</response>
+    /// <response code="403">If the current user is not an admin</response>
     [HttpGet]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<User>))]
