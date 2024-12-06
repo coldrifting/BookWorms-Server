@@ -108,7 +108,7 @@ public partial class Program
 	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<BookwormsDbContext>();
 	        
 	        // If running the application or the tests fails here, you need to drop your database and then try again
-	        if (dbContext.Database.EnsureCreated())
+	        if (dbContext.Database.GetPendingMigrations().Any())
 	        {
 				dbContext.Database.Migrate();
 	        }

@@ -1,0 +1,70 @@
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+stages:
+    - build
+    - test
+    - security
+
+services:
+# DinD service is required for Testcontainers
+    - name: docker:dind
+      command: ["--tls=false"]
+
+variables:
+    # Specify where to store NuGet packages, for downloading dependencies during build
+    NUGET_PACKAGES: "$CI_PROJECT_DIR/.nuget/packages"
+    # Set environment to Staging, so that Testcontainers will be used to run the application in the pipeline
+    ASPNETCORE_ENVIRONMENT: "Staging"
+    # Instruct Docker to use the DinD daemon
+    DOCKER_HOST: "tcp://docker:2375"
+    # Instruct Docker not to start over TLS.
+    DOCKER_TLS_CERTDIR: ""
+    # Improve performance with overlayfs
+    DOCKER_DRIVER: overlay2
+
+# Cache downloaded NuGet packages
+cache:
+    paths:
+        - .nuget/packages/
+
+build_job:
+    stage: build
+    script:
+        - echo "Building project..."
+        - dotnet build
+    artifacts: # Preserve build outputs for future use
+        paths:
+            - bin/
+    rules:
+        - if: '$CI_MERGE_REQUEST_ID'
+
+test_job:
+    stage: test
+    services:
+        - name: docker:dind
+          command: ["--tls=false"]
+    variables:
+        DOCKER_HOST: "tcp://docker:2375"
+        DOCKER_TLS_CERTDIR: ""
+        DOCKER_DRIVER: overlay2
+    script:
+        - echo "Running test suite..."
+        - dotnet test --logger:trx --results-directory TestResults
+    artifacts:
+        when: always
+        reports:
+            junit: TestResults/*.trx
+    dependencies:
+        - build_job # test_job depends on artifacts produced by build_job (avoids rebuilding the project)
+    rules:
+        - if: '$CI_MERGE_REQUEST_ID'
+
+# This doesn't cause the pipeline to fail if a vulnerability is found, but vulnerabilities do get printed
+dependency_scanning:
+    stage: security
+    script:
+    - echo "Running dependency scanning..."
+    - dotnet restore
+    - dotnet list package --vulnerable
+    rules:
+        - if: '$CI_MERGE_REQUEST_ID'
