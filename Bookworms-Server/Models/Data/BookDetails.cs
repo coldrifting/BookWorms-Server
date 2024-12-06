@@ -20,7 +20,7 @@ public record BookDetailsDTO(
         List<string> authors = book.Authors;
         double rating = book.StarRating ?? -1;
         string difficulty = book.Level ?? "";
-        string description = bookDetails["description"]?.Deserialize<string>() ?? "";
+        string description = GetDesc(bookDetails);
         List<string> subjects = bookDetails["subjects"]?.Deserialize<List<string>>() ?? [];
         string isbn10 = GetIsbn(bookDetails, true);
         string isbn13 = GetIsbn(bookDetails, false);
@@ -33,6 +33,17 @@ public record BookDetailsDTO(
             publisher, publishedDate, pageCount, reviews); 
     }
 
+    private static string GetDesc(JsonObject bookDetails)
+    {
+        string desc = bookDetails["description"]?.Deserialize<string>() ?? "";
+
+        desc = desc.Replace("</p><p>", "\r\n\r\n");
+        desc = desc.Replace("</p>", "");
+        desc = desc.Replace("<p>", "");
+        
+        return desc;
+    }
+    
     private static string GetIsbn(JsonObject bookDetails, bool useIsbn10)
     {
         int index = useIsbn10 ? 0 : 1;
