@@ -5,22 +5,9 @@ stages:
     - test
     - security
 
-services:
-# DinD service is required for Testcontainers
-    - name: docker:dind
-      command: ["--tls=false"]
-
 variables:
     # Specify where to store NuGet packages, for downloading dependencies during build
     NUGET_PACKAGES: "$CI_PROJECT_DIR/.nuget/packages"
-    # Set environment to Staging, so that Testcontainers will be used to run the application in the pipeline
-    ASPNETCORE_ENVIRONMENT: "Staging"
-    # Instruct Docker to use the DinD daemon
-    DOCKER_HOST: "tcp://docker:2375"
-    # Instruct Docker not to start over TLS.
-    DOCKER_TLS_CERTDIR: ""
-    # Improve performance with overlayfs
-    DOCKER_DRIVER: overlay2
 
 # Cache downloaded NuGet packages
 cache:
@@ -35,17 +22,24 @@ build_job:
     artifacts: # Preserve build outputs for future use
         paths:
             - bin/
+    resource_group: common
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
 
 test_job:
     stage: test
     services:
+        # DinD service is required for Testcontainers
         - name: docker:dind
           command: ["--tls=false"]
     variables:
+        # Set environment to Staging, so that Testcontainers will be used
+        ASPNETCORE_ENVIRONMENT: "Staging"
+        # Instruct Docker to use the DinD daemon
         DOCKER_HOST: "tcp://docker:2375"
+        # Instruct Docker not to start over TLS
         DOCKER_TLS_CERTDIR: ""
+        # Improve performance with overlayfs
         DOCKER_DRIVER: overlay2
     script:
         - echo "Running test suite..."
@@ -56,6 +50,7 @@ test_job:
             junit: TestResults/*.trx
     dependencies:
         - build_job # test_job depends on artifacts produced by build_job (avoids rebuilding the project)
+    resource_group: common
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
 
@@ -66,5 +61,6 @@ dependency_scanning:
     - echo "Running dependency scanning..."
     - dotnet restore
     - dotnet list package --vulnerable
+    resource_group: common
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
