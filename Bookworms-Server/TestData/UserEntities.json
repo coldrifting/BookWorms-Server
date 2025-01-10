@@ -3,7 +3,8 @@
     "username": "admin",
     "hash": "oy54qEkfr42oyHsC/AbZsiavd8gPNzgrEnpiYEX4kCG4LnPehunvDdKLCsGTos7GdALb6ELwkMmS/wEj4VzsIw==",
     "salt": "PtyNlX5kkeh9IUVw6tjtfjqFfapw183QDSazvWcvFWIOAyaG91oltkjy4/5P0s6Jjq4WGLmNkytCmPTE60kFzQ==",
-    "name": "Admin",
+    "firstName": "Admin",
+    "lastName": "Admin",
     "email": "admin@site.com",
     "userIcon": "Icon1",
     "roles": [
@@ -14,7 +15,8 @@
     "username": "parent0",
     "hash": "zTj+6eyTNaSX3tMuSpZBTL9+0XUbJnSBPSceY7wxuKg+03nOBAJv+eL9pKirfZ/hRv3Of2gWEuxg8fgj9Agu5w==",
     "salt": "YSDFeFqZJlvESYNl5TDrTqRHlPX3R2h5qCOd1PTSyDzSxn2NR7ytxAg8woAMNXIqQv6G9bhCkACNuuMl21vmrg==",
-    "name": "Audrey Hepburn",
+    "firstName": "Audrey", 
+    "lastName": "Hepburn",
     "email": "audreyhepburn@gmail.com",
     "userIcon": "Icon1",
     "roles": [
@@ -25,7 +27,8 @@
     "username": "parent1",
     "hash": "5qW68UsmOW9lxjwsLiWTN6KG/6UJPpnCN1yRP0Vbp1RvHrvZ+MVv5sTlm5rafybggR3LiRyVBf689aHpLEQPaA==",
     "salt": "5uw04095v7VwKdMt/ZvZrs2M5IJ3wnlVE4Sk90XvbQ3Zhd1KNBktKU49H3jfZlcsLZEpiaZXcWb+050fTFGCIQ==",
-    "name": "Liam Smith",
+    "firstName": "Liam", 
+    "lastName": "Smith",
     "email": "liam.smith@hotmail.com",
     "userIcon": "Icon1",
     "roles": [
@@ -36,7 +39,8 @@
     "username": "parent2",
     "hash": "P2rIWtet8FfYh1MNRzi+D96mvAUFUkbywFH/zb3okoQIGJk0qEF46qq3lxMQzAhFCBD/YMRg67yPmHUMzJChrg==",
     "salt": "/BZqvbNo8ZCCM1LlD8tNASbumHc/cYN6Gb7b59nG+guNZSlJhFaonxn4Rd2gWV0m2qUw+dLoGtMcU0z1MIZiWg==",
-    "name": "Noah Davis",
+    "firstName": "Noah", 
+    "lastName": "Davis",
     "email": "noah.davis@outlook.com",
     "userIcon": "Icon1",
     "roles": [
@@ -47,7 +51,8 @@
     "username": "parent3",
     "hash": "9MzbX6XalMPtiODUFyMW7Zd2tpbBBiv6MVf+1+NHc36cI9vnDtH55z3fEfpU8aTg/hQb8juCc22K40dAn5wLQw==",
     "salt": "QFJo6nGsA+Ucs7Pd9k5vVJjoPQ6ZaGCR6ObtlZnNHs+MkO8BgXBVZVFXcgYTdhanRvPSL+eT1ryFaSIhwx0FQQ==",
-    "name": "William Martinez",
+    "firstName": "William", 
+    "lastName": "Martinez",
     "email": "william.martinez@gmail.com",
     "userIcon": "Icon1",
     "roles": [
@@ -58,7 +63,8 @@
     "username": "parent4",
     "hash": "40lH1sJL8c8YKq2G0KWlEDmIgb51gr5dMGY5GxYnkmyNxNBHSK9XUFRInD2V6smb2Aw2xnXMpG+8K/VgAyRdpg==",
     "salt": "MV6QSm0o+fZdh4UuqOHzIA3quBCJxKawvy8UCzxdwyNXWKUWSu24pJu0gNjXcK2xqg2Fjgi7EGBzgUUWAzdBOQ==",
-    "name": "James Taylor",
+    "firstName": "James", 
+    "lastName": "Taylor",
     "email": "james.taylor@gmail.com",
     "userIcon": "Icon1",
     "roles": [
@@ -69,7 +75,8 @@
     "username": "parent5",
     "hash": "XO4fSUrdIpB8PmJbuvx+rgx1Nvts3DBGv2xJxthO+o2IR6h8aUrIOhjPqg3pkoy6EI7wVDU277An4yjl0IP6Hw==",
     "salt": "aVoA2BQN/rrTEqvre506zxb2uAkrPOy9172ur9R43ieTzBrjajEzL/3Kzwi0dotpMEN3apQNjqf4Q2hFpGtAlQ==",
-    "name": "Benjamin Moore",
+    "firstName": "Benjamin", 
+    "lastName": "Van Moore",
     "email": "benjamin.moore@gmail.com",
     "userIcon": "Icon1",
     "roles": [
@@ -80,7 +87,8 @@
     "username": "teacher0",
     "hash": "TdRmReSDDYNMzIKsR9x8UgxcjTJ58WYK+ubbbadam3iYP5S4ILI1Z0ooM0zMSo7fXYYX+6Yp/UIQ+43pQIql5g==",
     "salt": "54TG5DDBhZHm5wN4DLEMshfCREqrP3H0vi8CyE7NRmkc19REIGWWb6VhPZguPts3rlyD8tyIeYMGw7OjSZdWUQ==",
-    "name": "Sally Field",
+    "firstName": "Sally", 
+    "lastName": "Field",
     "email": "sallyfield@yahoo.com",
     "userIcon": "Icon1",
     "roles": [
@@ -91,7 +99,8 @@
     "username": "teacher1",
     "hash": "QGjxXO+qFse8HahyMg9y36r0ekV6EPcSA9mijYn3gdvx1Q8lvoqZTVFP1i5qgkM0lLL6wHgeM/g20LwjXFY/gA==",
     "salt": "QgX3PCX3gB0+9x/KpUuCPhZiedg1ORn6QHKmCxltQVV2e4XOzkUkIWlhYbuxgzB7/0d3qFXVf+Kw/3KzdwJp7A==",
-    "name": "Emma Johnson",
+    "firstName": "Emma", 
+    "lastName": "Johnson",
     "email": "emma.johnson@yahoo.com",
     "userIcon": "Icon1",
     "roles": [
@@ -102,7 +111,8 @@
     "username": "teacher2",
     "hash": "dS+NL3QEuDhVVtKhuq/faPb/Bp5qxKrJRFE/iNVFHn4tzEbx/dhdCkCECTm01wFo+x2zHND8mZVLB9w0dHAgUA==",
     "salt": "DhRp6/MfoYxqqGN4gvzi0x45OurroHeOv2XliY2T9fV1UnKftVkpmbRkE1sh1vPjyHe7meWg2uIgNyOSjE0fAw==",
-    "name": "Olivia Brown",
+    "firstName": "Olivia", 
+    "lastName": "Brown",
     "email": "olivia.brown@aol.com",
     "userIcon": "Icon1",
     "roles": [
@@ -113,7 +123,8 @@
     "username": "teacher3",
     "hash": "WZFwJ13Ke7JgXsfGqMahdsF3Is5FABDmnWBApTFpZKWxI54g8l/PUgDkhYB88fRbEUyNXiDFf9arZXwiGr7JwQ==",
     "salt": "eBAfJYVbPa1a5qpbxdxGgdMN2Syn9B0eKPd8MNZMlG/DWublUZ3oBjpSDJ45s6y+t0u49sbKP+B5WupBm95i0A==",
-    "name": "Ava Wilson",
+    "firstName": "Ava", 
+    "lastName": "Wilson",
     "email": "ava.wilson@hotmail.com",
     "userIcon": "Icon1",
     "roles": [
@@ -124,7 +135,8 @@
     "username": "teacher4",
     "hash": "1AgWQ0+fmkqRZ8mKNKqYo6vadRYcf0+mEFsoHrtIsq2sYzen363YzBXu1NVnhPIKY1ET1L8KrDfnviCTbEBgZA==",
     "salt": "frvxW7NK//iuJwP0CrXKZtQgrrcahbL9YFyOiKg1rNZMvc/O14qFnYqGy64UC7Cmhm822V2513bJAHHmFGSjmQ==",
-    "name": "Sophia Anderson",
+    "firstName": "Sophia", 
+    "lastName": "Anderson",
     "email": "sophia.anderson@gmail.com",
     "userIcon": "Icon1",
     "roles": [
@@ -135,7 +147,8 @@
     "username": "teacher5",
     "hash": "JMeg//bnmps9u5D8+IJcvS5YfuVoo9pe+SyoTEV1rBuMZIPeZUTkGG9sN/oF7cNiAGAovVGwOFlMxmlcKYyNdA==",
     "salt": "LKMS7PQscZ+fDjZ9joFlaNN4cLf6luXlfboAy91NDbraTgcsYC1UGlUwjF6c4NTQCKZ2DRDFqNcBydi7GiW6uA==",
-    "name": "Isabella Thomas",
+    "firstName": "Isabella", 
+    "lastName": "Thomas",
     "email": "isabella.thomas@aol.com",
     "userIcon": "Icon1",
     "roles": [

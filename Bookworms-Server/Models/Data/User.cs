@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BookwormsServer.Models.Entities;
 
 namespace BookwormsServer.Models.Data;
 
@@ -8,9 +7,9 @@ namespace BookwormsServer.Models.Data;
 /// </summary>
 /// <param name="username"></param>
 /// <param name="password"></param>
-/// <param name="name"></param>
-/// <param name="email"></param>
-public class UserRegisterDTO(string username, string password, string name, string email) 
+/// <param name="firstName"></param>
+/// <param name="lastName"></param>
+public class UserRegisterDTO(string username, string password, string firstName, string lastName) 
 {
     [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     public string Username { get; set; } = username;
@@ -19,18 +18,10 @@ public class UserRegisterDTO(string username, string password, string name, stri
     public string Password { get; set; } = password;
 
     [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)]
-    public string Name { get; set; } = name;
-        
-    [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
-    public string Email { get; set; } = email;
-}
+    public string FirstName { get; set; } = firstName;
 
-public record UserRegisterSuccessDTO(string Username, string Name, string Email, DateTime CreatedAt)
-{
-    public static UserRegisterSuccessDTO From(User user, DateTime createdAt)
-    {
-        return new(user.Username, user.Name, user.Email, createdAt);
-    }
+    [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)]
+    public string LastName { get; set; } = lastName;
 }
 
 /// <summary>
@@ -51,13 +42,4 @@ public class UserLoginDTO(string username, string password)
 /// 
 /// </summary>
 /// <param name="Token"></param>
-/// <param name="Timeout"></param>
-public record UserLoginSuccessDTO(string Token, int Timeout);
-
-public record UserInfoDTO(string Username, string Name, string Email)
-{
-    public static UserInfoDTO From(User user)
-    {
-        return new(user.Username, user.Name, user.Email);
-    }
-}
+public record UserLoginSuccessDTO(string Token);

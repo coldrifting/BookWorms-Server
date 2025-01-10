@@ -5,9 +5,9 @@ namespace BookwormsServer.Services;
 
 public static class UserService
 {
-    public static User CreateUser(string username, string password, string name, string email, UserIcon userIcon)
+    public static User CreateUser(string username, string password, string firstName, string lastName, UserIcon userIcon)
     {
         byte[] hash = AuthService.HashPassword(password, out byte[] salt);
-        return new(username, hash, salt, name, email, userIcon);
+        return new(username, hash, salt, firstName, lastName, userIcon);
     }
 }

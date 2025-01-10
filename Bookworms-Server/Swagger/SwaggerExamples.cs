@@ -23,8 +23,7 @@ public class UserLoginSuccessResponseExample : IExamplesProvider<UserLoginSucces
     public UserLoginSuccessDTO GetExamples()
     {
         return new(
-            "_jwt_token_string_",
-            15);
+            "_jwt_token_string_");
     }
 }
 
@@ -33,14 +32,6 @@ public class UserRegisterRequestBodyExample : IExamplesProvider<UserRegisterDTO>
     public UserRegisterDTO GetExamples()
     {
         return new("_username_", "_password_", "Person Doe", "email@example.com");
-    }
-}
-
-public class UserRegisterSuccessResponseExample : IExamplesProvider<UserRegisterSuccessDTO>
-{
-    public UserRegisterSuccessDTO GetExamples()
-    {
-        return new("_username_", "Person Doe", "email@example.com", new(2024, 12, 4, 11, 46, 23));
     }
 }
 
@@ -59,7 +50,8 @@ public class BookDetailsResponseExample : IExamplesProvider<BookDetailsDTO>
             40,
             [
                 new ReviewDTO(
-                    "Liam Smith",
+                    "Liam",
+                    "Smith",
                     "Parent",
                     UserIcon.Icon1,
                     new(2024, 01, 31),
@@ -84,7 +76,8 @@ public class ReviewResponseExample : IExamplesProvider<ReviewDTO>
     public ReviewDTO GetExamples()
     {
         return new(
-            "Emma Johnson",
+            "Emma", 
+            "Johnson",
             "Teacher",
             UserIcon.Icon1,
             new(2024, 01, 30),
@@ -98,9 +91,9 @@ public class ReviewsResponseExample : IExamplesProvider<List<ReviewDTO>>
     public List<ReviewDTO> GetExamples()
     {
         return [
-            new("Olivia Brown", "Teacher", UserIcon.Icon1, new(2024, 02, 15), 0.5, "Heartwarming and enjoyable"),
-            new("Isabella Thomas", "Teacher", UserIcon.Icon1, new(2024, 02, 03), 2, "A heartwarming book that we cherished"),
-            new("Noah Davis", "Parent", UserIcon.Icon1, new(2024, 01, 11), 2.5, "An exciting adventure we couldn't put down."),
+            new("Olivia", "Brown", "Teacher", UserIcon.Icon1, new(2024, 02, 15), 0.5, "Heartwarming and enjoyable"),
+            new("Isabella", "Thomas", "Teacher", UserIcon.Icon1, new(2024, 02, 03), 2, "A heartwarming book that we cherished"),
+            new("Noah", "Davis", "Parent", UserIcon.Icon1, new(2024, 01, 11), 2.5, "An exciting adventure we couldn't put down."),
         ];
     }
 }

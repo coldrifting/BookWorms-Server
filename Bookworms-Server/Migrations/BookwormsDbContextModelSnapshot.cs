@@ -207,7 +207,7 @@ namespace BookwormsServer.Migrations
                         .HasMaxLength(8)
                         .HasColumnType("varchar(8)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
@@ -216,7 +216,7 @@ namespace BookwormsServer.Migrations
                         .IsRequired()
                         .HasColumnType("longblob");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");

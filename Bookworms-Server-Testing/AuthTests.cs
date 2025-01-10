@@ -13,9 +13,9 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
     public async Task Test_CreateNewUser()
     {
         HttpResponseMessage registerResponse = await Client.PostAsJsonAsync("/user/register",
-            new UserRegisterDTO("user42", "improbable", "42", "user@42.com"));
+            new UserRegisterDTO("user23", "improbable", "23", "19"));
 
-        Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, registerResponse.StatusCode);
     }
 
     [Fact]
@@ -77,12 +77,12 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
     public async Task Test_CreateNewUserAndLogin()
     {
         HttpResponseMessage registerResponse = await Client.PostAsJsonAsync("/user/register",
-            new UserRegisterDTO("user42", "improbable", "42", "user@42.com"));
+            new UserRegisterDTO("user23", "improbable", "23", "19"));
 
-        Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, registerResponse.StatusCode);
         
         HttpResponseMessage loginResponse = await Client.PostAsJsonAsync("/user/login", 
-            new UserLoginDTO("user42", "improbable"));
+            new UserLoginDTO("user23", "improbable"));
         
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
         UserLoginSuccessDTO? token = await loginResponse.Content.ReadFromJsonAsync<UserLoginSuccessDTO>();
@@ -95,7 +95,7 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
     public async Task Test_CreateUserUsernameAlreadyExists()
     {
         HttpResponseMessage registerResponse = await Client.PostAsJsonAsync("/user/register",
-            new UserRegisterDTO("teacher0", "teacher0", "teacher0", "teacher0@gmail.com"));
+            new UserRegisterDTO("teacher0", "teacher0", "teacher0", "teacher0"));
 
         Assert.Equal(HttpStatusCode.Conflict, registerResponse.StatusCode);
         

@@ -49,7 +49,7 @@ public abstract class BasicTest(WebApplicationFactory<Program> factory) : BaseTe
         bool hasAdminUser = await Context.Users.AnyAsync(x => x.Username == "basicUser");
         if (!hasAdminUser)
         {
-            User user = UserService.CreateUser("basicUser", "basicUser", "basicUser", "basicUser@gmail.com", UserIcon.Icon1);
+            User user = UserService.CreateUser("basicUser", "basicUser", "basicUserFirst", "basicUserLast", UserIcon.Icon1);
             Context.Users.Add(user);
         }
 

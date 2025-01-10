@@ -153,9 +153,9 @@ namespace BookwormsServer.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Hash = table.Column<byte[]>(type: "longblob", nullable: false),
                     Salt = table.Column<byte[]>(type: "longblob", nullable: false),
-                    Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
+                    FirstName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
+                    LastName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Roles = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),

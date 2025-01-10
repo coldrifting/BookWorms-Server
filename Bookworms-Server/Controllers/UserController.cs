@@ -32,7 +32,7 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
         
         // Send JWT token to avoid expensive hash calls for each authenticated endpoint
         string token = AuthService.GenerateToken(userMatch.First());
-        return Ok(new UserLoginSuccessDTO(token, AuthService.ExpireTime));
+        return Ok(new UserLoginSuccessDTO(token));
     }
     
     /// <summary>
@@ -40,10 +40,10 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     /// </summary>
     /// <param name="payload">The data with which to register the new user</param>
     /// <returns>The now-registered user's data</returns>
-    /// <response code="201">Returns the now-registered user's data</response>
+    /// <response code="200">Creates and returns session data for the new user</response>
     /// <response code="409">If the specified username is already taken</response>
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserRegisterSuccessDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserLoginSuccessDTO))]
     [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorDTO))]
     public IActionResult Register(UserRegisterDTO payload)
     {
@@ -53,12 +53,14 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
             return Conflict(ErrorDTO.UsernameAlreadyExists);
         }
 
-        User user = UserService.CreateUser(payload.Username, payload.Password, payload.Name, payload.Email, UserIcon.Icon1);
+        User user = UserService.CreateUser(payload.Username, payload.Password, payload.FirstName, payload.LastName, UserIcon.Icon1);
         
         dbContext.Users.Add(user);
         dbContext.SaveChanges();
 
-        return Created("/account/info", UserRegisterSuccessDTO.From(user, DateTime.Now));
+        // Send JWT token to avoid expensive hash calls for each authenticated endpoint
+        string token = AuthService.GenerateToken(userMatch.First());
+        return Ok(new UserLoginSuccessDTO(token));
     }
 
     /// <summary>

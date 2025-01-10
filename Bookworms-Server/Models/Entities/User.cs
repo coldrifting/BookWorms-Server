@@ -12,7 +12,7 @@ namespace BookwormsServer.Models.Entities;
  */
 
 [Table("Users")]
-public class User(string username, byte[] hash, byte[] salt, string name, string email, UserIcon userIcon)
+public class User(string username, byte[] hash, byte[] salt, string firstName, string lastName, UserIcon userIcon)
 {
     [Key, StringLength(64, MinimumLength = 5, ErrorMessage = "User username must be between {2} and {1} characters long.")]
     public string Username { get; set; } = username;
@@ -21,11 +21,11 @@ public class User(string username, byte[] hash, byte[] salt, string name, string
     
     public byte[] Salt { get; set; } = salt;
     
-    [StringLength(256, MinimumLength = 2, ErrorMessage = "User name must be between {2} and {1} characters long.")]
-    public string Name { get; set; } = name;
+    [StringLength(256, MinimumLength = 2, ErrorMessage = "User first name must be between {2} and {1} characters long.")]
+    public string FirstName { get; set; } = firstName;
     
-    [StringLength(256, MinimumLength = 5, ErrorMessage = "User email must be between {2} and {1} characters long.")]
-    public string Email { get; set; } = email;
+    [StringLength(256, MinimumLength = 2, ErrorMessage = "User last name must be between {2} and {1} characters long.")]
+    public string LastName { get; set; } = lastName;
 
     public string[] Roles { get; set; } = [];
 
@@ -37,16 +37,16 @@ public class User(string username, byte[] hash, byte[] salt, string name, string
     public ICollection<Review> Reviews { get; set; } = null!;
 }
 
-public class Parent(string username, byte[] hash, byte[] salt, string name, string email, UserIcon userIcon)
-    : User(username, hash, salt, name, email, userIcon)
+public class Parent(string username, byte[] hash, byte[] salt, string firstName, string lastName, UserIcon userIcon)
+    : User(username, hash, salt, firstName, lastName, userIcon)
 {
     // Navigation
     
     public ICollection<Child> Children { get; set; } = null!;
 }
 
-public class Teacher(string username, byte[] hash, byte[] salt, string name, string email, UserIcon userIcon)
-    : User(username, hash, salt, name, email, userIcon)
+public class Teacher(string username, byte[] hash, byte[] salt, string firstName, string lastName, UserIcon userIcon)
+    : User(username, hash, salt, firstName, lastName, userIcon)
 {
     [StringLength(6, MinimumLength = 6, ErrorMessage = "Teacher classroom code must be exactly {0} characters long.")]
     public string? ClassroomCode { get; set; }

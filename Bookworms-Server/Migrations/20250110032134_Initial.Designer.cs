@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookwormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
-    [Migration("20241128212420_Initial")]
+    [Migration("20250110032134_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -210,7 +210,7 @@ namespace BookwormsServer.Migrations
                         .HasMaxLength(8)
                         .HasColumnType("varchar(8)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
@@ -219,7 +219,7 @@ namespace BookwormsServer.Migrations
                         .IsRequired()
                         .HasColumnType("longblob");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
