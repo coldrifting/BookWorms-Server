@@ -81,7 +81,7 @@ public partial class Program
 			        ValidateIssuer = false,
 			        ValidateAudience = false
 		        };
-		        // Make authorization failure (401) responses consistent with other bad requests
+		        // Make authorization failure (401 & 403) responses consistent with other bad requests
 		        opt.Events = AuthService.BearerEvents();
 		    });
 		builder.Services.AddAuthorization();

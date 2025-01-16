@@ -1,5 +1,7 @@
-﻿using BookwormsServer.Models.Data;
+﻿using System.Security.Claims;
+using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,30 +15,28 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     /// Adds/updates the review for the specified book and user
     /// </summary>
     /// <param name="bookId">The Google Books ID of the book to target</param>
-    /// <param name="username">The username of the user leaving the review</param>
     /// <param name="reviewDto">The data with which to populate the new/updated review</param>
     /// <returns>The newly created or updated review</returns>
     /// <response code="200">Returns the updated review</response>
     /// <response code="201">Returns the newly created review</response>
-    /// <response code="404">If the specified book or user is not found</response>
-    // TODO - Infer username when this becomes an authorized route
+    /// <response code="401">If the user is not logged in</response>
+    /// <response code="404">If the specified book is not found</response>
     [HttpPut]
+    [Authorize]
     [Route("/books/{bookId}/review")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReviewDTO))]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ReviewDTO))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult AddOrUpdate(string bookId, string username, [FromBody] ReviewAddOrUpdateRequestDTO reviewDto)
+    public IActionResult AddOrUpdate(string bookId, [FromBody] ReviewAddOrUpdateRequestDTO reviewDto)
     {
         if (!dbContext.Books.Any(b => b.BookId == bookId))
         {
             return NotFound(ErrorDTO.BookNotFound);
-        } 
-        
-        // TODO - Replace with username inference
-        if (!dbContext.Users.Any(u => u.Username == username))
-        {
-            return NotFound(ErrorDTO.UsernameNotFound);
         }
+
+        // Will not be null thanks to Authorize attribute
+        string username = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
         Review? review = dbContext.Reviews
             .Include(r => r.Reviewer)
@@ -68,19 +68,23 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     }
     
     /// <summary>
-    /// Removes the review for the specified book and user
+    /// Removes the review by the logged in user for the specified book 
     /// </summary>
     /// <param name="bookId">The Google Books ID of the book to target</param>
-    /// <param name="username">The username of the user who left the review</param>
     /// <response code="200">If the review was removed successfully</response>
-    /// <response code="404">If the specified book, user, or review is not found</response>
-    // TODO - Infer username when this becomes an authorized route
+    /// <response code="401">If the user is not logged in</response>
+    /// <response code="404">If the specified book is not found, or the user has not left a review for the book</response>
     [HttpDelete]
+    [Authorize]
     [Route("/books/{bookId}/review")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult Delete(string bookId, string username)
+    public IActionResult Delete(string bookId)
     {
+        // Will not be null thanks to Authorize attribute
+        string username = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        
         Review? review = dbContext.Reviews
             .Include(r => r.Reviewer)
             .FirstOrDefault(r => r.BookId == bookId && 

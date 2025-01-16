@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using BookwormsServer.Models.Entities;
 
 namespace BookwormsServer.Models.Data;
 
@@ -43,3 +44,16 @@ public class UserLoginDTO(string username, string password)
 /// </summary>
 /// <param name="Token"></param>
 public record UserLoginSuccessDTO(string Token);
+
+public record UserDTO(string Username, string FirstName, string LastName, string Roles, string Icon)
+{
+    public static UserDTO From(User user)
+    {
+        return new(
+            user.Username, 
+            user.FirstName, 
+            user.LastName, 
+            $"[{string.Join(", ", user.Roles)}]", 
+            user.UserIcon.ToString());
+    }
+}

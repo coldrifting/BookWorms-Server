@@ -72,25 +72,29 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="403">If the current user is not an admin</response>
     [HttpGet]
     [Authorize(Roles = "Admin")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<User>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserDTO>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     public IActionResult All()
     {
-        User[] users = dbContext.Set<User>().ToArray();
+        var users = dbContext.Set<User>().ToList();
 
-        // Example of inferring username from bearer token for authenticated routes
-        if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value is { } loggedInUser)
+        // Must not be null due to Authorize attribute
+        string loggedInUser = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        
+        // Put logged-in user at top of list
+        for (int i = 0; i < users.Count; i++)
         {
-            for (int i = 0; i < users.Length; i++)
+            if (users[0].Username == loggedInUser)
             {
-                if (users[0].Username == loggedInUser)
-                {
-                    (users[i], users[0]) = (users[0], users[i]);
-                }
+                (users[i], users[0]) = (users[0], users[i]);
+                break;
             }
         }
-        
-        return Ok(users);
+
+        List<UserDTO> usersFormatted = [];
+        usersFormatted.AddRange(users.Select(UserDTO.From));
+
+        return Ok(usersFormatted);
     }
 }

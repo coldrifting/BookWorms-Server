@@ -57,23 +57,19 @@ public static class AuthService
 	    {
 		    OnChallenge = context =>
 		    {
-			    context.Response.OnStarting(async () =>
-			    {
-				    context.Response.Headers.Append("content-type", "application/json; charset=utf-8");
-				    await context.Response.WriteAsync(JsonSerializer.Serialize(ErrorDTO.Unauthenticated));
-			    });
+			    context.HandleResponse();
+			    
+	            context.Response.ContentType = "application/json";
+	            context.Response.StatusCode = 401;
 
-			    return Task.CompletedTask;
+	            return context.Response.WriteAsJsonAsync(ErrorDTO.Unauthorized);
 		    },
 		    OnForbidden = context =>
 		    {
-			    context.Response.OnStarting(async () =>
-			    {
-				    context.Response.Headers.Append("content-type", "application/json; charset=utf-8");
-				    await context.Response.WriteAsync(JsonSerializer.Serialize(ErrorDTO.Unauthorized));
-			    });
+	            context.Response.ContentType = "application/json";
+	            context.Response.StatusCode = 403;
 
-			    return Task.CompletedTask;
+	            return context.Response.WriteAsJsonAsync(ErrorDTO.Forbidden);
 		    }
 	    };
     }

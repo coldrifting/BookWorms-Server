@@ -120,63 +120,45 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
         Assert.NotEmpty(token.Token);
     }
 
-    // TODO - Figure out why testing doesn't work for authorized routes
-    /*
     [Fact]
-    public async Task Test()
+    public async Task Test_ShowUsersAsAdminShouldOk()
     {
-        var response = await Client.GetAsync("/user/users");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task ShowUsersAsAdminShouldOk()
-    {
-        var prelim = await Client.PostAsJsonAsync("/user/login", new UserLoginDTO("admin", "admin"));
-
-        var t = await prelim.Content.ReadFromJsonAsync<UserLoginSuccessDTO>();
-
-        //Client.DefaultRequestHeaders.Authorization = new("Bearer", t.Token);
-        
-        var response = await Client.GetAsync("/user/users");
-        
-        //var response = await Client.GetAsyncAsUser("/user/users", "admin", "admin");
+        HttpResponseMessage response = await Client.GetAsyncAsUser("/user/all", "admin");
         
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         
-        User[]? users = await response.Content.ReadFromJsonAsync<User[]>();
+        var users = await response.Content.ReadFromJsonAsync<List<UserDTO>>();
 
         Assert.NotNull(users);
-        Assert.Single(users);
+        Assert.NotEmpty(users);
         Assert.Equal("admin", users[0].Username);
         
         Client.DefaultRequestHeaders.Remove("Authorization");
     }
     
     [Fact]
-    public async Task ShowUsersAsRegularUserShouldForbid()
+    public async Task Test_ShowUsersAsRegularUserShouldForbid()
     {
-        var response = await Client.GetAsyncAsUser("/user/users", "basicUser", "basicUser");
+        HttpResponseMessage response = await Client.GetAsyncAsUser("/user/all", "parent1");
         
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        var content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
+        ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
 
         Assert.NotNull(content);
         Assert.Equal("Forbidden", content.Error);
     }
     
     [Fact]
-    public async Task ShowUsersAsUnAuthenticatedShouldUnauthorized()
+    public async Task Test_ShowUsersAsUnAuthenticatedShouldUnauthorized()
     {
-        var response = await Client.GetAsync("/user/users");
+        HttpResponseMessage response = await Client.GetAsync("/user/all");
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
 
-        var content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
+        ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
 
         Assert.NotNull(content);
-        Assert.Equal("Forbidden", content.Error);
+        Assert.Equal("Unauthorized", content.Error);
     }
-    */
 }
