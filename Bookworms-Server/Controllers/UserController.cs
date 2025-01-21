@@ -34,7 +34,7 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
         string token = AuthService.GenerateToken(userMatch.First());
         return Ok(new UserLoginSuccessDTO(token));
     }
-    
+
     /// <summary>
     /// Registers a new user 
     /// </summary>
@@ -53,9 +53,21 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
             return Conflict(ErrorDTO.UsernameAlreadyExists);
         }
 
-        User user = UserService.CreateUser(payload.Username, payload.Password, payload.FirstName, payload.LastName, UserIcon.Icon1);
-        
-        dbContext.Users.Add(user);
+        User user = UserService.CreateUser(payload.Username, payload.Password, payload.FirstName, payload.LastName,
+            UserIcon.Icon1, payload.IsParent);
+        switch (user)
+        {
+            case Parent p:
+                dbContext.Parents.Add(p);
+                break;
+            case Teacher t:
+                dbContext.Teachers.Add(t);
+                break;
+            default:
+                dbContext.Users.Add(user);
+                break;
+        }
+
         dbContext.SaveChanges();
 
         // Send JWT token to avoid expensive hash calls for each authenticated endpoint

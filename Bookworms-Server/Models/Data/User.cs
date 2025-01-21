@@ -10,11 +10,12 @@ namespace BookwormsServer.Models.Data;
 /// <param name="password"></param>
 /// <param name="firstName"></param>
 /// <param name="lastName"></param>
-public class UserRegisterDTO(string username, string password, string firstName, string lastName) 
+/// <param name="isParent"></param>
+public class UserRegisterDTO(string username, string password, string firstName, string lastName, bool isParent)
 {
-    [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
+    [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     public string Username { get; set; } = username;
-    
+
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     public string Password { get; set; } = password;
 
@@ -23,6 +24,8 @@ public class UserRegisterDTO(string username, string password, string firstName,
 
     [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)]
     public string LastName { get; set; } = lastName;
+
+    public bool IsParent { get; set; }  = isParent;
 }
 
 /// <summary>
@@ -32,7 +35,7 @@ public class UserRegisterDTO(string username, string password, string firstName,
 /// <param name="password"></param>
 public class UserLoginDTO(string username, string password)
 {
-    [Key, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
+    [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     public string Username { get; set; } = username;
     
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
@@ -47,13 +50,13 @@ public record UserLoginSuccessDTO(string Token);
 
 public record UserDTO(string Username, string FirstName, string LastName, string Roles, string Icon)
 {
-    public static UserDTO From(User user)
+    public static UserDTO From(User userLogin)
     {
         return new(
-            user.Username, 
-            user.FirstName, 
-            user.LastName, 
-            $"[{string.Join(", ", user.Roles)}]", 
-            user.UserIcon.ToString());
+            userLogin.Username, 
+            userLogin.FirstName, 
+            userLogin.LastName, 
+            $"[{string.Join(", ", userLogin.Roles)}]", 
+            userLogin.UserIcon.ToString());
     }
 }

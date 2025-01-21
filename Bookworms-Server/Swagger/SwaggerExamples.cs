@@ -31,7 +31,7 @@ public class UserRegisterRequestBodyExample : IExamplesProvider<UserRegisterDTO>
 {
     public UserRegisterDTO GetExamples()
     {
-        return new("_username_", "_password_", "Person Doe", "email@example.com");
+        return new("_username_", "_password_", "Person Doe", "email@example.com", true);
     }
 }
 

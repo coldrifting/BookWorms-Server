@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServer.Models.Entities;
 
-public class Child(string name, DateOnly dateOfBirth, string parentUsername, string? readingLevel = null)
+[Index(nameof(Name), nameof(ParentUsername), IsUnique = true)]
+public class Child(string name, string parentUsername, DateOnly? dateOfBirth = null, string? readingLevel = null)
 {
     [Key]
     public Guid ChildId { get; set; }
@@ -13,7 +15,7 @@ public class Child(string name, DateOnly dateOfBirth, string parentUsername, str
 
     [Range(typeof(DateOnly), "01/01/1900", "01/01/2100",
         ErrorMessage = "Child date of birth must fall between {1} and {2}.")]
-    public DateOnly DateOfBirth { get; set; } = dateOfBirth;
+    public DateOnly? DateOfBirth { get; set; } = dateOfBirth;
     
     [StringLength(6)]
     public string? ReadingLevel { get; set; } = readingLevel;

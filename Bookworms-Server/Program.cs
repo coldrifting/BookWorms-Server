@@ -149,6 +149,9 @@ public partial class Program
 	            
 	            // Minimize Schemas at bottom of page by default
 	            opt.DefaultModelsExpandDepth(0);
+	            
+	            // Enable Try it out mode by default
+	            opt.EnableTryItOutByDefault();
             });
         }
 
@@ -180,11 +183,23 @@ public partial class Program
 			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 			Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
 	    };
-
+	    
 	    string userData = File.ReadAllText("TestData/UserEntities.json");
 		List<User> users = JsonSerializer.Deserialize<List<User>>(userData, jso)!;
 	    dbContext.Users.ExecuteDelete();
 		dbContext.Users.AddRange(users);
+		dbContext.SaveChanges();
+		
+	    string parentData = File.ReadAllText("TestData/ParentEntities.json");
+		List<Parent> parents = JsonSerializer.Deserialize<List<Parent>>(parentData, jso)!;
+	    dbContext.Parents.ExecuteDelete();
+		dbContext.Parents.AddRange(parents);
+		dbContext.SaveChanges();
+
+	    string teacherData = File.ReadAllText("TestData/TeacherEntities.json");
+		List<Teacher> teachers = JsonSerializer.Deserialize<List<Teacher>>(teacherData, jso)!;
+	    dbContext.Teachers.ExecuteDelete();
+		dbContext.Teachers.AddRange(teachers);
 		dbContext.SaveChanges();
 		
 	    string bookData = File.ReadAllText("TestData/BookEntities.json");

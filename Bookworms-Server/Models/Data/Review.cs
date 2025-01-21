@@ -9,7 +9,7 @@ public record ReviewDTO(string ReviewerFirstName, string ReviewerLastName, strin
         return new(
             r.Reviewer!.FirstName,
             r.Reviewer.LastName,
-            r.Reviewer.Roles.First(),
+            r.Reviewer is Parent ? "Parent" : "Teacher",
             r.Reviewer.UserIcon,
             r.ReviewDate,
             r.StarRating, 

@@ -1,5 +1,8 @@
-﻿using System.Net;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using BookwormsServer.Models.Data;
 
 namespace BookwormsServerTesting.Templates;
@@ -8,6 +11,17 @@ public static class Common
 {
     private const string LoginEndpoint = "/user/login";
 
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+
+    public static async Task<TValue?> ReadJsonAsync<TValue>(this HttpContent content)
+    {
+        return await content.ReadFromJsonAsync<TValue>(JsonSerializerOptions);
+    }
+    
     private static async Task<string> GetUserToken(HttpClient client, string username, string password)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(LoginEndpoint, new UserLoginDTO(username, password));
@@ -26,11 +40,22 @@ public static class Common
 
     private static async Task VerifyToken(HttpClient client, string username, string password)
     {
-        if (client.DefaultRequestHeaders.Authorization is null)
+        // Decode Auth Header
+        if (client.DefaultRequestHeaders.Authorization is { } auth)
         {
-            string token = await GetUserToken(client, username, password);
-            client.DefaultRequestHeaders.Authorization = new("Bearer", token);
+            var curToken = auth.Parameter;
+            var handler = new JwtSecurityTokenHandler();
+            var jwtSecurityToken = handler.ReadJwtToken(curToken);
+            var loggedInUser = jwtSecurityToken.Claims.First(claim => claim.Type == "sub").Value;
+
+            if (loggedInUser == username)
+            {
+                return;
+            }
         }
+        
+        string token = await GetUserToken(client, username, password);
+        client.DefaultRequestHeaders.Authorization = new("Bearer", token);
     }
 
     public static async Task<HttpResponseMessage> GetAsyncAsUser(this HttpClient client, string url, string username, string? password = null)

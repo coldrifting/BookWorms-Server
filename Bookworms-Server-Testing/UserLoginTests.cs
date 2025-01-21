@@ -7,13 +7,13 @@ using BookwormsServerTesting.Templates;
 namespace BookwormsServerTesting;
 
 [Collection("Integration Tests")]
-public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
+public class UserLoginTests(BaseStartup<Program> factory) : BaseTest(factory)
 {
     [Fact]
     public async Task Test_CreateNewUser()
     {
         HttpResponseMessage registerResponse = await Client.PostAsJsonAsync("/user/register",
-            new UserRegisterDTO("user23", "improbable", "23", "19"));
+            new UserRegisterDTO("user23", "improbable", "23", "19", true));
 
         Assert.Equal(HttpStatusCode.OK, registerResponse.StatusCode);
     }
@@ -35,7 +35,7 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
     public async Task Test_LoginBadUsername()
     {
         HttpResponseMessage loginResponse = await Client.PostAsJsonAsync("/user/login", 
-            new UserLoginDTO("userdoesnotexist", "improbable"));
+            new UserLoginDTO("userDoesNotExist", "improbable"));
         
         Assert.Equal(HttpStatusCode.BadRequest, loginResponse.StatusCode);
 
@@ -49,7 +49,7 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
     public async Task Test_LoginBadPassword()
     {
         HttpResponseMessage loginResponse = await Client.PostAsJsonAsync("/user/login", 
-            new UserLoginDTO("teacher0", "wrongpassword"));
+            new UserLoginDTO("teacher0", "wrongPassword"));
         
         Assert.Equal(HttpStatusCode.BadRequest, loginResponse.StatusCode);
 
@@ -63,7 +63,7 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
     public async Task Test_LoginBadUsernameAndPassword()
     {
         HttpResponseMessage loginResponse = await Client.PostAsJsonAsync("/user/login", 
-            new UserLoginDTO("wrongusername", "wrongpassword"));
+            new UserLoginDTO("wrongUsername", "wrongPassword"));
         
         Assert.Equal(HttpStatusCode.BadRequest, loginResponse.StatusCode);
 
@@ -77,7 +77,7 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
     public async Task Test_CreateNewUserAndLogin()
     {
         HttpResponseMessage registerResponse = await Client.PostAsJsonAsync("/user/register",
-            new UserRegisterDTO("user23", "improbable", "23", "19"));
+            new UserRegisterDTO("user23", "improbable", "23", "19", true));
 
         Assert.Equal(HttpStatusCode.OK, registerResponse.StatusCode);
         
@@ -95,7 +95,7 @@ public class AuthTests(BaseStartup<Program> factory) : BaseTest(factory)
     public async Task Test_CreateUserUsernameAlreadyExists()
     {
         HttpResponseMessage registerResponse = await Client.PostAsJsonAsync("/user/register",
-            new UserRegisterDTO("teacher0", "teacher0", "teacher0", "teacher0"));
+            new UserRegisterDTO("teacher0", "teacher0", "teacher0", "teacher0", false));
 
         Assert.Equal(HttpStatusCode.Conflict, registerResponse.StatusCode);
         

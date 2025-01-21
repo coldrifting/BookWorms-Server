@@ -16,10 +16,6 @@ public class User(string username, byte[] hash, byte[] salt, string firstName, s
 {
     [Key, StringLength(64, MinimumLength = 5, ErrorMessage = "User username must be between {2} and {1} characters long.")]
     public string Username { get; set; } = username;
-
-    public byte[] Hash { get; set; } = hash;
-    
-    public byte[] Salt { get; set; } = salt;
     
     [StringLength(256, MinimumLength = 2, ErrorMessage = "User first name must be between {2} and {1} characters long.")]
     public string FirstName { get; set; } = firstName;
@@ -31,6 +27,10 @@ public class User(string username, byte[] hash, byte[] salt, string firstName, s
 
     [Column(TypeName = "nvarchar(64)")]
     public UserIcon UserIcon { get; set; } = userIcon;
+
+    public byte[] Hash { get; set; } = hash;
+    
+    public byte[] Salt { get; set; } = salt;
 
     // Navigation
 

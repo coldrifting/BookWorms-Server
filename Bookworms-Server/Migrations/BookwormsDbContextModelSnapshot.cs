@@ -118,7 +118,7 @@ namespace BookwormsServer.Migrations
                         .HasMaxLength(6)
                         .HasColumnType("varchar(6)");
 
-                    b.Property<DateOnly>("DateOfBirth")
+                    b.Property<DateOnly?>("DateOfBirth")
                         .HasColumnType("date");
 
                     b.Property<string>("Name")
@@ -140,6 +140,9 @@ namespace BookwormsServer.Migrations
                     b.HasIndex("ClassroomCode");
 
                     b.HasIndex("ParentUsername");
+
+                    b.HasIndex("Name", "ParentUsername")
+                        .IsUnique();
 
                     b.ToTable("Children");
                 });

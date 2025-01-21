@@ -1,0 +1,56 @@
+﻿[
+  {
+    "username": "parent0",
+    "hash": "zTj+6eyTNaSX3tMuSpZBTL9+0XUbJnSBPSceY7wxuKg+03nOBAJv+eL9pKirfZ/hRv3Of2gWEuxg8fgj9Agu5w==",
+    "salt": "YSDFeFqZJlvESYNl5TDrTqRHlPX3R2h5qCOd1PTSyDzSxn2NR7ytxAg8woAMNXIqQv6G9bhCkACNuuMl21vmrg==",
+    "firstName": "Audrey", 
+    "lastName": "Hepburn",
+    "email": "audreyhepburn@gmail.com",
+    "userIcon": "Icon1"
+  },
+  {
+    "username": "parent1",
+    "hash": "5qW68UsmOW9lxjwsLiWTN6KG/6UJPpnCN1yRP0Vbp1RvHrvZ+MVv5sTlm5rafybggR3LiRyVBf689aHpLEQPaA==",
+    "salt": "5uw04095v7VwKdMt/ZvZrs2M5IJ3wnlVE4Sk90XvbQ3Zhd1KNBktKU49H3jfZlcsLZEpiaZXcWb+050fTFGCIQ==",
+    "firstName": "Liam", 
+    "lastName": "Smith",
+    "email": "liam.smith@hotmail.com",
+    "userIcon": "Icon1"
+  },
+  {
+    "username": "parent2",
+    "hash": "P2rIWtet8FfYh1MNRzi+D96mvAUFUkbywFH/zb3okoQIGJk0qEF46qq3lxMQzAhFCBD/YMRg67yPmHUMzJChrg==",
+    "salt": "/BZqvbNo8ZCCM1LlD8tNASbumHc/cYN6Gb7b59nG+guNZSlJhFaonxn4Rd2gWV0m2qUw+dLoGtMcU0z1MIZiWg==",
+    "firstName": "Noah", 
+    "lastName": "Davis",
+    "email": "noah.davis@outlook.com",
+    "userIcon": "Icon1"
+  },
+  {
+    "username": "parent3",
+    "hash": "9MzbX6XalMPtiODUFyMW7Zd2tpbBBiv6MVf+1+NHc36cI9vnDtH55z3fEfpU8aTg/hQb8juCc22K40dAn5wLQw==",
+    "salt": "QFJo6nGsA+Ucs7Pd9k5vVJjoPQ6ZaGCR6ObtlZnNHs+MkO8BgXBVZVFXcgYTdhanRvPSL+eT1ryFaSIhwx0FQQ==",
+    "firstName": "William", 
+    "lastName": "Martinez",
+    "email": "william.martinez@gmail.com",
+    "userIcon": "Icon1"
+  },
+  {
+    "username": "parent4",
+    "hash": "40lH1sJL8c8YKq2G0KWlEDmIgb51gr5dMGY5GxYnkmyNxNBHSK9XUFRInD2V6smb2Aw2xnXMpG+8K/VgAyRdpg==",
+    "salt": "MV6QSm0o+fZdh4UuqOHzIA3quBCJxKawvy8UCzxdwyNXWKUWSu24pJu0gNjXcK2xqg2Fjgi7EGBzgUUWAzdBOQ==",
+    "firstName": "James", 
+    "lastName": "Taylor",
+    "email": "james.taylor@gmail.com",
+    "userIcon": "Icon1"
+  },
+  {
+    "username": "parent5",
+    "hash": "XO4fSUrdIpB8PmJbuvx+rgx1Nvts3DBGv2xJxthO+o2IR6h8aUrIOhjPqg3pkoy6EI7wVDU277An4yjl0IP6Hw==",
+    "salt": "aVoA2BQN/rrTEqvre506zxb2uAkrPOy9172ur9R43ieTzBrjajEzL/3Kzwi0dotpMEN3apQNjqf4Q2hFpGtAlQ==",
+    "firstName": "Benjamin", 
+    "lastName": "Van Moore",
+    "email": "benjamin.moore@gmail.com",
+    "userIcon": "Icon1"
+  }
+]

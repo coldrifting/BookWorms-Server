@@ -151,8 +151,6 @@ namespace BookwormsServer.Migrations
                 {
                     Username = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Hash = table.Column<byte[]>(type: "longblob", nullable: false),
-                    Salt = table.Column<byte[]>(type: "longblob", nullable: false),
                     FirstName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     LastName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
@@ -160,6 +158,8 @@ namespace BookwormsServer.Migrations
                     Roles = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     UserIcon = table.Column<string>(type: "nvarchar(64)", nullable: false),
+                    Hash = table.Column<byte[]>(type: "longblob", nullable: false),
+                    Salt = table.Column<byte[]>(type: "longblob", nullable: false),
                     Discriminator = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
@@ -183,7 +183,7 @@ namespace BookwormsServer.Migrations
                     ChildId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false),
+                    DateOfBirth = table.Column<DateOnly>(type: "date", nullable: true),
                     ReadingLevel = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ParentUsername = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
@@ -334,6 +334,12 @@ namespace BookwormsServer.Migrations
                 name: "IX_Children_ClassroomCode",
                 table: "Children",
                 column: "ClassroomCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Children_Name_ParentUsername",
+                table: "Children",
+                columns: new[] { "Name", "ParentUsername" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Children_ParentUsername",

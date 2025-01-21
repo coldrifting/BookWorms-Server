@@ -39,4 +39,15 @@ public class ErrorDTO(string error, string description)
         new("Review Already Exists", "Unable to create a new review as it already exists");
 
    public static ErrorDTO ReviewStarRatingOrTextRequired => new("Invalid Review Data", "Star Rating or Review Text required");
+
+   public static ErrorDTO ChildNotFound => new("Child Not Found",
+       "Unable to find a child with the given name under the logged in parent");
+   public static ErrorDTO ChildAlreadyExists => new("Child Already Exists",
+       "Unable to create a child with the same name under the same parent");
+   
+   public static ErrorDTO UserNotParent => new("User is not a Parent",
+       "The requested operation is invalid because the logged in user is not a parent.");
+   
+   public static ErrorDTO UserNotTeacher => new("User is not a Teacher",
+       "The requested operation is invalid because the logged in user is not a teacher.");
 }
