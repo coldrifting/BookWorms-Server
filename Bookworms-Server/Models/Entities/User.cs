@@ -40,9 +40,13 @@ public class User(string username, byte[] hash, byte[] salt, string firstName, s
 public class Parent(string username, byte[] hash, byte[] salt, string firstName, string lastName, UserIcon userIcon)
     : User(username, hash, salt, firstName, lastName, userIcon)
 {
-    // Navigation
+    public Guid? SelectedChildId { get; set; }
     
+    // Navigation
     public ICollection<Child> Children { get; set; } = null!;
+
+    [ForeignKey(nameof(SelectedChildId))] 
+    public Child? SelectedChild { get; set; }
 }
 
 public class Teacher(string username, byte[] hash, byte[] salt, string firstName, string lastName, UserIcon userIcon)

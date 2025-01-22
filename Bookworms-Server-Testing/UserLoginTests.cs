@@ -9,11 +9,13 @@ namespace BookwormsServerTesting;
 [Collection("Integration Tests")]
 public class UserLoginTests(BaseStartup<Program> factory) : BaseTest(factory)
 {
-    [Fact]
-    public async Task Test_CreateNewUser()
+    [Theory]
+    [InlineData("testParent", "testParentName", true)]
+    [InlineData("testTeacher", "testName", false)]
+    public async Task Test_CreateUserBasic(string username, string name, bool isParent)
     {
         HttpResponseMessage registerResponse = await Client.PostAsJsonAsync("/user/register",
-            new UserRegisterDTO("user23", "improbable", "23", "19", true));
+            new UserRegisterDTO(username, username, name, name, isParent));
 
         Assert.Equal(HttpStatusCode.OK, registerResponse.StatusCode);
     }

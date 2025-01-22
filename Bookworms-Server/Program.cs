@@ -1,16 +1,15 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using BookwormsServer.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using BookwormsServer.Filters;
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services;
 using BookwormsServer.Services.Interfaces;
+using BookwormsServer.Swagger;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace BookwormsServer;
@@ -62,7 +61,7 @@ public partial class Program
 			opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 		});
 
-		builder.Services.AddSwaggerExamplesFromAssemblyOf<ImagesRequestBodyExample>();
+		builder.Services.AddSwaggerExamplesFromAssemblyOf<SwaggerExamples.ImagesRequestBodyExample>();
         
         // Authorization & Authentication
 		builder.Services
@@ -183,6 +182,9 @@ public partial class Program
 			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 			Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
 	    };
+
+	    dbContext.Database.EnsureDeleted();
+        dbContext.Database.Migrate();
 	    
 	    string userData = File.ReadAllText("TestData/UserEntities.json");
 		List<User> users = JsonSerializer.Deserialize<List<User>>(userData, jso)!;

@@ -4,7 +4,7 @@ namespace BookwormsServer.Models.Entities;
 
 public class Classroom(string classroomName)
 {
-    [Key, StringLength(6, MinimumLength = 6, ErrorMessage = "Classroom code must be exactly {0} characters long.")]
+    [Key, StringLength(6, MinimumLength = 6, ErrorMessage = "Classroom code must be exactly {1} characters long.")]
     public string ClassroomCode { get ; set; } = GenerateClassroomCode();
 
     [StringLength(256, ErrorMessage = "Classroom name cannot be longer than {0} characters.")]

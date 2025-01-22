@@ -146,33 +146,21 @@ namespace BookwormsServer.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "ChildBookshelves",
                 columns: table => new
                 {
-                    Username = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    FirstName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    LastName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Roles = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserIcon = table.Column<string>(type: "nvarchar(64)", nullable: false),
-                    Hash = table.Column<byte[]>(type: "longblob", nullable: false),
-                    Salt = table.Column<byte[]>(type: "longblob", nullable: false),
-                    Discriminator = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    BookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ChildId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Username);
+                    table.PrimaryKey("PK_ChildBookshelves", x => x.BookshelfId);
                     table.ForeignKey(
-                        name: "FK_Users_Classrooms_ClassroomCode",
-                        column: x => x.ClassroomCode,
-                        principalTable: "Classrooms",
-                        principalColumn: "ClassroomCode");
+                        name: "FK_ChildBookshelves_Bookshelves_BookshelfId",
+                        column: x => x.BookshelfId,
+                        principalTable: "Bookshelves",
+                        principalColumn: "BookshelfId",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -199,69 +187,6 @@ namespace BookwormsServer.Migrations
                         column: x => x.ClassroomCode,
                         principalTable: "Classrooms",
                         principalColumn: "ClassroomCode");
-                    table.ForeignKey(
-                        name: "FK_Children_Users_ParentUsername",
-                        column: x => x.ParentUsername,
-                        principalTable: "Users",
-                        principalColumn: "Username",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Reviews",
-                columns: table => new
-                {
-                    ReviewId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Username = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    StarRating = table.Column<double>(type: "double", nullable: false),
-                    ReviewText = table.Column<string>(type: "varchar(4096)", maxLength: 4096, nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ReviewDate = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Reviews", x => x.ReviewId);
-                    table.ForeignKey(
-                        name: "FK_Reviews_Books_BookId",
-                        column: x => x.BookId,
-                        principalTable: "Books",
-                        principalColumn: "BookId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Reviews_Users_Username",
-                        column: x => x.Username,
-                        principalTable: "Users",
-                        principalColumn: "Username",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "ChildBookshelves",
-                columns: table => new
-                {
-                    BookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    ChildId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChildBookshelves", x => x.BookshelfId);
-                    table.ForeignKey(
-                        name: "FK_ChildBookshelves_Bookshelves_BookshelfId",
-                        column: x => x.BookshelfId,
-                        principalTable: "Bookshelves",
-                        principalColumn: "BookshelfId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ChildBookshelves_Children_ChildId",
-                        column: x => x.ChildId,
-                        principalTable: "Children",
-                        principalColumn: "ChildId",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -311,6 +236,75 @@ namespace BookwormsServer.Migrations
                         column: x => x.ChildId,
                         principalTable: "Children",
                         principalColumn: "ChildId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Username = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FirstName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LastName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Roles = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserIcon = table.Column<string>(type: "nvarchar(64)", nullable: false),
+                    Hash = table.Column<byte[]>(type: "longblob", nullable: false),
+                    Salt = table.Column<byte[]>(type: "longblob", nullable: false),
+                    Discriminator = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SelectedChildId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Username);
+                    table.ForeignKey(
+                        name: "FK_Users_Children_SelectedChildId",
+                        column: x => x.SelectedChildId,
+                        principalTable: "Children",
+                        principalColumn: "ChildId");
+                    table.ForeignKey(
+                        name: "FK_Users_Classrooms_ClassroomCode",
+                        column: x => x.ClassroomCode,
+                        principalTable: "Classrooms",
+                        principalColumn: "ClassroomCode");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Reviews",
+                columns: table => new
+                {
+                    ReviewId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Username = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StarRating = table.Column<double>(type: "double", nullable: false),
+                    ReviewText = table.Column<string>(type: "varchar(4096)", maxLength: 4096, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ReviewDate = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reviews", x => x.ReviewId);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "BookId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Users_Username",
+                        column: x => x.Username,
+                        principalTable: "Users",
+                        principalColumn: "Username",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -379,11 +373,36 @@ namespace BookwormsServer.Migrations
                 table: "Users",
                 column: "ClassroomCode",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_SelectedChildId",
+                table: "Users",
+                column: "SelectedChildId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ChildBookshelves_Children_ChildId",
+                table: "ChildBookshelves",
+                column: "ChildId",
+                principalTable: "Children",
+                principalColumn: "ChildId",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Children_Users_ParentUsername",
+                table: "Children",
+                column: "ParentUsername",
+                principalTable: "Users",
+                principalColumn: "Username",
+                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Users_Children_SelectedChildId",
+                table: "Users");
+
             migrationBuilder.DropTable(
                 name: "BookBookshelf");
 
@@ -409,10 +428,10 @@ namespace BookwormsServer.Migrations
                 name: "Bookshelves");
 
             migrationBuilder.DropTable(
-                name: "Children");
+                name: "Books");
 
             migrationBuilder.DropTable(
-                name: "Books");
+                name: "Children");
 
             migrationBuilder.DropTable(
                 name: "Users");

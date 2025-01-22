@@ -50,4 +50,7 @@ public class ErrorDTO(string error, string description)
    
    public static ErrorDTO UserNotTeacher => new("User is not a Teacher",
        "The requested operation is invalid because the logged in user is not a teacher.");
+
+   public static ErrorDTO ClassroomNotFound =>
+       new("Classroom Not Found", "Unable to find a class with the given classroom code");
 }

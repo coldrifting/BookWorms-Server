@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace BookwormsServer.Filters;
+namespace BookwormsServer.Swagger;
 
 // Makes padlock icon only shows on endpoints needing authentication
 // ReSharper disable once ClassNeverInstantiated.Global

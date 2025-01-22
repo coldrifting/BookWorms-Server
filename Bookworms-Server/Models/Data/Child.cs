@@ -3,13 +3,7 @@ using BookwormsServer.Models.Entities;
 
 namespace BookwormsServer.Models.Data;
 
-public class AddChildDTO(string name)
-{
-    [StringLength(256, MinimumLength = 2, ErrorMessage = "Child name must be between {2} and {1} characters long.")]
-    public string Name { get; set; } = name;
-}
-
-public class ChildEditDTO(string? newName, string? readingLevel, string? classroomCode, DateOnly? dateOfBirth)
+public class ChildEditDTO(string? newName = null, string? readingLevel = null, string? classroomCode = null, DateOnly? dateOfBirth = null)
 {
     [StringLength(256, MinimumLength = 2, ErrorMessage = "Child name must be between {2} and {1} characters long.")]
     public string? NewName { get; set; } = newName;
@@ -17,7 +11,7 @@ public class ChildEditDTO(string? newName, string? readingLevel, string? classro
     [StringLength(6)]
     public string? ReadingLevel { get; set; } = readingLevel;
     
-    [StringLength(6, MinimumLength = 6, ErrorMessage = "Child classroom code must be exactly {0} characters long.")]
+    [StringLength(6, MinimumLength = 6, ErrorMessage = "Child classroom code must be exactly {1} characters long.")]
     public string? ClassroomCode { get; set; } = classroomCode;
     
     [Range(typeof(DateOnly), "01/01/1900", "01/01/2100",
@@ -25,10 +19,10 @@ public class ChildEditDTO(string? newName, string? readingLevel, string? classro
     public DateOnly? DateOfBirth { get; set; } = dateOfBirth;
 }
 
-public record ChildResponseDTO(string Name, string? ReadingLevel, DateOnly? DateOfBirth)
+public record ChildResponseDTO(string Name, string? ReadingLevel, string? ClassroomCode, DateOnly? DateOfBirth, bool? Selected)
 {
-    public static ChildResponseDTO From(Child child)
+    public static ChildResponseDTO From(Child child, bool? selected = null)
     {
-        return new(child.Name, child.ReadingLevel, child.DateOfBirth);
+        return new(child.Name, child.ReadingLevel, child.ClassroomCode, child.DateOfBirth, selected);
     }
 }

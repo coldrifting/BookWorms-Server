@@ -23,11 +23,13 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
     [StringLength(64)]
     public string ParentUsername { get; set; } = parentUsername;
         
-    [StringLength(6, MinimumLength = 6, ErrorMessage = "Child classroom code must be exactly {0} characters long.")]
+    [StringLength(6, MinimumLength = 6, ErrorMessage = "Child classroom code must be exactly {1} characters long.")]
     public string? ClassroomCode { get; set; }
     
     // Navigation
     
+    // Inverse property needed for extra selected child property in parent to work
+    [InverseProperty(nameof(Parent.Children))]
     [ForeignKey(nameof(ParentUsername))]
     public Parent? Parent { get; set; }
     

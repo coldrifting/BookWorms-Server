@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services.Interfaces;
+using BookwormsServer.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Filters;
@@ -75,7 +76,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     [HttpPost]
     [Route("/books/covers")]
     [ProducesResponseType(typeof(Task<IActionResult>), StatusCodes.Status200OK, "application/zip", Type = typeof(File))]
-    [SwaggerRequestExample(typeof(List<string>), typeof(ImagesRequestBodyExample))]
+    [SwaggerRequestExample(typeof(List<string>), typeof(SwaggerExamples.ImagesRequestBodyExample))]
     public async Task<IActionResult> Images([FromBody] List<string> bookIds)
     {
         using var ms = new MemoryStream();
