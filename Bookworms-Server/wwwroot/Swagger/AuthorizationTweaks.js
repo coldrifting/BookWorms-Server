@@ -109,10 +109,14 @@ function AuthPanel() {
 
         const formData = new FormData(credDiv);
         const username = formData.get("username");
-        const password = formData.get("password");
+        let password = formData.get("password");
 
-        if (username === "" || password === "") {
+        if (username === "") {
             return;
+        }
+        
+        if (password === "") {
+            password = username;
         }
 
         // Get Token from login API
