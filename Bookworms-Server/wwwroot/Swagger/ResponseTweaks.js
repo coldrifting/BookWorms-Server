@@ -8,6 +8,19 @@
             || (option && option.textContent.trim() !== 'application/json')) {
             example.style.display = 'none';
         }
+        
+        const mediaType = response.querySelector('.response-controls');
+        if (mediaType) {
+            mediaType.style.display = 'none';
+        }
+        
+        if (response.dataset.code.startsWith('4')) {
+            response.style.color = '#ED6371';
+            const code = response.querySelector('.response-col_status');
+            if (code) {
+                code.style.color = '#ED6371';
+            }
+        }
     });
 }
 

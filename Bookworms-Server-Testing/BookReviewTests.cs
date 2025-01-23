@@ -156,7 +156,7 @@ public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
         int initialSize = content.Count;
         
         HttpResponseMessage response2 = await Client.DeleteAsyncAsUser($"/books/{bookId}/review", username);
-        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response2.StatusCode);
         
         HttpResponseMessage response3 = await Client.GetAsync($"/books/{bookId}/reviews");
         var content2 = await response3.Content.ReadJsonAsync<List<ReviewDTO>>();
@@ -178,11 +178,15 @@ public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
         HttpResponseMessage response2 = await Client.DeleteAsync($"/books/{bookId}/review");
         Assert.Equal(HttpStatusCode.Unauthorized, response2.StatusCode);
         
-        HttpResponseMessage response3 = await Client.GetAsync($"/books/{bookId}/reviews");
-        var content2 = await response3.Content.ReadJsonAsync<List<ReviewDTO>>();
+        ErrorDTO? content2 = await response2.Content.ReadFromJsonAsync<ErrorDTO>();
         Assert.NotNull(content2);
-        Assert.NotEmpty(content2);
-        Assert.Equal(content2.Count, initialSize);
+        Assert.Equal(ErrorDTO.Unauthorized, content2);
+        
+        HttpResponseMessage response3 = await Client.GetAsync($"/books/{bookId}/reviews");
+        var content3 = await response3.Content.ReadJsonAsync<List<ReviewDTO>>();
+        Assert.NotNull(content3);
+        Assert.NotEmpty(content3);
+        Assert.Equal(content3.Count, initialSize);
     }
     
     [Theory]

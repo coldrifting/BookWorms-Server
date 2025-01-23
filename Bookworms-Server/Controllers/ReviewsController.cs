@@ -12,6 +12,53 @@ namespace BookwormsServer.Controllers;
 public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
 {
     /// <summary>
+    /// Gets reviews for the specified book
+    /// </summary>
+    /// <param name="bookId">The Google Books ID of the book to target</param>
+    /// <param name="start" default="0">The start index from which to start returning reviews (first is 0)</param>
+    /// <param name="max" default="-1">The maximum number of reviews to return (use -1 for unconstrained)</param>
+    /// <returns>The list of reviews</returns>
+    /// <response code="200">Returns the list of requested reviews</response>
+    /// <response code="404">If the specified book is not found</response>
+    [HttpGet]
+    [Route("/books/{bookId}/reviews")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ReviewDTO>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    public IActionResult Get(string bookId, int start, int max)
+    {
+        Book? book = dbContext.Books
+            .Include(book => book.Reviews)
+            .FirstOrDefault(b => b.BookId == bookId);
+
+        if (book is null)
+        {
+            return NotFound(ErrorDTO.BookNotFound);
+        }
+        
+        List<ReviewDTO> output = [];
+
+        List<Review> x = dbContext.Reviews
+            .Include(review => review.Reviewer)
+            .Where(r => r.BookId == bookId)
+            .OrderByDescending(r => r.ReviewDate).ToList();
+
+        for (int i = 0; i < x.Count; i++)
+        {
+            if (i >= start)
+            {
+                output.Add(ReviewDTO.From(x[i]));
+            }
+
+            if (max > 0 && i >= start + max - 1)
+            {
+                break;
+            }
+        }
+            
+        return Ok(output);
+    }
+    
+    /// <summary>
     /// Adds/updates the review for the specified book and user
     /// </summary>
     /// <param name="bookId">The Google Books ID of the book to target</param>
@@ -71,13 +118,13 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     /// Removes the review by the logged in user for the specified book 
     /// </summary>
     /// <param name="bookId">The Google Books ID of the book to target</param>
-    /// <response code="200">If the review was removed successfully</response>
+    /// <response code="204">If the review was removed successfully</response>
     /// <response code="401">If the user is not logged in</response>
     /// <response code="404">If the specified book is not found, or the user has not left a review for the book</response>
     [HttpDelete]
     [Authorize]
     [Route("/books/{bookId}/review")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public IActionResult Delete(string bookId)
@@ -100,53 +147,6 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
 
         Response.Headers.Append("location", "");
         
-        return Ok();
-    }
-
-    /// <summary>
-    /// Gets reviews for the specified book
-    /// </summary>
-    /// <param name="bookId">The Google Books ID of the book to target</param>
-    /// <param name="start" default="0">The start index from which to start returning reviews (first is 0)</param>
-    /// <param name="max" default="-1">The maximum number of reviews to return (use -1 for unconstrained)</param>
-    /// <returns>The list of reviews</returns>
-    /// <response code="200">Returns the list of requested reviews</response>
-    /// <response code="404">If the specified book is not found</response>
-    [HttpGet]
-    [Route("/books/{bookId}/reviews")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ReviewDTO>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult Get(string bookId, int start, int max)
-    {
-        Book? book = dbContext.Books
-            .Include(book => book.Reviews)
-            .FirstOrDefault(b => b.BookId == bookId);
-
-        if (book is null)
-        {
-            return NotFound(ErrorDTO.BookNotFound);
-        }
-        
-        List<ReviewDTO> output = [];
-
-        List<Review> x = dbContext.Reviews
-            .Include(review => review.Reviewer)
-            .Where(r => r.BookId == bookId)
-            .OrderByDescending(r => r.ReviewDate).ToList();
-
-        for (int i = 0; i < x.Count; i++)
-        {
-            if (i >= start)
-            {
-                output.Add(ReviewDTO.From(x[i]));
-            }
-
-            if (max > 0 && i >= start + max - 1)
-            {
-                break;
-            }
-        }
-            
-        return Ok(output);
+        return NoContent();
     }
 }

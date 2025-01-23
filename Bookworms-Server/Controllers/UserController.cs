@@ -41,16 +41,16 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     /// <param name="payload">The data with which to register the new user</param>
     /// <returns>The now-registered user's data</returns>
     /// <response code="200">Creates and returns session data for the new user</response>
-    /// <response code="409">If the specified username is already taken</response>
+    /// <response code="422">If the specified username is already taken</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserLoginSuccessDTO))]
-    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
     public IActionResult Register(UserRegisterDTO payload)
     {
         IQueryable<User> userMatch = dbContext.Users.Where(l => l.Username == payload.Username);
         if (userMatch.Any())
         {
-            return Conflict(ErrorDTO.UsernameAlreadyExists);
+            return UnprocessableEntity(ErrorDTO.UsernameAlreadyExists);
         }
 
         User user = UserService.CreateUser(payload.Username, payload.Password, payload.FirstName, payload.LastName,
@@ -78,12 +78,12 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     /// <summary>
     /// Returns all the registered users
     /// </summary>
-    /// <returns>A list of Users</returns>
-    /// <response code="200">Returns the list of users</response>
-    /// <response code="401">If the current user is not logged in</response>
-    /// <response code="403">If the current user is not an admin</response>
+    /// <returns>A list of all Users</returns>
+    /// <response code="200">Returns a list of all users</response>
+    /// <response code="401">If the user is not logged in</response>
+    /// <response code="403">If the user is not an admin</response>
     [HttpGet]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserDTO>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
@@ -93,6 +93,11 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
 
         // Must not be null due to Authorize attribute
         string loggedInUser = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        
+        if (User.FindFirst(ClaimTypes.Role)?.Value != "Admin")
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotAdmin);
+        }
         
         // Put logged-in user at top of list
         for (int i = 0; i < users.Count; i++)

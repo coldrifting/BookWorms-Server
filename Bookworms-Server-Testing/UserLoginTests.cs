@@ -43,7 +43,6 @@ public class UserLoginTests(BaseStartup<Program> factory) : BaseTest(factory)
 
         var content = await loginResponse.Content.ReadFromJsonAsync<ErrorDTO>();
         Assert.NotNull(content);
-
         Assert.Equal(ErrorDTO.LoginFailure, content);
     }
 
@@ -57,7 +56,6 @@ public class UserLoginTests(BaseStartup<Program> factory) : BaseTest(factory)
 
         var content = await loginResponse.Content.ReadFromJsonAsync<ErrorDTO>();
         Assert.NotNull(content);
-
         Assert.Equal(ErrorDTO.LoginFailure, content);
     }
 
@@ -71,7 +69,6 @@ public class UserLoginTests(BaseStartup<Program> factory) : BaseTest(factory)
 
         var content = await loginResponse.Content.ReadFromJsonAsync<ErrorDTO>();
         Assert.NotNull(content);
-
         Assert.Equal(ErrorDTO.LoginFailure, content);
     }
     
@@ -99,12 +96,10 @@ public class UserLoginTests(BaseStartup<Program> factory) : BaseTest(factory)
         HttpResponseMessage registerResponse = await Client.PostAsJsonAsync("/user/register",
             new UserRegisterDTO("teacher0", "teacher0", "teacher0", "teacher0", false));
 
-        Assert.Equal(HttpStatusCode.Conflict, registerResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableContent, registerResponse.StatusCode);
         
         ErrorDTO? loginError = await registerResponse.Content.ReadFromJsonAsync<ErrorDTO>();
         Assert.NotNull(loginError);
-        Assert.NotEmpty(loginError.Error);
-        Assert.NotEmpty(loginError.Description);
         Assert.Equal(ErrorDTO.UsernameAlreadyExists, loginError);
     }
     
@@ -148,7 +143,7 @@ public class UserLoginTests(BaseStartup<Program> factory) : BaseTest(factory)
         ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
 
         Assert.NotNull(content);
-        Assert.Equal("Forbidden", content.Error);
+        Assert.Equal(ErrorDTO.UserNotAdmin, content);
     }
     
     [Fact]
@@ -161,6 +156,6 @@ public class UserLoginTests(BaseStartup<Program> factory) : BaseTest(factory)
         ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
 
         Assert.NotNull(content);
-        Assert.Equal("Unauthorized", content.Error);
+        Assert.Equal(ErrorDTO.Unauthorized, content);
     }
 }
