@@ -73,15 +73,15 @@ public record UserDetailsDTO(string Username, string FirstName, string LastName,
 
 public record UserDetailsEditDTO(
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)] 
-    string? FirstName, 
+    string? FirstName = null, 
     
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)] 
-    string? LastName, 
+    string? LastName = null, 
     
-    string? Icon, 
+    string? Icon = null, 
     
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
-    string? Password);
+    string? Password = null);
 
 public enum Role
 {

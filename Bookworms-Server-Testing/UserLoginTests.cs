@@ -124,7 +124,7 @@ public class UserLoginTests(BaseStartup<Program> factory) : BaseTest(factory)
         
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         
-        var users = await response.Content.ReadFromJsonAsync<List<UserDTO>>();
+        var users = await response.Content.ReadFromJsonAsync<List<UserDetailsDTO>>();
 
         Assert.NotNull(users);
         Assert.NotEmpty(users);
@@ -157,5 +157,225 @@ public class UserLoginTests(BaseStartup<Program> factory) : BaseTest(factory)
 
         Assert.NotNull(content);
         Assert.Equal(ErrorDTO.Unauthorized, content);
+    }
+    
+    [Fact]
+    public async Task Test_UserDetails_NotLoggedInShouldError()
+    {
+        HttpResponseMessage response = await Client.GetAsync("/user/details");
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        
+        ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
+        Assert.NotNull(content);
+        Assert.Equal(ErrorDTO.Unauthorized, content);
+    }
+    
+    [Theory]
+    [InlineData("teacher1", "Emma", "Johnson", "Teacher", "Icon2")]
+    [InlineData("parent1", "Liam", "Smith", "Parent", "Icon1")]
+    [InlineData("admin", "Admin", "Admin", "Admin", "Icon3")]
+    public async Task Test_UserDetails_Basic(string username, string firstName, string lastName, string role, string icon)
+    {
+        HttpResponseMessage response = await Client.GetAsyncAsUser("/user/details", username);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        UserDetailsDTO? content = await response.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content);
+        Assert.Equal(username, content.Username);
+        Assert.Equal(firstName, content.FirstName);
+        Assert.Equal(lastName, content.LastName);
+        Assert.Equal(role, content.Role);
+        Assert.Equal(icon, content.Icon);
+    }
+    
+    [Fact]
+    public async Task Test_UserEdit_NotLoggedInShouldError()
+    {
+        HttpResponseMessage response = await Client.PostAsync("/user/edit", new StringContent(""));
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        
+        ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
+        Assert.NotNull(content);
+        Assert.Equal(ErrorDTO.Unauthorized, content);
+    }
+    
+    [Theory]
+    [InlineData("teacher1", "New")]
+    [InlineData("parent1", "First")]
+    [InlineData("admin", "Name")]
+    public async Task Test_UserEdit_FirstNameOnly(string username, string newFirstName)
+    {
+        HttpResponseMessage response = await Client.PostAsJsonAsyncAsUser("/user/edit", new UserDetailsEditDTO(FirstName: newFirstName), username);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        UserDetailsDTO? content = await response.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content);
+        Assert.Equal(username, content.Username);
+        Assert.Equal(newFirstName, content.FirstName);
+        
+        HttpResponseMessage response2 = await Client.GetAsyncAsUser("/user/details", username);
+        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+        
+        UserDetailsDTO? content2 = await response2.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content2);
+        Assert.Equal(username, content2.Username);
+        Assert.Equal(newFirstName, content2.FirstName);
+    }
+    
+    [Theory]
+    [InlineData("teacher1", "New")]
+    [InlineData("parent1", "First")]
+    [InlineData("admin", "Name")]
+    public async Task Test_UserEdit_LastNameOnly(string username, string newLastName)
+    {
+        HttpResponseMessage response = await Client.PostAsJsonAsyncAsUser("/user/edit", new UserDetailsEditDTO(LastName: newLastName), username);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        UserDetailsDTO? content = await response.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content);
+        Assert.Equal(username, content.Username);
+        Assert.Equal(newLastName, content.LastName);
+        
+        HttpResponseMessage response2 = await Client.GetAsyncAsUser("/user/details", username);
+        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+        
+        UserDetailsDTO? content2 = await response2.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content2);
+        Assert.Equal(username, content2.Username);
+        Assert.Equal(newLastName, content2.LastName);
+    }
+    
+    [Theory]
+    [InlineData("teacher1", "Icon1")]
+    [InlineData("parent1", "Icon3")]
+    [InlineData("admin", "Icon3")]
+    public async Task Test_UserEdit_IconOnly(string username, string newIcon)
+    {
+        HttpResponseMessage response = await Client.PostAsJsonAsyncAsUser("/user/edit", new UserDetailsEditDTO(Icon: newIcon), username);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        UserDetailsDTO? content = await response.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content);
+        Assert.Equal(username, content.Username);
+        Assert.Equal(newIcon, content.Icon);
+        
+        HttpResponseMessage response2 = await Client.GetAsyncAsUser("/user/details", username);
+        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+        
+        UserDetailsDTO? content2 = await response2.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content2);
+        Assert.Equal(username, content2.Username);
+        Assert.Equal(newIcon, content2.Icon);
+    }
+    
+    [Theory]
+    [InlineData("teacher1", "IconX")]
+    [InlineData("parent1", "Blah")]
+    [InlineData("admin", "Iconzzzz")]
+    public async Task Test_UserEdit_IconOnlyInvalid(string username, string newIcon)
+    {
+        HttpResponseMessage response = await Client.PostAsJsonAsyncAsUser("/user/edit", new UserDetailsEditDTO(Icon: newIcon), username);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        
+        ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
+        Assert.NotNull(content);
+        Assert.Equal(ErrorDTO.InvalidIconIndex, content);
+        
+        HttpResponseMessage response2 = await Client.GetAsyncAsUser("/user/details", username);
+        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+        
+        UserDetailsDTO? content2 = await response2.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content2);
+        Assert.Equal(username, content2.Username);
+        Assert.NotEqual(newIcon, content2.Icon);
+    }
+    
+    [Theory]
+    [InlineData("teacher1", "NewPassWord")]
+    [InlineData("parent1", "NewPassWord")]
+    [InlineData("admin", "NewPassWord")]
+    public async Task Test_UserEdit_PasswordOnly(string username, string newPassword)
+    {
+        HttpResponseMessage response = await Client.PostAsJsonAsyncAsUser("/user/edit", new UserDetailsEditDTO(Password: newPassword), username);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        UserDetailsDTO? content = await response.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content);
+        Assert.Equal(username, content.Username);
+
+        // Clear token to force re-login with new password
+        Client.DefaultRequestHeaders.Authorization = null;
+        
+        HttpResponseMessage response2 = await Client.GetAsyncAsUser("/user/details", username, newPassword);
+        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+        
+        UserDetailsDTO? content2 = await response2.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content2);
+        Assert.Equal(username, content2.Username);
+    }
+    
+    [Theory]
+    [InlineData("teacher1", "NewFirstName", "NewLastName", "Icon2", "NewPassWord")]
+    [InlineData("parent1", "NewFirstName", "NewLastName", "Icon2", "NewPassWord")]
+    [InlineData("admin", "NewFirstName", "NewLastName", "Icon2", "NewPassWord")]
+    public async Task Test_UserEdit_AllValid(string username, string newFirstName, string newLastName, string newIcon, string newPassword)
+    {
+        HttpResponseMessage response = await Client.PostAsJsonAsyncAsUser("/user/edit", new UserDetailsEditDTO(newFirstName, newLastName, newIcon, newPassword), username);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        UserDetailsDTO? content = await response.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content);
+        Assert.Equal(username, content.Username);
+        Assert.Equal(newFirstName, content.FirstName);
+        Assert.Equal(newLastName, content.LastName);
+        Assert.Equal(newIcon, content.Icon);
+        
+        // Clear token to force re-login with new password
+        Client.DefaultRequestHeaders.Authorization = null;
+        
+        HttpResponseMessage response2 = await Client.GetAsyncAsUser("/user/details", username, newPassword);
+        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+        
+        UserDetailsDTO? content2 = await response2.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content2);
+        Assert.Equal(username, content2.Username);
+        Assert.Equal(newFirstName, content2.FirstName);
+        Assert.Equal(newLastName, content2.LastName);
+        Assert.Equal(newIcon, content2.Icon);
+    }
+    
+    [Theory]
+    [InlineData("teacher1", "NewFirstName", "NewLastName", "BadIconIndex", "NewPassWord")]
+    [InlineData("parent1", "NewFirstName", "NewLastName", "BadIconIndex", "NewPassWord")]
+    [InlineData("admin", "NewFirstName", "NewLastName", "BadIconIndex", "NewPassWord")]
+    public async Task Test_UserEdit_AllValidExceptIcon(string username, string newFirstName, string newLastName, string newIcon, string newPassword)
+    {
+        HttpResponseMessage response = await Client.PostAsJsonAsyncAsUser("/user/edit", new UserDetailsEditDTO(newFirstName, newLastName, newIcon, newPassword), username);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        
+        ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
+        Assert.NotNull(content);
+        Assert.Equal(ErrorDTO.InvalidIconIndex, content);
+        
+        // Clear token to force re-login with new password
+        Client.DefaultRequestHeaders.Authorization = null;
+        
+        // Check that password did not update
+        HttpResponseMessage response2 = await Client.PostAsJsonAsync("/user/login", new UserLoginDTO(username, newPassword));
+        Assert.Equal(HttpStatusCode.BadRequest, response2.StatusCode);
+        
+        ErrorDTO? content2 = await response2.Content.ReadFromJsonAsync<ErrorDTO>();
+        Assert.NotNull(content2);
+        Assert.Equal(ErrorDTO.LoginFailure, content2);
+        
+        HttpResponseMessage response3 = await Client.GetAsyncAsUser("/user/details", username);
+        Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+        
+        UserDetailsDTO? content3 = await response3.Content.ReadFromJsonAsync<UserDetailsDTO>();
+        Assert.NotNull(content3);
+        Assert.Equal(username, content3.Username);
+        Assert.NotEqual(newFirstName, content3.FirstName);
+        Assert.NotEqual(newLastName, content3.LastName);
+        Assert.NotEqual(newIcon, content3.Icon);
     }
 }
