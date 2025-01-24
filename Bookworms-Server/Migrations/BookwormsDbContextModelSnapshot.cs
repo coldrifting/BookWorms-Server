@@ -114,6 +114,9 @@ namespace BookwormsServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<int>("ChildIcon")
+                        .HasColumnType("int");
+
                     b.Property<string>("ClassroomCode")
                         .HasMaxLength(6)
                         .HasColumnType("varchar(6)");

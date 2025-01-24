@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BookwormsServer.Models.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServer.Models.Entities;
@@ -13,6 +14,8 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
     [StringLength(256, MinimumLength = 2, ErrorMessage = "Child name must be between {2} and {1} characters long.")]
     public string Name { get; set; } = name;
 
+    public UserIcon ChildIcon { get; set; } = UserIcon.Icon1;
+
     [Range(typeof(DateOnly), "01/01/1900", "01/01/2100",
         ErrorMessage = "Child date of birth must fall between {1} and {2}.")]
     public DateOnly? DateOfBirth { get; set; } = dateOfBirth;
@@ -25,7 +28,7 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
         
     [StringLength(6, MinimumLength = 6, ErrorMessage = "Child classroom code must be exactly {1} characters long.")]
     public string? ClassroomCode { get; set; }
-    
+
     // Navigation
     
     // Inverse property needed for extra selected child property in parent to work

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookwormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
-    [Migration("20250121211851_Initial")]
+    [Migration("20250124053834_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -116,6 +116,9 @@ namespace BookwormsServer.Migrations
                     b.Property<Guid>("ChildId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
+
+                    b.Property<int>("ChildIcon")
+                        .HasColumnType("int");
 
                     b.Property<string>("ClassroomCode")
                         .HasMaxLength(6)

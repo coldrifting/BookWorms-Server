@@ -194,7 +194,7 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="401">If the user is not logged in</response>
     /// <response code="403">If the user is not a parent</response>
     /// <response code="404">If no child with the requested name is found for the logged in parent account</response>
-    /// <response code="422">If a child already exists under the parent with the requested name, or the classroom code is invalid</response>
+    /// <response code="422">If a child already exists under the parent with the requested name, if the classroom code is invalid, or an invalid icon is specified</response>
     [HttpPost]
     [Authorize]
     [Route("/children/{childName}/[action]")]
@@ -228,6 +228,19 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
         if (payload.ReadingLevel is not null)
         {
             child.ReadingLevel = payload.ReadingLevel;
+        }
+        
+        
+        if (payload.ChildIcon is not null)
+        {
+            if (Enum.TryParse(payload.ChildIcon, out UserIcon icon))
+            {
+                child.ChildIcon = icon;
+            }
+            else
+            {
+                return UnprocessableEntity(ErrorDTO.InvalidIconIndex);
+            }
         }
 
         if (payload.ClassroomCode is not null)

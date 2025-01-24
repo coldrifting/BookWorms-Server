@@ -171,6 +171,7 @@ namespace BookwormsServer.Migrations
                     ChildId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    ChildIcon = table.Column<int>(type: "int", nullable: false),
                     DateOfBirth = table.Column<DateOnly>(type: "date", nullable: true),
                     ReadingLevel = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),

@@ -151,7 +151,7 @@ public static class SwaggerExamples
     {
         public ChildEditDTO GetExamples()
         {
-            return new("New_Child_Name", "READA7", "WLF359", DateOnly.Parse("2017-3-4"));
+            return new("New_Child_Name", UserIcon.Icon1.ToString(), "READA7", "WLF359", DateOnly.Parse("2017-3-4"));
         }
     }
 
@@ -159,7 +159,7 @@ public static class SwaggerExamples
     {
         public ChildResponseDTO GetExamples()
         {
-            return new("Joey", "A5", "CLS098", DateOnly.Parse("2015-04-15"), true);
+            return new("Joey", UserIcon.Icon2.ToString(), "A5", "CLS098", DateOnly.Parse("2015-04-15"), true);
         }
     }
     
@@ -169,9 +169,9 @@ public static class SwaggerExamples
         {
             return
             [
-                new("Ashley", "A7", "CLS098", DateOnly.Parse("2014-08-23"), true),
-                new("Miles", "B4", "CLS498", null, null),
-                new("Joey", null, null, DateOnly.Parse("2015-04-15"), null)
+                new("Ashley", UserIcon.Icon1.ToString(),  "A7", "CLS098", DateOnly.Parse("2014-08-23"), true),
+                new("Miles", UserIcon.Icon2.ToString(), "B4", "CLS498", null, null),
+                new("Joey", UserIcon.Icon3.ToString(), null, null, DateOnly.Parse("2015-04-15"), null)
             ];
         }
     }

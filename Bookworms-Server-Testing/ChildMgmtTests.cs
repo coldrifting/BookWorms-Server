@@ -357,7 +357,37 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
         Assert.DoesNotContain(children, c => c.Name == childName);
         Assert.Contains(children, c => c.Name == newChildName && c.Selected == true);
     }
-    
+
+    [Theory]
+    [InlineData("parent1", "Joey", "IconInvalid")]
+    public async Task Test_EditChild_ChangeIcon_InvalidIconIndex(string parent, string childName, string newIcon)
+    {
+        await Client.PostAsJsonAsyncAsUser($"/children/{childName}/add", new { }, parent);
+
+        HttpResponseMessage response2 = await Client.PostAsJsonAsyncAsUser($"/children/{childName}/edit",
+            new ChildEditDTO(ChildIcon: newIcon), parent);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response2.StatusCode);
+
+        ErrorDTO? error = await response2.Content.ReadJsonAsync<ErrorDTO>();
+        Assert.NotNull(error);
+        Assert.Equal(ErrorDTO.InvalidIconIndex, error);
+    }
+
+    [Theory]
+    [InlineData("parent1", "Joey", "Icon3")]
+    public async Task Test_EditChild_ChangeIcon_Basic(string parent, string childName, string newIcon)
+    {
+        await Client.PostAsJsonAsyncAsUser($"/children/{childName}/add", new { }, parent);
+
+        HttpResponseMessage response2 = await Client.PostAsJsonAsyncAsUser($"/children/{childName}/edit",
+            new ChildEditDTO(ChildIcon: newIcon), parent);
+        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+        ChildResponseDTO? child2 = await response2.Content.ReadJsonAsync<ChildResponseDTO>();
+        Assert.NotNull(child2);
+        Assert.Equal(newIcon, child2.ChildIcon);
+    }
+
     [Theory]
     [InlineData("parent1", "Joey", "Andrew")]
     public async Task Test_EditChild_ChangeName_NameAlreadyExistsUnderParent(string parent, string childName, string childName2)
@@ -411,7 +441,7 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
         Assert.Contains(children1, c => c.Name == childName && c.Selected == true);
 
         HttpResponseMessage response2 = await Client.PostAsJsonAsyncAsUser($"/children/{childName}/edit",
-            new ChildEditDTO(readingLevel: readingLevel), parent);
+            new ChildEditDTO(ReadingLevel: readingLevel), parent);
         Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
         
         ChildResponseDTO? child2 = await response2.Content.ReadJsonAsync<ChildResponseDTO>();
@@ -443,7 +473,7 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
         Assert.Contains(children1, c => c.Name == childName && c.Selected == true);
 
         HttpResponseMessage response2 = await Client.PostAsJsonAsyncAsUser($"/children/{childName}/edit",
-            new ChildEditDTO(dateOfBirth: DateOnly.Parse(dob)), parent);
+            new ChildEditDTO(DateOfBirth: DateOnly.Parse(dob)), parent);
         Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
         
         ChildResponseDTO? child2 = await response2.Content.ReadJsonAsync<ChildResponseDTO>();
@@ -636,7 +666,7 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
         Assert.Contains(children1,
             c => c.Name == child && c.Selected == true);
         
-        HttpResponseMessage response2 = await Client.PostAsJsonAsyncAsUser($"/children/{child}/edit", new ChildEditDTO(classroomCode: classroomCode, readingLevel: "A5"), parent);
+        HttpResponseMessage response2 = await Client.PostAsJsonAsyncAsUser($"/children/{child}/edit", new ChildEditDTO(ClassroomCode: classroomCode, ReadingLevel: "A5"), parent);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response2.StatusCode);
 
         ErrorDTO? content2 = await response2.Content.ReadJsonAsync<ErrorDTO>();
