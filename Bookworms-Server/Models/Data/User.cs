@@ -6,41 +6,38 @@ namespace BookwormsServer.Models.Data;
 /// <summary>
 /// 
 /// </summary>
-/// <param name="username"></param>
-/// <param name="password"></param>
-/// <param name="firstName"></param>
-/// <param name="lastName"></param>
-/// <param name="isParent"></param>
-public class UserRegisterDTO(string username, string password, string firstName, string lastName, bool isParent)
-{
+/// <param name="Username"></param>
+/// <param name="Password"></param>
+/// <param name="FirstName"></param>
+/// <param name="LastName"></param>
+/// <param name="IsParent"></param>
+public record UserRegisterDTO(
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
-    public string Username { get; set; } = username;
+    string Username,
 
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
-    public string Password { get; set; } = password;
+    string Password,
 
     [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)]
-    public string FirstName { get; set; } = firstName;
+    string FirstName,
 
     [StringLength(256, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)]
-    public string LastName { get; set; } = lastName;
+    string LastName,
 
-    public bool IsParent { get; set; }  = isParent;
-}
+    bool IsParent);
 
 /// <summary>
 /// 
 /// </summary>
-/// <param name="username"></param>
-/// <param name="password"></param>
-public class UserLoginDTO(string username, string password)
-{
+/// <param name="Username"></param>
+/// <param name="Password"></param>
+public record UserLoginDTO(
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
-    public string Username { get; set; } = username;
+    string Username,
     
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
-    public string Password { get; set; } = password;
-}
+    string Password
+    );
 
 /// <summary>
 /// 
