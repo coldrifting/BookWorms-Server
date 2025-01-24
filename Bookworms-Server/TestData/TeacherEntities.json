@@ -6,7 +6,7 @@
     "firstName": "Sally", 
     "lastName": "Field",
     "email": "sallyfield@yahoo.com",
-    "userIcon": "Icon1"
+    "userIcon": "Icon2"
   },
   {
     "username": "teacher1",
@@ -15,7 +15,7 @@
     "firstName": "Emma", 
     "lastName": "Johnson",
     "email": "emma.johnson@yahoo.com",
-    "userIcon": "Icon1"
+    "userIcon": "Icon2"
   },
   {
     "username": "teacher2",
@@ -24,7 +24,7 @@
     "firstName": "Olivia", 
     "lastName": "Brown",
     "email": "olivia.brown@aol.com",
-    "userIcon": "Icon1"
+    "userIcon": "Icon2"
   },
   {
     "username": "teacher3",
@@ -33,7 +33,7 @@
     "firstName": "Ava", 
     "lastName": "Wilson",
     "email": "ava.wilson@hotmail.com",
-    "userIcon": "Icon1"
+    "userIcon": "Icon2"
   },
   {
     "username": "teacher4",
@@ -42,7 +42,7 @@
     "firstName": "Sophia", 
     "lastName": "Anderson",
     "email": "sophia.anderson@gmail.com",
-    "userIcon": "Icon1"
+    "userIcon": "Icon2"
   },
   {
     "username": "teacher5",
@@ -51,6 +51,6 @@
     "firstName": "Isabella", 
     "lastName": "Thomas",
     "email": "isabella.thomas@aol.com",
-    "userIcon": "Icon1"
+    "userIcon": "Icon2"
   }
 ]

@@ -38,6 +38,26 @@ public static class SwaggerExamples
         }
     }
 
+    public class UserDetailsSuccessResponseExample : IExamplesProvider<UserDetailsDTO>
+    {
+        public UserDetailsDTO GetExamples()
+        {
+            return new("_username_", "_password_", "John Jackson", "Teacher", "Icon1");
+        }
+    }
+
+    public class UserDetailsListSuccessResponseExample : IExamplesProvider<List<UserDetailsDTO>>
+    {
+        public List<UserDetailsDTO> GetExamples()
+        {
+            return
+            [
+                new("_username_", "_password_", "John Jackson", "Teacher", "Icon1"),
+                new("_username_", "_password_", "Ashley Reed", "Parent", "Icon3"),
+                new("_username_", "_password_", "Wyatt Smith", "Admin", "Icon2"),
+            ];
+        }
+    }
 
     public class BookDetailsResponseExample : IExamplesProvider<BookDetailsDTO>
     {

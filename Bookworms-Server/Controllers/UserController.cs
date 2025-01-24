@@ -76,6 +76,77 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     }
 
     /// <summary>
+    /// Returns information about the currently logged in user
+    /// </summary>
+    /// <returns>Details about the current user</returns>
+    /// <response code="200">Returns current user details</response>
+    /// <response code="401">If the user is not logged in</response>
+    [HttpGet]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDetailsDTO))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
+    public IActionResult Details()
+    {
+        // Must not be null due to Authorize attribute
+        string loggedInUser = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        User user = dbContext.Users.First(u => u.Username == loggedInUser);
+
+        return Ok(UserDetailsDTO.From(user));
+    }
+
+    /// <summary>
+    /// Edits properties of the currently logged in user
+    /// </summary>
+    /// <returns>Updated Details about the current user</returns>
+    /// <response code="200">Returns current user details</response>
+    /// <response code="401">If the user is not logged in</response>
+    /// <response code="422">If the requested icon is not valid</response>
+    [HttpPost]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDetailsDTO))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
+    public IActionResult Edit(UserDetailsEditDTO payload)
+    {
+        // Must not be null due to Authorize attribute
+        string loggedInUser = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        User user = dbContext.Users.First(u => u.Username == loggedInUser);
+
+        if (payload.FirstName is not null)
+        {
+            user.FirstName = payload.FirstName;
+        }
+
+        if (payload.LastName is not null)
+        {
+            user.LastName = payload.LastName;
+        }
+
+        if (payload.Icon is not null)
+        {
+            if (Enum.TryParse(payload.Icon, true, out UserIcon icon))
+            {
+                user.UserIcon = icon;
+            }
+            else
+            {
+                return UnprocessableEntity(ErrorDTO.InvalidIconIndex);
+            }
+        }
+
+        if (payload.Password is not null)
+        {
+            UserService.UpdatePassword(user, payload.Password);
+        }
+
+        dbContext.SaveChanges();
+        
+        return Ok(UserDetailsDTO.From(user));
+    }
+
+    /// <summary>
     /// Returns all the registered users
     /// </summary>
     /// <returns>A list of all Users</returns>
@@ -84,7 +155,7 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="403">If the user is not an admin</response>
     [HttpGet]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserDetailsDTO>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     public IActionResult All()
@@ -109,8 +180,8 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
             }
         }
 
-        List<UserDTO> usersFormatted = [];
-        usersFormatted.AddRange(users.Select(UserDTO.From));
+        List<UserDetailsDTO> usersFormatted = [];
+        usersFormatted.AddRange(users.Select(UserDetailsDTO.From));
 
         return Ok(usersFormatted);
     }

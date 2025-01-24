@@ -12,4 +12,11 @@ public static class UserService
             ? new Parent(username, hash, salt, firstName, lastName, userIcon)
             : new Teacher(username, hash, salt, firstName, lastName, userIcon);
     }
+
+    public static void UpdatePassword(User user, string newPassword)
+    {
+        byte[] hash = AuthService.HashPassword(newPassword, out byte[] salt);
+        user.Hash = hash;
+        user.Salt = salt;
+    }
 }
