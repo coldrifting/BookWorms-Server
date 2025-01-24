@@ -331,12 +331,6 @@ namespace BookwormsServer.Migrations
                 column: "ClassroomCode");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Children_Name_ParentUsername",
-                table: "Children",
-                columns: new[] { "Name", "ParentUsername" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Children_ParentUsername",
                 table: "Children",
                 column: "ParentUsername");

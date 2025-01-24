@@ -187,33 +187,51 @@ public partial class Program
         dbContext.Database.Migrate();
 	    
 	    string userData = File.ReadAllText("TestData/UserEntities.json");
-		List<User> users = JsonSerializer.Deserialize<List<User>>(userData, jso)!;
+		var users = JsonSerializer.Deserialize<List<User>>(userData, jso)!;
 	    dbContext.Users.ExecuteDelete();
 		dbContext.Users.AddRange(users);
 		dbContext.SaveChanges();
 		
 	    string parentData = File.ReadAllText("TestData/ParentEntities.json");
-		List<Parent> parents = JsonSerializer.Deserialize<List<Parent>>(parentData, jso)!;
+		var parents = JsonSerializer.Deserialize<List<Parent>>(parentData, jso)!;
 	    dbContext.Parents.ExecuteDelete();
 		dbContext.Parents.AddRange(parents);
 		dbContext.SaveChanges();
 
 	    string teacherData = File.ReadAllText("TestData/TeacherEntities.json");
-		List<Teacher> teachers = JsonSerializer.Deserialize<List<Teacher>>(teacherData, jso)!;
+		var teachers = JsonSerializer.Deserialize<List<Teacher>>(teacherData, jso)!;
 	    dbContext.Teachers.ExecuteDelete();
 		dbContext.Teachers.AddRange(teachers);
 		dbContext.SaveChanges();
 		
 	    string bookData = File.ReadAllText("TestData/BookEntities.json");
-		List<Book> books = JsonSerializer.Deserialize<List<Book>>(bookData, jso)!;
+		var books = JsonSerializer.Deserialize<List<Book>>(bookData, jso)!;
 	    dbContext.Books.ExecuteDelete();
 		dbContext.Books.AddRange(books);
 		dbContext.SaveChanges();
 		
 	    string reviewData = File.ReadAllText("TestData/ReviewEntities.json");
-		List<Review> reviews = JsonSerializer.Deserialize<List<Review>>(reviewData, jso)!;
+		var reviews = JsonSerializer.Deserialize<List<Review>>(reviewData, jso)!;
 	    dbContext.Reviews.ExecuteDelete();
 		dbContext.Reviews.AddRange(reviews);
+		dbContext.SaveChanges();
+		
+	    string childData = File.ReadAllText("TestData/ChildEntities.json");
+		var children = JsonSerializer.Deserialize<List<Child>>(childData, jso)!;
+	    dbContext.Children.ExecuteDelete();
+		dbContext.Children.AddRange(children);
+		
+		dbContext.SaveChanges();
+		
+		// Ensure a child is selected if at least one exists under a parent
+		foreach (var child in dbContext.Children.Include(child => child.Parent))
+		{
+			if (child.Parent is not null && child.Parent.SelectedChild is null)
+			{
+				child.Parent.SelectedChild = child;
+			}
+		}
+		
 		dbContext.SaveChanges();
     }
 }

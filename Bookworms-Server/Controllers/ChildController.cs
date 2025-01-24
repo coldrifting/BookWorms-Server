@@ -29,29 +29,11 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        if (!dbContext.Parents.Any(p => p.Username == parentUsername))
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
-        }
-        
-        IQueryable<Child> childrenUnderParent = dbContext.Children.Include(c => c.Parent)
-            .Where(c => c.Parent != null && c.Parent.Username == parentUsername);
-        
-        Parent parent = dbContext.Parents
-            .Include(p => p.SelectedChild)
-            .First(p => p.Username == parentUsername);
-
-        string? selectedChildName = parent.SelectedChild?.Name;
-        
-        List<ChildResponseDTO> children = [];
-        
-        foreach (Child c in childrenUnderParent)
-        {
-            children.Add(ChildResponseDTO.From(c, c.Name == selectedChildName ? true : null));
-        }
-        
-        return Ok(children);
+        return dbContext.Parents.Any(p => p.Username == parentUsername) 
+            ? Ok(GetAllChildren(parentUsername)) 
+            : StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
     }
+    
     
     /// <summary>
     /// Gets the currently selected child that actions will be performed for
@@ -91,48 +73,6 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
         return Ok(childResponse);
     }
     
-    /// <summary>
-    /// Sets the current child to perform actions for
-    /// </summary>
-    /// <returns>Sets the currently selected child and then gets their info</returns>
-    /// <response code="200">Info about the currently selected child</response>
-    /// <response code="401">If the user is not logged in</response>
-    /// <response code="403">If the user is not a parent</response>
-    /// <response code="404">If no child with the requested name is found for the logged in parent account</response>
-    [HttpPost]
-    [Authorize]
-    [Route("/children/{childName}/[action]")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ChildResponseDTO))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult Select(string childName)
-    {
-        // This should never be null thanks to the authorize attribute above
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        if (!dbContext.Parents.Any(p => p.Username == parentUsername))
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
-        }
-        
-        IQueryable<Child> childMatch = GetChildByName(parentUsername, childName);
-
-        if (!childMatch.Any())
-        {
-            return NotFound(ErrorDTO.ChildNotFound);
-        }
-
-        Child child = childMatch.First();
-
-        Parent parent = dbContext.Parents.First(p => p.Username == parentUsername);
-
-        parent.SelectedChildId = child.ChildId;
-
-        dbContext.SaveChanges();
-
-        return Ok(ChildResponseDTO.From(child, true));
-    }
     
     /// <summary>
     /// Adds a child under the logged-in parent with the specified name.
@@ -140,17 +80,15 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     /// be selected automatically.
     /// </summary>
     /// <returns>A list of all children under the parent and their info</returns>
-    /// <response code="200">Info about all children under the logged in parent</response>
+    /// <response code="201">A child was successfully created</response>
     /// <response code="401">If the user is not logged in</response>
     /// <response code="403">If the user is not a parent</response>
-    /// <response code="422">If a child with the requested name already exists under the logged in parent account</response>
     [HttpPost]
     [Authorize]
-    [Route("/children/{childName}/[action]")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ChildResponseDTO>))]
+    [Route("/children/[action]")]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(List<ChildResponseDTO>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
     public IActionResult Add(string childName)
     {
         // This should never be null thanks to the authorize attribute above
@@ -159,13 +97,6 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
         if (!dbContext.Parents.Any(p => p.Username == parentUsername))
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
-        }
-        
-        IQueryable<Child> childMatch = GetChildByName(parentUsername, childName);
-
-        if (childMatch.Any())
-        {
-            return UnprocessableEntity(ErrorDTO.ChildAlreadyExists);
         }
 
         Child child = new(childName, parentUsername);
@@ -182,7 +113,48 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
         
         dbContext.SaveChanges();
 
-        return All();
+        return Created($"/children/{child.ChildId.ToString()}", GetAllChildren(parentUsername));
+    }
+    
+    
+    /// <summary>
+    /// Sets the current child to perform actions for
+    /// </summary>
+    /// <returns>Sets the currently selected child and then gets their info</returns>
+    /// <response code="200">Info about the currently selected child</response>
+    /// <response code="401">If the user is not logged in</response>
+    /// <response code="403">If the user is not a parent</response>
+    /// <response code="404">If no child with the requested id is found under the logged in parent account</response>
+    [HttpPut]
+    [Authorize]
+    [Route("/children/{childId:guid}/[action]")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ChildResponseDTO))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    public IActionResult Select(Guid childId)
+    {
+        // This should never be null thanks to the authorize attribute above
+        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        if (!dbContext.Parents.Any(p => p.Username == parentUsername))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+        }
+
+        Child? child = dbContext.Children.FirstOrDefault(c => c.ChildId == childId);
+        if (child is null || child.ParentUsername != parentUsername)
+        {
+            return NotFound(ErrorDTO.ChildNotFound);
+        }
+
+        Parent parent = dbContext.Parents.First(p => p.Username == parentUsername);
+
+        parent.SelectedChildId = child.ChildId;
+
+        dbContext.SaveChanges();
+
+        return Ok(ChildResponseDTO.From(child, true));
     }
 
     
@@ -190,20 +162,20 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     /// Edits properties of a given child under the logged-in parent
     /// </summary>
     /// <returns>The updated details of the edited child</returns>
-    /// <response code="200">Info about the  child</response>
+    /// <response code="200">Info about the child</response>
     /// <response code="401">If the user is not logged in</response>
     /// <response code="403">If the user is not a parent</response>
-    /// <response code="404">If no child with the requested name is found for the logged in parent account</response>
-    /// <response code="422">If a child already exists under the parent with the requested name, if the classroom code is invalid, or an invalid icon is specified</response>
-    [HttpPost]
+    /// <response code="404">If the child id is invalid, or is not managed by the logged in parent</response>
+    /// <response code="422">If the classroom code is invalid, or an invalid icon is specified</response>
+    [HttpPut]
     [Authorize]
-    [Route("/children/{childName}/[action]")]
+    [Route("/children/{childId:guid}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ChildResponseDTO))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
-    public IActionResult Edit(string childName, ChildEditDTO payload)
+    public IActionResult Edit(Guid childId, ChildEditDTO payload)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
@@ -211,15 +183,18 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
         }
-        
-        IQueryable<Child> childMatch = GetChildByName(parentUsername, childName);
 
-        if (!childMatch.Any())
+        Child? child = dbContext.Children.FirstOrDefault(c => c.ChildId == childId);
+        if (child is null || child.ParentUsername != parentUsername)
         {
             return NotFound(ErrorDTO.ChildNotFound);
         }
 
-        Child child = childMatch.First();
+        if (payload.NewName is not null)
+        {
+            child.Name = payload.NewName;
+        }
+
         if (payload.DateOfBirth is not null)
         {
             child.DateOfBirth = payload.DateOfBirth;
@@ -230,41 +205,24 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
             child.ReadingLevel = payload.ReadingLevel;
         }
         
-        
         if (payload.ChildIcon is not null)
         {
-            if (Enum.TryParse(payload.ChildIcon, out UserIcon icon))
-            {
-                child.ChildIcon = icon;
-            }
-            else
+            if (!Enum.TryParse(payload.ChildIcon, out UserIcon icon))
             {
                 return UnprocessableEntity(ErrorDTO.InvalidIconIndex);
             }
+
+            child.ChildIcon = icon;
         }
 
         if (payload.ClassroomCode is not null)
         {
-            IQueryable<Classroom> classrooms = dbContext.Classrooms.Where(c => c.ClassroomCode == payload.ClassroomCode);
-            if (classrooms.Any())
-            {
-                child.ClassroomCode = payload.ClassroomCode;
-            }
-            else
+            if (!dbContext.Classrooms.Any(c => c.ClassroomCode == payload.ClassroomCode))
             {
                 return UnprocessableEntity(ErrorDTO.ClassroomNotFound);
             }
-        }
-
-        if (payload.NewName is not null)
-        {
-            IQueryable<Child> childMatchNew = GetChildByName(parentUsername, payload.NewName);
-            if (childMatchNew.Any())
-            {
-                return UnprocessableEntity(ErrorDTO.ChildAlreadyExists);
-            }
             
-            child.Name = payload.NewName;
+            child.ClassroomCode = payload.ClassroomCode;
         }
 
         dbContext.SaveChanges();
@@ -273,21 +231,21 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
 
     
     /// <summary>
-    /// Removes a child with the specified name from the logged-in parent 
+    /// Deletes the specified child that is under the logged-in parent 
     /// </summary>
     /// <returns>A list of all children under the parent and their info</returns>
     /// <response code="200">Info about all remaining children under the logged in parent</response>
     /// <response code="401">If the user is not logged in</response>
     /// <response code="403">If the user is not a parent</response>
-    /// <response code="404">If no child with the requested name is found for the logged in parent account</response>
+    /// <response code="404">If no child with the requested id is found under the logged in parent account</response>
     [HttpDelete]
     [Authorize]
-    [Route("/children/{childName}/[action]")]
+    [Route("/children/{childId:guid}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ChildResponseDTO>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult Remove(string childName)
+    public IActionResult Remove(Guid childId)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
@@ -296,9 +254,8 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
         }
 
-        IQueryable<Child> childMatch = GetChildByName(parentUsername, childName);
-
-        if (!childMatch.Any())
+        Child? child = dbContext.Children.FirstOrDefault(c => c.ChildId == childId);
+        if (child is null || child.ParentUsername != parentUsername)
         {
             return NotFound(ErrorDTO.ChildNotFound);
         }
@@ -308,38 +265,49 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
             .Include(p => p.Children)
             .Include(parent => parent.SelectedChild)
             .First(p => p.Username == parentUsername);
-        if (parent.SelectedChildId is not null && parent.SelectedChildId == childMatch.First().ChildId)
+        if (parent.SelectedChildId is not null && parent.SelectedChildId == child.ChildId)
         {
-            int index = 0;
-            var children = parent.Children.ToArray();
-            for (int i = 0; i < children.Length; i++)
+            List<Child> children = parent.Children.ToList();
+            int index = children.IndexOf(child);
+            
+            children.Remove(child);
+
+            if (children.Count > 0)
             {
-                if (children[i].Name == parent.SelectedChild?.Name)
-                {
-                    index = i;
-                }
+                int newIndex = Math.Clamp(index, 0, children.Count - 1);
+                Child newSelectedChild = children[newIndex];
+
+                parent.SelectedChild = newSelectedChild;
             }
-
-            Child newSelectedChild = index == children.Length - 1 
-                ? children[Math.Clamp(children.Length - 2, 0, children.Length - 1)] 
-                : children[index + 1];
-
-            parent.SelectedChild = newSelectedChild;
+            else
+            {
+                parent.SelectedChild = null;
+            }
         }
         
-        dbContext.Remove(childMatch.First());
+        dbContext.Remove(child);
         dbContext.SaveChanges();
 
         return All();
     }
 
     
-    private IQueryable<Child> GetChildByName(string parentUsername, string childName)
+    private List<ChildResponseDTO> GetAllChildren(string parentUsername)
     {
-        IQueryable<Child> childMatch = dbContext.Children.Include(c => c.Parent)
-            .Where(c => c.Parent != null && c.Parent.Username == parentUsername && c.Name == childName);
+        Parent parent = dbContext.Parents
+            .Include(parent => parent.SelectedChild)
+            .Include(parent => parent.Children)
+            .First(p => p.Username == parentUsername);
+        
+        Guid? selectedChildId = parent.SelectedChildId;
+        
+        List<ChildResponseDTO> children = [];
+        foreach (Child c in parent.Children)
+        {
+            children.Add(ChildResponseDTO.From(c, c.ChildId == selectedChildId ? true : null));
+        }
 
-        return childMatch;
+        return children;
     }
 
     private bool IsChildSelected(string parentUsername, string childName)

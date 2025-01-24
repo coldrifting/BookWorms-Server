@@ -18,10 +18,10 @@ public record ChildEditDTO(
         ErrorMessage = "Child date of birth must fall between {1} and {2}.")]
     DateOnly? DateOfBirth = null);
 
-public record ChildResponseDTO(string Name, string ChildIcon, string? ReadingLevel, string? ClassroomCode, DateOnly? DateOfBirth, bool? Selected)
+public record ChildResponseDTO(Guid ChildId, string Name, string ChildIcon, string? ReadingLevel, string? ClassroomCode, DateOnly? DateOfBirth, bool? Selected)
 {
     public static ChildResponseDTO From(Child child, bool? selected = null)
     {
-        return new(child.Name, child.ChildIcon.ToString(), child.ReadingLevel, child.ClassroomCode, child.DateOfBirth, selected);
+        return new(child.ChildId, child.Name, child.ChildIcon.ToString(), child.ReadingLevel, child.ClassroomCode, child.DateOfBirth, selected);
     }
 }

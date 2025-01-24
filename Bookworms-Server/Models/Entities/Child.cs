@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BookwormsServer.Models.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServer.Models.Entities;
 
-[Index(nameof(Name), nameof(ParentUsername), IsUnique = true)]
 public class Child(string name, string parentUsername, DateOnly? dateOfBirth = null, string? readingLevel = null)
 {
     [Key]

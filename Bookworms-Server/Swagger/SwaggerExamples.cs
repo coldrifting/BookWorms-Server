@@ -1,4 +1,5 @@
-﻿using BookwormsServer.Models.Data;
+﻿using System.Diagnostics.CodeAnalysis;
+using BookwormsServer.Models.Data;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace BookwormsServer.Swagger;
@@ -10,9 +11,9 @@ namespace BookwormsServer.Swagger;
 
 // Content responses
 
+[SuppressMessage("ReSharper", "UnusedType.Global")]
 public static class SwaggerExamples
 {
-
     public class UserLoginRequestBodyExample : IExamplesProvider<UserLoginDTO>
     {
         public UserLoginDTO GetExamples()
@@ -159,7 +160,7 @@ public static class SwaggerExamples
     {
         public ChildResponseDTO GetExamples()
         {
-            return new("Joey", UserIcon.Icon2.ToString(), "A5", "CLS098", DateOnly.Parse("2015-04-15"), true);
+            return new(Guid.NewGuid(), "Jackson", UserIcon.Icon2.ToString(), "A5", "CLS098", DateOnly.Parse("2015-04-15"), true);
         }
     }
     
@@ -169,9 +170,9 @@ public static class SwaggerExamples
         {
             return
             [
-                new("Ashley", UserIcon.Icon1.ToString(),  "A7", "CLS098", DateOnly.Parse("2014-08-23"), true),
-                new("Miles", UserIcon.Icon2.ToString(), "B4", "CLS498", null, null),
-                new("Joey", UserIcon.Icon3.ToString(), null, null, DateOnly.Parse("2015-04-15"), null)
+                new(Guid.NewGuid(),"Ashley", UserIcon.Icon1.ToString(),  "A7", "CLS098", DateOnly.Parse("2014-08-23"), true),
+                new(Guid.NewGuid(),"Miles", UserIcon.Icon2.ToString(), "B4", "CLS498", null, null),
+                new(Guid.NewGuid(),"Joey", UserIcon.Icon3.ToString(), null, null, DateOnly.Parse("2015-04-15"), null)
             ];
         }
     }

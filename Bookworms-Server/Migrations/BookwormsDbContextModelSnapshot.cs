@@ -144,9 +144,6 @@ namespace BookwormsServer.Migrations
 
                     b.HasIndex("ParentUsername");
 
-                    b.HasIndex("Name", "ParentUsername")
-                        .IsUnique();
-
                     b.ToTable("Children");
                 });
 

@@ -173,11 +173,13 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
         // Put logged-in user at top of list
         for (int i = 0; i < users.Count; i++)
         {
-            if (users[0].Username == loggedInUser)
+            if (users[0].Username != loggedInUser)
             {
-                (users[i], users[0]) = (users[0], users[i]);
-                break;
+                continue;
             }
+            
+            (users[i], users[0]) = (users[0], users[i]);
+            break;
         }
 
         List<UserDetailsDTO> usersFormatted = [];
