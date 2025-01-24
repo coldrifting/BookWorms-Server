@@ -45,15 +45,47 @@ public record UserLoginDTO(
 /// <param name="Token"></param>
 public record UserLoginSuccessDTO(string Token);
 
-public record UserDTO(string Username, string FirstName, string LastName, string Roles, string Icon)
+public record UserDetailsDTO(string Username, string FirstName, string LastName, string Role, string Icon)
 {
-    public static UserDTO From(User userLogin)
+    public static UserDetailsDTO From(User userLogin)
     {
+        Role role;
+        if (userLogin.Roles.Length > 0 && userLogin.Roles[0] == "Admin")
+        {
+            role = Data.Role.Admin;
+        }
+        else if (userLogin is Parent)
+        {
+            role = Data.Role.Parent;
+        }
+        else
+        {
+            role = Data.Role.Teacher;
+        }
         return new(
             userLogin.Username, 
             userLogin.FirstName, 
             userLogin.LastName, 
-            $"[{string.Join(", ", userLogin.Roles)}]", 
+            role.ToString(),
             userLogin.UserIcon.ToString());
     }
+}
+
+public record UserDetailsEditDTO(
+    [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)] 
+    string? FirstName, 
+    
+    [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)] 
+    string? LastName, 
+    
+    string? Icon, 
+    
+    [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
+    string? Password);
+
+public enum Role
+{
+    Parent,
+    Teacher,
+    Admin
 }

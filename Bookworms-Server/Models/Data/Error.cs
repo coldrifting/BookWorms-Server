@@ -48,4 +48,7 @@ public class ErrorDTO(string error, string description)
 
    public static ErrorDTO ClassroomNotFound =>
        new("Classroom Not Found", "Unable to find a class with the given classroom code");
+
+   public static ErrorDTO InvalidIconIndex =>
+       new("Invalid Icon Index", "The requested icon index is not valid");
 }
