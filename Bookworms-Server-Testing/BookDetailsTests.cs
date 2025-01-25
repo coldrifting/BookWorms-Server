@@ -6,26 +6,26 @@ using System.IO.Compression;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
+
 using static BookwormsServerTesting.Templates.Common;
 
 namespace BookwormsServerTesting;
 
 [Collection("Integration Tests")]
-public class BookDetailsTests(BaseStartup<Program> factory) : BaseTest(factory)
+public class BookDetailsTests(AppFactory<Program> factory) : BaseTestReadOnlyFixture(factory)
 {
     [Theory]
     [InlineData("OL3368288W", "0060256656")]
     [InlineData("OL48763W", "1570982066")]
     public async Task Test_GetBookDetails(string bookId, string isbn10)
     {
-        HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/details");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        
-        BookDetailsDTO? content = await response.Content.ReadJsonAsync<BookDetailsDTO>();
-
-        Assert.NotNull(content);
-        Assert.False(content.Description.IsNullOrEmpty());
-        Assert.Equal(isbn10, content.Isbn10);
+        await CheckResponse<BookDetailsDTO>(async () => await Client.GetAsync($"/books/{bookId}/details"),
+            HttpStatusCode.OK,
+            content =>
+            {
+                Assert.False(content.Description.IsNullOrEmpty());
+                Assert.Equal(isbn10, content.Isbn10);
+            });
     }
 
     [Theory]

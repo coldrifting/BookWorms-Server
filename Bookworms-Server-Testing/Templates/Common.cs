@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -59,61 +60,109 @@ public static class Common
         string token = await GetUserToken(client, username, password);
         client.DefaultRequestHeaders.Authorization = new("Bearer", token);
     }
-    
-    public static async Task<HttpResponseMessage> PostAsync(this HttpClient client, string url)
+
+    private static async Task VerifyOrDeleteToken(HttpClient client, string? username, string? password)
     {
-        return await client.PostAsync(url, new StringContent(""));
+        if (username is not null)
+        {
+            await VerifyToken(client, username, password ?? username);
+        }
+        else
+        {
+            client.DefaultRequestHeaders.Authorization = null;
+        }
     }
     
-    public static async Task<HttpResponseMessage> PostAsyncAsUser(this HttpClient client, string url, string username, string? password = null)
+    public static async Task<HttpResponseMessage> GetAsync(this HttpClient client, string url, string? username = null, string? password = null)
     {
-        await VerifyToken(client, username, password ?? username);
-        return await client.PostAsync(url, new StringContent(""));
-    }
-    
-    public static async Task<HttpResponseMessage> PutAsync(this HttpClient client, string url)
-    {
-        return await client.PutAsync(url, new StringContent(""));
-    }
-    
-    public static async Task<HttpResponseMessage> PutAsyncAsUser(this HttpClient client, string url, string username, string? password = null)
-    {
-        await VerifyToken(client, username, password ?? username);
-        return await client.PutAsync(url, new StringContent(""));
-    }
-    
-    public static async Task<HttpResponseMessage> GetAsyncAsUser(this HttpClient client, string url, string username, string? password = null)
-    {
-        await VerifyToken(client, username, password ?? username);
+        await VerifyOrDeleteToken(client, username, password);
         return await client.GetAsync(url);
     }
-
-    public static async Task<HttpResponseMessage> PostAsJsonAsyncAsUser<TValue>(this HttpClient client, string url, TValue obj, string username, string? password = null)
+    
+    public static async Task<HttpResponseMessage> PostAsync(this HttpClient client, string url, string? username = null, string? password = null)
     {
-        await VerifyToken(client, username, password ?? username);
-        return await client.PostAsJsonAsync(url, obj);
+        await VerifyOrDeleteToken(client, username, password);
+        return await client.PostAsync(url, new StringContent(""));
     }
 
-    public static async Task<HttpResponseMessage> PutAsJsonAsyncAsUser<TValue>(this HttpClient client, string url, TValue obj, string username, string? password = null)
+    public static async Task<HttpResponseMessage> PostPayloadAsync<TValue>(this HttpClient client, string url, TValue obj, string? username = null, string? password = null)
     {
-        await VerifyToken(client, username, password ?? username);
+        await VerifyOrDeleteToken(client, username, password);
+        return await client.PostAsJsonAsync(url, obj);
+    }
+    
+    public static async Task<HttpResponseMessage> PutAsync(this HttpClient client, string url, string? username = null, string? password = null)
+    {
+        await VerifyOrDeleteToken(client, username, password);
+        return await client.PutAsync(url, new StringContent(""));
+    }
+
+    public static async Task<HttpResponseMessage> PutPayloadAsync<TValue>(this HttpClient client, string url, TValue obj, string? username = null, string? password = null)
+    {
+        await VerifyOrDeleteToken(client, username, password);
         return await client.PutAsJsonAsync(url, obj);
     }
 
-    public static async Task<HttpResponseMessage> DeleteAsyncAsUser(this HttpClient client, string url, string username, string? password = null)
+    public static async Task<HttpResponseMessage> DeleteAsync(this HttpClient client, string url, string username, string? password = null)
     {
         await VerifyToken(client, username, password ?? username);
         return await client.DeleteAsync(url);
     }
     
     // Test helpers
-    public static async Task CheckForError(Func<Task<HttpResponseMessage>> func, HttpStatusCode statusCode, ErrorDTO errorType)
+    public static async Task CheckForError(Func<Task<HttpResponseMessage>> requestFunc, HttpStatusCode statusCode, ErrorDTO errorType)
     {
-        HttpResponseMessage response = await func.Invoke();
+        HttpResponseMessage response = await requestFunc.Invoke();
         Assert.Equal(statusCode, response.StatusCode);
         
         ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
         Assert.NotNull(content);
         Assert.Equal(errorType, content);
+    }
+    
+    public static async Task CheckResponse(Func<Task<HttpResponseMessage>> requestFunc, HttpStatusCode statusCode)
+    {
+        HttpResponseMessage response = await requestFunc.Invoke();
+        Assert.Equal(statusCode, response.StatusCode);
+    }
+    
+    public static async Task CheckResponse<T>(Func<Task<HttpResponseMessage>> requestFunc, HttpStatusCode statusCode, Action<T> check)
+    {
+        HttpResponseMessage response = await requestFunc.Invoke();
+        Assert.Equal(statusCode, response.StatusCode);
+
+        T? content = await response.Content.ReadJsonAsync<T>();
+        Assert.NotNull(content);
+        check.Invoke(content);
+    }
+    
+    public static async Task CheckResponse<TContent>(Func<Task<HttpResponseMessage>> requestFunc, HttpStatusCode statusCode, Action<TContent,HttpResponseHeaders> check)
+    {
+        HttpResponseMessage response = await requestFunc.Invoke();
+        Assert.Equal(statusCode, response.StatusCode);
+
+        TContent? content = await response.Content.ReadJsonAsync<TContent>();
+        Assert.NotNull(content);
+        check.Invoke(content, response.Headers);
+    }
+    
+    public static async Task<TOutput> CheckResponse<TContent,TOutput>(Func<Task<HttpResponseMessage>> requestFunc, HttpStatusCode statusCode, Func<TContent,HttpResponseHeaders,TOutput> check)
+    {
+        HttpResponseMessage response = await requestFunc.Invoke();
+        Assert.Equal(statusCode, response.StatusCode);
+
+        TContent? content = await response.Content.ReadJsonAsync<TContent>();
+        Assert.NotNull(content);
+        return check.Invoke(content, response.Headers);
+    }
+    
+    public static async Task<TOutput> CheckResponse<TContent,TOutput>(Func<Task<HttpResponseMessage>> requestFunc, HttpStatusCode statusCode, Func<TContent,TOutput> check)
+    {
+        HttpResponseMessage response = await requestFunc.Invoke();
+        Assert.Equal(statusCode, response.StatusCode);
+
+        TContent? content = await response.Content.ReadJsonAsync<TContent>();
+        Assert.NotNull(content);
+        return check.Invoke(content);
     }
 }
