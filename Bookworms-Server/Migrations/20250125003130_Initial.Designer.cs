@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookwormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
-    [Migration("20250124081934_Initial")]
+    [Migration("20250125003130_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -50,6 +50,13 @@ namespace BookwormsServer.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("CoverId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Isbn10")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -60,12 +67,21 @@ namespace BookwormsServer.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("varchar(13)");
 
-                    b.Property<string>("Level")
-                        .HasMaxLength(16)
-                        .HasColumnType("varchar(16)");
+                    b.Property<int?>("Level")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PageCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PublishYear")
+                        .HasColumnType("int");
 
                     b.Property<double?>("StarRating")
                         .HasColumnType("double");
+
+                    b.Property<string>("Subjects")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Title")
                         .IsRequired()

@@ -10,7 +10,7 @@ namespace BookwormsServerTesting;
 public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
 {
    [Theory]
-    [InlineData("1IleAgAAQBAJ", "I like green")]
+    [InlineData("OL3368288W", "I like green")]
     public async Task Test_GetAllReviews(string bookId, string reviewText)
     {
         HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/reviews");
@@ -25,7 +25,7 @@ public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
 
     [Theory]
-    [InlineData("1IleAgAAQBAJ", 3.5, "some review text")]
+    [InlineData("OL3368288W", 3.5, "some review text")]
     public async Task Test_PutReview_NotLoggedIn(string bookId, double rating, string reviewText)
     {
         HttpResponseMessage response = await Client.PutAsJsonAsync($"/books/{bookId}/review", 
@@ -39,7 +39,7 @@ public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
     
     [Theory]
-    [InlineData("1IleAgAAQBAJ", "teacher1", 3.5, "some review text")]
+    [InlineData("OL3368288W", "teacher1", 3.5, "some review text")]
     public async Task Test_PutReview_Basic(string bookId, string username, double rating, string reviewText)
     {
         HttpResponseMessage response = await Client.PutAsJsonAsyncAsUser($"/books/{bookId}/review", 
@@ -70,7 +70,7 @@ public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
     
     [Theory]
-    [InlineData("_kaGDwAAQBAJ", "teacher1", 4.5, "some review text")]
+    [InlineData("OL286593W", "teacher1", 4.5, "some review text")]
     public async Task Test_PutReview_ReviewAlreadyExists(string bookId, string username, double rating, string reviewText)
     {
         HttpResponseMessage response = await Client.PutAsJsonAsyncAsUser($"/books/{bookId}/review", 
@@ -85,8 +85,8 @@ public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
 
     [Theory]
-    [InlineData("1IleAgAAQBAJ", "parent0", 1.0, "Didn't like it")]
-    [InlineData("1IleAgAAQBAJ", "teacher0", 1.5, "Horrible")]
+    [InlineData("OL3368288W", "parent0", 1.0, "Didn't like it")]
+    [InlineData("OL3368288W", "teacher0", 1.5, "Horrible")]
     public async Task Test_PutReview_UpdateRatingAndText(string bookId, string username, double rating, string reviewText)
     {
         HttpResponseMessage response = await Client.PutAsJsonAsyncAsUser($"/books/{bookId}/review", 
@@ -102,8 +102,8 @@ public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
 
     [Theory]
-    [InlineData("1IleAgAAQBAJ", "parent0", "Audrey", "Hepburn", 1.0, "I like green")]
-    [InlineData("1IleAgAAQBAJ", "teacher0", "Sally", "Field", 1.5, "I like trees")]
+    [InlineData("OL3368288W", "parent0", "Audrey", "Hepburn", 1.0, "I like green")]
+    [InlineData("OL3368288W", "teacher0", "Sally", "Field", 1.5, "I like trees")]
     public async Task Test_PutReview_UpdateRating(string bookId, string username, string reviewerFirstName, string reviewerLastName, double rating, string reviewText)
     {
         HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/reviews?start=0&max=-1");
@@ -124,8 +124,8 @@ public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
     
     [Theory]
-    [InlineData("1IleAgAAQBAJ", "parent0", "Audrey", "Hepburn", 4.5, "New text")]
-    [InlineData("1IleAgAAQBAJ", "teacher0", "Sally", "Field", 5.0, "New text")]
+    [InlineData("OL3368288W", "parent0", "Audrey", "Hepburn", 4.5, "New text")]
+    [InlineData("OL3368288W", "teacher0", "Sally", "Field", 5.0, "New text")]
     public async Task Test_PutReview_UpdateText(string bookId, string username, string reviewerFirstName, string reviewerLastName, double rating, string reviewText)
     {
         HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/reviews?start=0&max=-1");
@@ -146,8 +146,8 @@ public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
     
     [Theory]
-    [InlineData("1IleAgAAQBAJ", "parent0", "Audrey", "Hepburn")]
-    [InlineData("1IleAgAAQBAJ", "teacher0", "Sally", "Field")]
+    [InlineData("OL3368288W", "parent0", "Audrey", "Hepburn")]
+    [InlineData("OL3368288W", "teacher0", "Sally", "Field")]
     public async Task Test_DeleteReview(string bookId, string username, string reviewerFirstName, string reviewerLastName)
     {
         HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/reviews");
@@ -167,7 +167,7 @@ public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
 
     [Theory]
-    [InlineData("1IleAgAAQBAJ")]
+    [InlineData("OL3368288W")]
     public async Task Test_DeleteReview_NotLoggedIn(string bookId)
     {
         HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/reviews");
@@ -203,9 +203,9 @@ public class BookReviewTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
     
     [Theory]
-    [InlineData("1IleAgAAQBAJ",  0, -1, 5)]
-    [InlineData("1IleAgAAQBAJ",  1, 3, 3)]
-    [InlineData("1IleAgAAQBAJ",  2, 4, 3)]
+    [InlineData("OL3368288W",  0, -1, 5)]
+    [InlineData("OL3368288W",  1, 3, 3)]
+    [InlineData("OL3368288W",  2, 4, 3)]
     public async Task Test_GetReviews_ByBook(string bookId, int start, int max, int expected)
     {
         HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/reviews?start={start}&max={max}");

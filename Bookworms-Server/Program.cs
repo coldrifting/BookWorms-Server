@@ -89,8 +89,9 @@ public partial class Program
 		// Register services -------------------------------------------------------------------------------------------
 		// (Dependency Injections)
 		
-		builder.Services.AddSingleton<IBookApiService, GoogleBooksApiService>();
-		//builder.Services.AddSingleton<IBookApiService, TestDataApiService>();
+		builder.Services.AddSingleton<IBookApiService, OpenLibraryApiService>();
+		// builder.Services.AddSingleton<IBookApiService, GoogleBooksApiService>();
+		// builder.Services.AddSingleton<IBookApiService, TestDataApiService>();
 
 		builder.Services.AddHttpClient();
 		builder.Services.AddMemoryCache();

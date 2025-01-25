@@ -12,27 +12,19 @@ namespace BookwormsServerTesting;
 [Collection("Integration Tests")]
 public class BookDetailsTests(BaseStartup<Program> factory) : BaseTest(factory)
 {
-    // TODO - This test sometimes fails due to remote issues. Need to figure out game plan for remote API
     [Theory]
-    [InlineData("VnAkAQAAMAAJ", "9780689204531")]
-    [InlineData("1IleAgAAQBAJ", "9780061965104")]
-    public async Task Test_GetBookDetails(string bookId, string isbn13)
+    [InlineData("OL3368288W", "0060256656")]
+    [InlineData("OL48763W", "1570982066")]
+    public async Task Test_GetBookDetails(string bookId, string isbn10)
     {
-        // TODO - Workaround for GoogleBooks API going down
-        HttpClient c = new HttpClient();
-        HttpResponseMessage responsePre = await c.GetAsync($"https://www.googleapis.com/books/v1/volumes/{bookId}");
-        if (responsePre.StatusCode != HttpStatusCode.TooManyRequests)
-        {
-            HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/details");
+        HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/details");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        BookDetailsDTO? content = await response.Content.ReadJsonAsync<BookDetailsDTO>();
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
-            BookDetailsDTO? content = await response.Content.ReadJsonAsync<BookDetailsDTO>();
-
-            Assert.NotNull(content);
-            Assert.False(content.Description.IsNullOrEmpty());
-            Assert.Equal(isbn13, content.Isbn13);
-        }
+        Assert.NotNull(content);
+        Assert.False(content.Description.IsNullOrEmpty());
+        Assert.Equal(isbn10, content.Isbn10);
     }
 
     [Theory]
@@ -49,8 +41,8 @@ public class BookDetailsTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
     
     [Theory]
-    [InlineData("1IleAgAAQBAJ", "0c2df2776ed3100cd82113b6c39c7ec3")]
-    [InlineData("VnAkAQAAMAAJ", "83bf16254e2a31531fd2c58421bad407")]
+    [InlineData("OL3368288W", "f6269ead8320cd8c5c2bfac121fe0019")]
+    [InlineData("OL48763W", "cc278287bca068865216ecbcc8fa37ab")]
     public async Task Test_GetImage(string bookId, string md5Hash)
     {
         HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/cover");
@@ -66,7 +58,7 @@ public class BookDetailsTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
     
     [Theory]
-    [InlineData("1IleAgAAQBAJ", "0c2df2776ed3100cd82113b6c39c7ec3","VnAkAQAAMAAJ", "83bf16254e2a31531fd2c58421bad407")]
+    [InlineData("OL3368288W", "f6269ead8320cd8c5c2bfac121fe0019","OL48763W", "cc278287bca068865216ecbcc8fa37ab")]
     public async Task Test_GetImageBatch(string bookId1, string md5Hash1, string bookId2, string md5Hash2)
     {
         HttpResponseMessage response = await Client.PostAsJsonAsync("/books/covers", new List<string>([bookId1, bookId2]));

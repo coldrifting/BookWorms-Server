@@ -14,6 +14,134 @@ namespace BookwormsServer.Swagger;
 [SuppressMessage("ReSharper", "UnusedType.Global")]
 public static class SwaggerExamples
 {
+    // BookDetailsController
+    
+    public class BookDetailsResponseExample : IExamplesProvider<BookDetailsDTO>
+    {
+        public BookDetailsDTO GetExamples()
+        {
+            return new(
+                "<b>A sweet, fun-filled follow-up to <i>The Welcome Wagon</i> from acclaimed author Cori Doerrfeld!</b><br> <br> Every year, the town of Cubby Hill comes together for the Great Giving Festival, celebrating the spirit of giving and community that makes their town such a great place to live. And this year, Cooper Cub has a very special task: delivering his grandmother’s special honey to everyone in town! But with such a big job, can Cooper find a way to help his friends and sweeten up the Festival?<br> In this sweet follow-up to <i>The Welcome Wagon</i>, Cori Doerrfeld’s adorable animal citizens of Cubby Hill celebrate sharing with your community and offering a helping hand!<br>",
+                [],
+                "1683359046",
+                "9781683359043",
+                2020,
+                40,
+                [
+                    new(
+                        "Liam",
+                        "Smith",
+                        "Parent",
+                        UserIcon.Icon1,
+                        new(2024, 01, 31),
+                        0,
+                        "We loved the colorful pictures and silly characters")
+                ]
+            );
+        }
+    }
+
+    public class ImagesRequestBodyExample : IExamplesProvider<List<string>>
+    {
+        public List<string> GetExamples()
+        {
+            return ["XlrMDwAAQBAJ", "sQSDzQEACAAJ", "_BxZ71b-u5QC"];
+        }
+    }
+
+
+    // ChildController
+    
+    public class ChildEditBodyExample : IExamplesProvider<ChildEditDTO>
+    {
+        public ChildEditDTO GetExamples()
+        {
+            return new("New_Child_Name", UserIcon.Icon1.ToString(), "READA7", "WLF359", DateOnly.Parse("2017-3-4"));
+        }
+    }
+
+    public class ChildResponseExample : IExamplesProvider<ChildResponseDTO>
+    {
+        public ChildResponseDTO GetExamples()
+        {
+            return new(Guid.NewGuid(), "Jackson", UserIcon.Icon2.ToString(), "A5", "CLS098", DateOnly.Parse("2015-04-15"), true);
+        }
+    }
+    
+    public class ChildListResponseExample : IExamplesProvider<List<ChildResponseDTO>>
+    {
+        public List<ChildResponseDTO> GetExamples()
+        {
+            return
+            [
+                new(Guid.NewGuid(),"Ashley", UserIcon.Icon1.ToString(),  "A7", "CLS098", DateOnly.Parse("2014-08-23"), true),
+                new(Guid.NewGuid(),"Miles", UserIcon.Icon2.ToString(), "B4", "CLS498", null, null),
+                new(Guid.NewGuid(),"Joey", UserIcon.Icon3.ToString(), null, null, DateOnly.Parse("2015-04-15"), null)
+            ];
+        }
+    }
+
+    
+    // ReviewsController
+
+    public class ReviewResponseExample : IExamplesProvider<ReviewDTO>
+    {
+        public ReviewDTO GetExamples()
+        {
+            return new(
+                "Emma",
+                "Johnson",
+                "Teacher",
+                UserIcon.Icon1,
+                new(2024, 01, 30),
+                5.0,
+                "Such a sweet and touching story.");
+        }
+    }
+
+    public class ReviewsResponseExample : IExamplesProvider<List<ReviewDTO>>
+    {
+        public List<ReviewDTO> GetExamples()
+        {
+            return
+            [
+                new("Olivia", "Brown", "Teacher", UserIcon.Icon1, new(2024, 02, 15), 0.5, "Heartwarming and enjoyable"),
+                new("Isabella", "Thomas", "Teacher", UserIcon.Icon1, new(2024, 02, 03), 2,
+                    "A heartwarming book that we cherished"),
+                new("Noah", "Davis", "Parent", UserIcon.Icon1, new(2024, 01, 11), 2.5,
+                    "An exciting adventure we couldn't put down."),
+            ];
+        }
+    }
+
+    public class ReviewAddOrUpdateRequestBodyExample : IExamplesProvider<ReviewAddOrUpdateRequestDTO>
+    {
+        public ReviewAddOrUpdateRequestDTO GetExamples()
+        {
+            return new(4.5, "We loved the colorful pictures and silly characters");
+        }
+    }
+
+    
+    // SearchController
+
+    public class BooksResponseExample : IExamplesProvider<List<BookDto>>
+    {
+        public List<BookDto> GetExamples()
+        {
+            return
+            [
+                new("1IleAgAAQBAJ", "The Giving Tree", ["Shel Silverstein"], 4.3, 10),
+                new("bSSW15rcQbsC", "The Giving Book", ["Ellen Sabin"], 3.7, 15),
+                new("IUnGtgEACAAJ", "The Giving Sack", ["Leanne Hill"], 5, 20),
+                new("jXvSDwAAQBAJ", "The Giving Day", ["Cori Doerrfeld"], 3.3, 15)
+            ];
+        }
+    }
+
+    
+    // UserController
+    
     public class UserLoginRequestBodyExample : IExamplesProvider<UserLoginDTO>
     {
         public UserLoginDTO GetExamples()
@@ -56,123 +184,6 @@ public static class SwaggerExamples
                 new("_username_", "_password_", "John Jackson", "Teacher", "Icon1"),
                 new("_username_", "_password_", "Ashley Reed", "Parent", "Icon3"),
                 new("_username_", "_password_", "Wyatt Smith", "Admin", "Icon2"),
-            ];
-        }
-    }
-
-    public class BookDetailsResponseExample : IExamplesProvider<BookDetailsDTO>
-    {
-        public BookDetailsDTO GetExamples()
-        {
-            return new(
-                "<b>A sweet, fun-filled follow-up to <i>The Welcome Wagon</i> from acclaimed author Cori Doerrfeld!</b><br> <br> Every year, the town of Cubby Hill comes together for the Great Giving Festival, celebrating the spirit of giving and community that makes their town such a great place to live. And this year, Cooper Cub has a very special task: delivering his grandmother’s special honey to everyone in town! But with such a big job, can Cooper find a way to help his friends and sweeten up the Festival?<br> In this sweet follow-up to <i>The Welcome Wagon</i>, Cori Doerrfeld’s adorable animal citizens of Cubby Hill celebrate sharing with your community and offering a helping hand!<br>",
-                [],
-                "1683359046",
-                "9781683359043",
-                "Abrams",
-                "2020-10-27",
-                40,
-                [
-                    new(
-                        "Liam",
-                        "Smith",
-                        "Parent",
-                        UserIcon.Icon1,
-                        new(2024, 01, 31),
-                        0,
-                        "We loved the colorful pictures and silly characters")
-                ]
-            );
-        }
-    }
-
-    public class ImagesRequestBodyExample : IExamplesProvider<List<string>>
-    {
-        public List<string> GetExamples()
-        {
-            return ["XlrMDwAAQBAJ", "sQSDzQEACAAJ", "_BxZ71b-u5QC"];
-        }
-    }
-
-
-    public class ReviewResponseExample : IExamplesProvider<ReviewDTO>
-    {
-        public ReviewDTO GetExamples()
-        {
-            return new(
-                "Emma",
-                "Johnson",
-                "Teacher",
-                UserIcon.Icon1,
-                new(2024, 01, 30),
-                5.0,
-                "Such a sweet and touching story.");
-        }
-    }
-
-    public class ReviewsResponseExample : IExamplesProvider<List<ReviewDTO>>
-    {
-        public List<ReviewDTO> GetExamples()
-        {
-            return
-            [
-                new("Olivia", "Brown", "Teacher", UserIcon.Icon1, new(2024, 02, 15), 0.5, "Heartwarming and enjoyable"),
-                new("Isabella", "Thomas", "Teacher", UserIcon.Icon1, new(2024, 02, 03), 2,
-                    "A heartwarming book that we cherished"),
-                new("Noah", "Davis", "Parent", UserIcon.Icon1, new(2024, 01, 11), 2.5,
-                    "An exciting adventure we couldn't put down."),
-            ];
-        }
-    }
-
-    public class ReviewAddOrUpdateRequestBodyExample : IExamplesProvider<ReviewAddOrUpdateRequestDTO>
-    {
-        public ReviewAddOrUpdateRequestDTO GetExamples()
-        {
-            return new(4.5, "We loved the colorful pictures and silly characters");
-        }
-    }
-
-
-    public class BooksResponseExample : IExamplesProvider<List<BookDto>>
-    {
-        public List<BookDto> GetExamples()
-        {
-            return
-            [
-                new("1IleAgAAQBAJ", "The Giving Tree", ["Shel Silverstein"], 4.3, "A1"),
-                new("bSSW15rcQbsC", "The Giving Book", ["Ellen Sabin"], 3.7, "C2"),
-                new("IUnGtgEACAAJ", "The Giving Sack", ["Leanne Hill"], 5, "F9"),
-                new("jXvSDwAAQBAJ", "The Giving Day", ["Cori Doerrfeld"], 3.3, "Z2")
-            ];
-        }
-    }
-
-    public class ChildEditBodyExample : IExamplesProvider<ChildEditDTO>
-    {
-        public ChildEditDTO GetExamples()
-        {
-            return new("New_Child_Name", UserIcon.Icon1.ToString(), "READA7", "WLF359", DateOnly.Parse("2017-3-4"));
-        }
-    }
-
-    public class ChildResponseExample : IExamplesProvider<ChildResponseDTO>
-    {
-        public ChildResponseDTO GetExamples()
-        {
-            return new(Guid.NewGuid(), "Jackson", UserIcon.Icon2.ToString(), "A5", "CLS098", DateOnly.Parse("2015-04-15"), true);
-        }
-    }
-    
-    public class ChildListResponseExample : IExamplesProvider<List<ChildResponseDTO>>
-    {
-        public List<ChildResponseDTO> GetExamples()
-        {
-            return
-            [
-                new(Guid.NewGuid(),"Ashley", UserIcon.Icon1.ToString(),  "A7", "CLS098", DateOnly.Parse("2014-08-23"), true),
-                new(Guid.NewGuid(),"Miles", UserIcon.Icon2.ToString(), "B4", "CLS498", null, null),
-                new(Guid.NewGuid(),"Joey", UserIcon.Icon3.ToString(), null, null, DateOnly.Parse("2015-04-15"), null)
             ];
         }
     }

@@ -4,14 +4,13 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace BookwormsServer.Services;
 
-public class GoogleBooksApiService(IHttpClientFactory factory, IMemoryCache cache) : IBookApiService
+public class OpenLibraryApiService(IHttpClientFactory factory, IMemoryCache cache) : IBookApiService
 {
     private readonly HttpClient _client = factory.CreateClient();
-    private const string ApiKey = "AIzaSyCMAFln3TxoTl0R9P-2IBPBer36d0HV7Ek";
 
     public async Task<JsonObject> GetData(string bookId)
     {
-        string endpoint = $"https://www.googleapis.com/books/v1/volumes/{bookId}&key={ApiKey}";
+        string endpoint = $"https://www.openlibrary.org/works/{bookId}.json";
         
         if (cache.TryGetValue(endpoint, out JsonObject? cachedResponse))
         {
@@ -25,12 +24,11 @@ public class GoogleBooksApiService(IHttpClientFactory factory, IMemoryCache cach
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadFromJsonAsync<JsonObject>();
 
-            if (content?["volumeInfo"] is not JsonObject volumeInfo) 
+            if (content is null) 
                 return [];
             
-            cache.Set(endpoint, volumeInfo, TimeSpan.FromMinutes(60));
-            return volumeInfo;
-
+            cache.Set(endpoint, content, TimeSpan.FromMinutes(60));
+            return content;
         }
         catch (HttpRequestException)
         {
@@ -38,10 +36,9 @@ public class GoogleBooksApiService(IHttpClientFactory factory, IMemoryCache cach
         }
     }
 
-    public async Task<byte[]> GetImage(string bookId)
+    public async Task<byte[]> GetImage(string imageId)
     {
-        string endpoint =
-            $"https://books.google.com/books/publisher/content?id={bookId}&printsec=frontcover&img=1&zoom=1&key={ApiKey}";
+        string endpoint = $"https://covers.openlibrary.org/b/id/{imageId}-L.jpg";
         
         if (cache.TryGetValue(endpoint, out byte[]? cachedResponse))
         {

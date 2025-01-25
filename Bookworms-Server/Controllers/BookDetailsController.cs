@@ -26,7 +26,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     [ResponseCache(Duration = 60)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public async Task<IActionResult> Get(string bookId)
+    public Task<IActionResult> Get(string bookId)
     {
         Book? bookEntity = dbContext.Books
             .Include(b => b.Reviews)
@@ -35,12 +35,11 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
 
         if (bookEntity == null)
         {
-            return NotFound(ErrorDTO.BookNotFound);
+            return Task.FromResult<IActionResult>(NotFound(ErrorDTO.BookNotFound));
         }
-
-        JsonObject bookDetailsJson = await bookApiService.GetData(bookId);
-        var details = BookDetailsDTO.From(bookEntity, bookDetailsJson);
-        return Ok(details);
+        
+        var details = BookDetailsDTO.From(bookEntity);
+        return Task.FromResult<IActionResult>(Ok(details));
     }
 
     /// <summary>
@@ -56,9 +55,18 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     [ProducesResponseType(typeof(Task<IActionResult>), StatusCodes.Status404NotFound, "application/json", Type = typeof(ErrorDTO))]
     public async Task<IActionResult> Image(string bookId)
     {
+        string? coverId = dbContext.Books
+            .SingleOrDefault(b => b.BookId == bookId)
+            ?.CoverId
+            ?.ToString();
+        if (coverId == null)
+        {
+            return NotFound(ErrorDTO.BookCoverNotFound);
+        }
+        
         try
         {
-            byte[] b = await bookApiService.GetImage(bookId);
+            byte[] b = await bookApiService.GetImage(coverId);
             return File(b, "image/jpeg");
         }
         catch (HttpRequestException)
@@ -79,13 +87,23 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     [SwaggerRequestExample(typeof(List<string>), typeof(SwaggerExamples.ImagesRequestBodyExample))]
     public async Task<IActionResult> Images([FromBody] List<string> bookIds)
     {
+        List<Book> books = dbContext.Books
+            .Where(b => bookIds.Contains(b.BookId))
+            .ToList();
+        
+        List<(string bookId, string coverId)> bookStubs = bookIds
+            .Select(id => books.FirstOrDefault(b => b.BookId == id))
+            .Select(b => (bookId: b?.BookId, coverId: b?.CoverId?.ToString()))
+            .Where(t => t is { bookId: not null, coverId: not null })
+            .ToList()!;
+        
         using var ms = new MemoryStream();
         using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
         {
-            foreach (var bookId in bookIds)
+            foreach (var stub in bookStubs)
             {
-                var zipEntry = archive.CreateEntry($"{bookId}_cover.jpg", CompressionLevel.Optimal);
-                byte[] imageBytes = await bookApiService.GetImage(bookId);
+                var zipEntry = archive.CreateEntry($"{stub.bookId}_cover.jpg", CompressionLevel.Optimal);
+                byte[] imageBytes = await bookApiService.GetImage(stub.coverId);
 
                 await using var zipStream = zipEntry.Open();
                 await zipStream.WriteAsync(imageBytes);

@@ -21,7 +21,7 @@ public class BookSearchTests(BaseStartup<Program> factory) : BaseTest(factory)
 
         Assert.NotNull(content);
         Assert.NotEmpty(content);
-        Assert.Contains(content, bookDto => bookDto.Title == title);
+        Assert.Contains(content, bookDto => string.Equals(bookDto.Title, title, StringComparison.OrdinalIgnoreCase));
     }
     
     // TODO - Add more tests when more search parameters are added

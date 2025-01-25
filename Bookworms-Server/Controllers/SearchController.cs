@@ -2,6 +2,7 @@
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServer.Controllers;
 
@@ -21,7 +22,7 @@ public class SearchController(BookwormsDbContext dbContext, IBookApiService book
     public Task<IActionResult> ByName(string query)
     {
         List<Book> books = dbContext.Books
-            .Where(b => b.Title.Contains(query))
+            .Where(b => EF.Functions.Like(b.Title, $"%{query}%"))
             .ToList();
         
         Console.WriteLine(books.Count);
@@ -29,8 +30,7 @@ public class SearchController(BookwormsDbContext dbContext, IBookApiService book
         List<BookDto> bookDtos = [];
         bookDtos.AddRange(
             from book in books
-            let bookDetails = bookApiService.GetData(book.BookId).Result
-            select BookDto.From(book, bookDetails)
+            select BookDto.From(book)
         );
 
         return Task.FromResult<IActionResult>(Ok(bookDtos));

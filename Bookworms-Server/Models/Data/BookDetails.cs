@@ -9,52 +9,20 @@ public record BookDetailsDTO(
     List<string> Subjects,
     string Isbn10,
     string Isbn13,
-    string Publisher,
-    string PublishDate,
-    int PageCount,
+    int PublishYear,
+    int? PageCount,
     List<ReviewDTO> Reviews)
 {
-    public static BookDetailsDTO From(Book book, JsonObject bookDetails)
+    public static BookDetailsDTO From(Book book)
     {
-        string title = book.Title;
-        List<string> authors = book.Authors;
-        double rating = book.StarRating ?? -1;
-        string difficulty = book.Level ?? "";
-        string description = GetDesc(bookDetails);
-        List<string> subjects = bookDetails["subjects"]?.Deserialize<List<string>>() ?? [];
-        string isbn10 = GetIsbn(bookDetails, true);
-        string isbn13 = GetIsbn(bookDetails, false);
-        string publisher = bookDetails["publisher"]?.Deserialize<string>() ?? "";
-        string publishedDate = bookDetails["publishedDate"]?.Deserialize<string>() ?? "";
-        int pageCount = bookDetails["pageCount"]?.Deserialize<int>() ?? -1;
+        string description = book.Description;
+        List<string> subjects = book.Subjects;
+        string isbn10 = book.Isbn10;
+        string isbn13 = book.Isbn13;
+        int publishYear = book.PublishYear;
+        int? pageCount = book.PageCount;
         List<ReviewDTO> reviews = book.Reviews.Select(ReviewDTO.From).ToList();
         
-        return new BookDetailsDTO(description, subjects, isbn10, isbn13,
-            publisher, publishedDate, pageCount, reviews); 
-    }
-
-    private static string GetDesc(JsonObject bookDetails)
-    {
-        string desc = bookDetails["description"]?.Deserialize<string>() ?? "";
-
-        desc = desc.Replace("</p><p>", "\r\n\r\n");
-        desc = desc.Replace("</p>", "");
-        desc = desc.Replace("<p>", "");
-        
-        return desc;
-    }
-    
-    private static string GetIsbn(JsonObject bookDetails, bool useIsbn10)
-    {
-        int index = useIsbn10 ? 0 : 1;
-
-        try
-        {
-            return bookDetails["industryIdentifiers"]?[index]?["identifier"]?.Deserialize<string>() ?? "";
-        }
-        catch
-        {
-            return "";
-        }
+        return new(description, subjects, isbn10, isbn13, publishYear, pageCount, reviews); 
     }
 }

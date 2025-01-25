@@ -1,168 +1,249 @@
 ﻿[
   {
-    "bookId": "1IleAgAAQBAJ",
-    "isbn10": "0061965103",
-    "isbn13": "9780061965104",
+    "bookId": "OL3368288W",
     "title": "The Giving Tree",
     "authors": [
       "Shel Silverstein"
     ],
-    "level": "A1",
-    "starRating": 4.3
+    "description": "From Shel Silverstein, New York Times bestselling author of Where the Sidewalk Ends and A Light in the Attic, comes a poignant picture book about love and acceptance, cherished for over fifty years. This classic is perfect for both young readers and lifelong fans.\r\n\r\n\"Once there was a tree...and she loved a little boy.\"\r\n\r\nSo begins a story of unforgettable perception, beautifully written and illustrated by the gifted and versatile Shel Silverstein. This moving parable for all ages offers a touching interpretation of the gift of giving and a serene acceptance of another's capacity to love in return.\r\n\r\nEvery day the boy would come to the tree to eat her apples, swing from her branches, or slide down her trunk...and the tree was happy. But as the boy grew older he began to want more from the tree, and the tree gave and gave and gave. This is a tender story, touched with sadness, aglow with consolation.\r\n\r\nThe Giving Tree is a meaningful gift for milestone events such as graduations, birthdays, and baby showers.\r\n\r\nShel Silverstein's incomparable career as a bestselling children's book author and illustrator began with Lafcadio, the Lion Who Shot Back. He is also the creator of picture books including A Giraffe and a Half, Who Wants a Cheap Rhinoceros?, The Missing Piece, The Missing Piece Meets the Big O, and the perennial favorite The Giving Tree, and of classic poetry collections such as Where the Sidewalk Ends, A Light in the Attic, Falling Up, Every Thing On It, Don't Bump the Glump!, and Runny Babbit plus Runny Babbit Returns.",
+    "subjects": [
+      "Children's poetry, American",
+      "Fiction",
+      "Juvenile fiction",
+      "Latin language materials",
+      "Multigenerational",
+      "Picture books for children",
+      "Children's fiction",
+      "Trees, fiction",
+      "Emotions, fiction",
+      "Picture books",
+      "Latin language, readers"
+    ],
+    "isbn10": "0060256656",
+    "isbn13": "",
+    "coverId": 11769478,
+    "pageCount": 57,
+    "publishYear": 1964
   },
   {
-    "bookId": "VnAkAQAAMAAJ",
-    "isbn10": "",
-    "isbn13": "",
-    "title": "The Three Robbers",
+    "bookId": "OL48763W",
+    "title": "The three robbers",
     "authors": [
       "Tomi Ungerer"
     ],
-    "level": "B1",
-    "starRating": 4.5
+    "description": "Three robbers who terrify the countryside are subdued by the charm of a little girl named Tiffany.",
+    "subjects": [
+      "Robbers and outlaws",
+      "Juvenile fiction",
+      "Fiction",
+      "New York Times reviewed",
+      "Children's fiction",
+      "Robbers and outlaws, fiction",
+      "Orphans, fiction",
+      "Picture books"
+    ],
+    "isbn10": "1570982066",
+    "isbn13": "",
+    "coverId": 819191,
+    "pageCount": null,
+    "publishYear": 1981
   },
   {
-    "bookId": "1yU0MQAACAAJ",
-    "isbn10": "0448189119",
-    "isbn13": "9780448189116",
+    "bookId": "OL47935W",
     "title": "While the Clock Ticked",
     "authors": [
       "Franklin W. Dixon"
     ],
-    "level": "F5",
-    "starRating": 2.3
+    "description": "Frank and Joe solve the mystery of the secret locked room in the spooky Dalrymple Mansion.",
+    "subjects": [
+      "Fiction",
+      "Juvenile Fiction",
+      "Children's fiction",
+      "Mystery and detective stories",
+      "Hardy boys (fictitious characters), fiction",
+      "collectionID:HBMS1"
+    ],
+    "isbn10": "1557092699",
+    "isbn13": "9781557092694",
+    "coverId": 779460,
+    "pageCount": 212,
+    "publishYear": 1932
   },
   {
-    "bookId": "bSSW15rcQbsC",
-    "isbn10": "0975986805",
-    "isbn13": "9780975986806",
+    "bookId": "OL8843356W",
     "title": "The Giving Book",
     "authors": [
       "Ellen Sabin"
     ],
-    "level": "C2",
-    "starRating": 3.7
+    "description": "",
+    "subjects": [],
+    "isbn10": "0545084504",
+    "isbn13": "9780545084505",
+    "coverId": 10758772,
+    "pageCount": 46,
+    "publishYear": 2004
   },
   {
-    "bookId": "Sj5MWqEPsDkC",
-    "isbn10": "0545000157",
-    "isbn13": "9780545000154",
-    "title": "The Silver Door",
+    "bookId": "OL28633459W",
+    "title": "Silver Door",
     "authors": [
       "Holly Lisle"
     ],
-    "level": "H5",
-    "starRating": 3.3
-  },
-  {
-    "bookId": "a-0C_BKFmY4C",
-    "isbn10": "1455615110",
-    "isbn13": "9781455615117",
-    "title": "The Magic of Giving",
-    "authors": [
-      "Marc Dunston"
+    "description": "",
+    "subjects": [
+      "Children's fiction",
+      "War, fiction",
+      "Fantasy fiction"
     ],
-    "level": "T3",
-    "starRating": 0.5
+    "isbn10": "0545000157",
+    "isbn13": "9780545000154",
+    "coverId": 6374525,
+    "pageCount": null,
+    "publishYear": 2010
   },
   {
-    "bookId": "mF34zQEACAAJ",
-    "isbn10": "1735966517",
-    "isbn13": "9781735966519",
-    "title": "The Little Book of Giving",
+    "bookId": "OL21025297W",
+    "title": "Magic of Giving",
     "authors": [
-      "Zack Bush",
-      "Laurie Friedman"
+      "Marc Dunston",
+      "Katie Cantrell",
+      "Wally Amos"
     ],
-    "level": "G3",
-    "starRating": 2.5
+    "description": "",
+    "subjects": [
+      "Children's fiction",
+      "Contests, fiction",
+      "Magic, fiction",
+      "Picture books",
+      "Values, fiction",
+      "Magic tricks",
+      "Fiction",
+      "Talent shows",
+      "Perseverance (Ethics)",
+      "Pictorial works",
+      "Juvenile fiction"
+    ],
+    "isbn10": "",
+    "isbn13": "9781589808058",
+    "coverId": 10783939,
+    "pageCount": 32,
+    "publishYear": 2010
   },
   {
-    "bookId": "sQSDzQEACAAJ",
-    "isbn10": "1951287339",
-    "isbn13": "9781951287337",
-    "title": "A Little SPOT of Giving",
-    "authors": [
-      "Diane Alber"
-    ],
-    "level": "J8",
-    "starRating": 4.3
-  },
-  {
-    "bookId": "jXvSDwAAQBAJ",
-    "isbn10": "1683359046",
-    "isbn13": "9781683359043",
-    "title": "The Giving Day",
+    "bookId": "OL26571192W",
+    "title": "Giving Day",
     "authors": [
       "Cori Doerrfeld"
     ],
-    "level": "Z2",
-    "starRating": 3.3
-  },
-  {
-    "bookId": "IUnGtgEACAAJ",
-    "isbn10": "0999026933",
-    "isbn13": "9780999026939",
-    "title": "The Giving Sack",
-    "authors": [
-      "Leanne Hill"
+    "description": "",
+    "subjects": [
+      "Friendship, fiction",
+      "Animals, fiction"
     ],
-    "level": "F9",
-    "starRating": 5.0
+    "isbn10": "",
+    "isbn13": "9798855035063",
+    "coverId": null,
+    "pageCount": 34,
+    "publishYear": 2020
   },
   {
-    "bookId": "_BxZ71b-u5QC",
-    "isbn10": "1429980567",
-    "isbn13": "9781429980562",
+    "bookId": "OL14912086W",
     "title": "A Boy Named Shel",
     "authors": [
       "Lisa Rogak"
     ],
-    "level": "E8",
-    "starRating": 3.8
+    "description": "",
+    "subjects": [
+      "American Authors",
+      "American Humorists",
+      "Authors, american",
+      "Authors, biography",
+      "Artists, united states",
+      "Artists, biography"
+    ],
+    "isbn10": "0312353596",
+    "isbn13": "9780312353599",
+    "coverId": 2370729,
+    "pageCount": 256,
+    "publishYear": 2007
   },
   {
-    "bookId": "XlrMDwAAQBAJ",
-    "isbn10": "0062999699",
-    "isbn13": "9780062999696",
+    "bookId": "OL3368286W",
     "title": "Falling Up",
     "authors": [
       "Shel Silverstein"
     ],
-    "level": "J1",
-    "starRating": 2.3
-  },
-  {
-    "bookId": "_kaGDwAAQBAJ",
-    "isbn10": "1536204714",
-    "isbn13": "9781536204711",
-    "title": "My Sweet Orange Tree",
-    "authors": [
-      "José Mauro de Vasconcelos"
+    "description": "A collection of humorous poems and drawings.",
+    "subjects": [
+      "American poetry",
+      "Children's poetry, American",
+      "Spanish language materials",
+      "Juvenile literature",
+      "American Humorous poetry",
+      "JUVENILE FICTION",
+      "Children's poetry",
+      "New York Times reviewed"
     ],
-    "level": "S1",
-    "starRating": 1.0
+    "isbn10": "0060513098",
+    "isbn13": "9780060513092",
+    "coverId": 26482,
+    "pageCount": 176,
+    "publishYear": 1996
   },
   {
-    "bookId": "KkIwzwEACAAJ",
-    "isbn10": "0060256710",
-    "isbn13": "9780060256715",
+    "bookId": "OL286593W",
+    "title": "My Sweet-orange Tree",
+    "authors": [
+      "Jose Mauro De Vasconcelos"
+    ],
+    "description": "",
+    "subjects": [
+      "Brazil, fiction",
+      "Children's fiction"
+    ],
+    "isbn10": "",
+    "isbn13": "9781782692454",
+    "coverId": 14557626,
+    "pageCount": 192,
+    "publishYear": 2019
+  },
+  {
+    "bookId": "OL3368273W",
     "title": "The Missing Piece",
     "authors": [
       "Shel Silverstein"
     ],
-    "level": "T2",
-    "starRating": 1.0
+    "description": "",
+    "subjects": [
+      "Fiction",
+      "Juvenile fiction"
+    ],
+    "isbn10": "0060256710",
+    "isbn13": "",
+    "coverId": 24107,
+    "pageCount": 105,
+    "publishYear": 1976
   },
   {
-    "bookId": "aG-9DAAAQBAJ",
-    "isbn10": "1338153609",
-    "isbn13": "9781338153606",
-    "title": "Old Turtle and the Broken Truth",
+    "bookId": "OL892371W",
+    "title": "Old Turtle and the broken truth",
     "authors": [
       "Douglas Wood"
     ],
-    "level": "L2",
-    "starRating": 1.5
+    "description": "Earth is full of suffering and war until one little girl seeks Old Turtle, who tells her about a \"broken truth\" and how mending it will help her community to understand the common bond of all humanity.",
+    "subjects": [
+      "Fiction",
+      "Effect of human beings on",
+      "Children's fiction",
+      "Toleration, fiction",
+      "Nature, effect of human beings on, fiction",
+      "Juvenile fiction",
+      "Human influence on nature"
+    ],
+    "isbn10": "0439321093",
+    "isbn13": "",
+    "coverId": 277175,
+    "pageCount": null,
+    "publishYear": 2003
   }
 ]

@@ -20,16 +20,22 @@ namespace BookwormsServer.Migrations
                 {
                     BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Isbn10 = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Isbn13 = table.Column<string>(type: "varchar(13)", maxLength: 13, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Title = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Authors = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Level = table.Column<string>(type: "varchar(16)", maxLength: 16, nullable: true)
+                    Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Subjects = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Isbn10 = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Isbn13 = table.Column<string>(type: "varchar(13)", maxLength: 13, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CoverId = table.Column<int>(type: "int", nullable: true),
+                    PageCount = table.Column<int>(type: "int", nullable: true),
+                    PublishYear = table.Column<int>(type: "int", nullable: false),
+                    Level = table.Column<int>(type: "int", nullable: true),
                     StarRating = table.Column<double>(type: "double", nullable: true)
                 },
                 constraints: table =>
