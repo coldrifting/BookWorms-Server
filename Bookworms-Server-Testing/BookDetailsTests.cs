@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
+using static BookwormsServerTesting.Templates.Common;
 
 namespace BookwormsServerTesting;
 
@@ -31,13 +32,9 @@ public class BookDetailsTests(BaseStartup<Program> factory) : BaseTest(factory)
     [InlineData("abc123")]
     public async Task Test_GetBookDetails_InvalidBookId(string bookId)
     {
-        HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/details");
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        
-        ErrorDTO? content = await response.Content.ReadJsonAsync<ErrorDTO>();
-        
-        Assert.NotNull(content);
-        Assert.Equal(ErrorDTO.BookNotFound, content);
+        await CheckForError(() => Client.GetAsync($"/books/{bookId}/details"), 
+            HttpStatusCode.NotFound, 
+            ErrorDTO.BookNotFound);
     }
     
     [Theory]

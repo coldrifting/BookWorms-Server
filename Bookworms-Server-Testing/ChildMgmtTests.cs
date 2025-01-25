@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using BookwormsServer;
 using BookwormsServer.Models.Data;
 using BookwormsServerTesting.Templates;
+using static BookwormsServerTesting.Templates.Common;
 
 namespace BookwormsServerTesting;
 
@@ -13,12 +14,9 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
     [InlineData("teacher1")]
     public async Task Test_GetAllChildren_NotParent(string username)
     {
-        HttpResponseMessage response = await Client.GetAsyncAsUser($"/children/all", username);
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        
-        ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
-        Assert.NotNull(content);
-        Assert.Equal(ErrorDTO.UserNotParent, content);
+        await CheckForError(() => Client.GetAsyncAsUser($"/children/all", username), 
+            HttpStatusCode.Forbidden, 
+            ErrorDTO.UserNotParent);
     }
     
     [Theory]
@@ -37,12 +35,9 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
     [InlineData("joey")]
     public async Task Test_AddChild_NotLoggedIn(string childName)
     {
-        HttpResponseMessage response = await Client.PostAsync($"/children/add?childName={childName}", new StringContent(""));
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-        
-        ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
-        Assert.NotNull(content);
-        Assert.Equal(ErrorDTO.Unauthorized, content);
+        await CheckForError(() => Client.PostAsync($"/children/add?childName={childName}"), 
+            HttpStatusCode.Unauthorized, 
+            ErrorDTO.Unauthorized);
     }
     
     [Theory]
@@ -50,12 +45,9 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
     [InlineData("admin", "joey")]
     public async Task Test_AddChild_NotAParent(string username, string childName)
     {
-        HttpResponseMessage response = await Client.PostAsJsonAsyncAsUser($"/children/add?childName={childName}", new {}, username);
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        
-        ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
-        Assert.NotNull(content);
-        Assert.Equal(ErrorDTO.UserNotParent, content);
+        await CheckForError(() => Client.PostAsyncAsUser($"/children/add?childName={childName}", username), 
+            HttpStatusCode.Forbidden, 
+            ErrorDTO.UserNotParent);
     }
     
     [Theory]
@@ -119,7 +111,7 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
     [InlineData("parent0", "parent5","joey")]
     public async Task Test_AddChild_MultipleSameName_DifferentParents(string username1, string username2, string childName)
     {
-        HttpResponseMessage response1 = await Client.PostAsJsonAsyncAsUser($"/children/add?childName={childName}", new {}, username1);
+        HttpResponseMessage response1 = await Client.PostAsyncAsUser($"/children/add?childName={childName}", username1);
         Assert.Equal(HttpStatusCode.Created, response1.StatusCode);
         
         var children1 = await response1.Content.ReadJsonAsync<List<ChildResponseDTO>>();
@@ -127,13 +119,12 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
         Assert.Single(children1);
         Assert.Contains(children1, c => c.Name == childName && c.Selected == true);
         
-        HttpResponseMessage response2 = await Client.PostAsJsonAsyncAsUser($"/children/add?childName={childName}", new {}, username2);
+        HttpResponseMessage response2 = await Client.PostAsyncAsUser($"/children/add?childName={childName}", username2);
         Assert.Equal(HttpStatusCode.Created, response2.StatusCode);
+        string? child2Guid = response2.Headers.Location?.ToString().Replace("/children/", "");
         
-        var children2 = await response2.Content.ReadJsonAsync<List<ChildResponseDTO>>();
-        Assert.NotNull(children2);
-        Assert.Single(children2);
-        Assert.Contains(children2, c => c.Name == childName && c.Selected == true);
+        var msg = await Client.PutAsyncAsUser($"/children/{child2Guid}/select", username2);
+        var con = await msg.Content.ReadJsonAsync<ChildResponseDTO>();
         
         HttpResponseMessage response3 = await Client.GetAsyncAsUser($"/children/all", username1);
         Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
@@ -148,20 +139,17 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
 
         var children4 = await response4.Content.ReadJsonAsync<List<ChildResponseDTO>>();
         Assert.NotNull(children4);
-        Assert.Single(children4);
-        Assert.Contains(children4, c => c.Name == childName && c.Selected == true);
+        Assert.Equal(2, children4.Count);
+        Assert.Contains(children4, c => c.Name == childName && c.ChildId.ToString() == child2Guid && c.Selected == true);
     }
     
     [Theory]
     [InlineData("parent1", "389b78f0-13f1-4003-8be4-9a72cb145d9e", "ab198b2c-e08b-4f3d-a372-6af43c80e229")]
     public async Task Test_RemoveChild_ChildNotExist(string username, Guid invalidChildId, Guid existingChildId)
     {
-        HttpResponseMessage response1 = await Client.DeleteAsyncAsUser($"/children/{invalidChildId}/remove", username);
-        Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
-        
-        ErrorDTO? content1 = await response1.Content.ReadFromJsonAsync<ErrorDTO>();
-        Assert.NotNull(content1);
-        Assert.Equal(ErrorDTO.ChildNotFound, content1);
+        await CheckForError(() => Client.DeleteAsyncAsUser($"/children/{invalidChildId}/remove", username), 
+            HttpStatusCode.NotFound, 
+            ErrorDTO.ChildNotFound);
         
         HttpResponseMessage response2 = await Client.GetAsyncAsUser($"/children/all", username);
         Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
@@ -176,12 +164,9 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
     [InlineData("teacher1", "389b78f0-13f1-4003-8be4-9a72cb145d9e")]
     public async Task Test_RemoveChild_NotParent(string username, Guid childId)
     {
-        HttpResponseMessage response1 = await Client.DeleteAsyncAsUser($"/children/{childId}/remove", username);
-        Assert.Equal(HttpStatusCode.Forbidden, response1.StatusCode);
-        
-        ErrorDTO? content1 = await response1.Content.ReadFromJsonAsync<ErrorDTO>();
-        Assert.NotNull(content1);
-        Assert.Equal(ErrorDTO.UserNotParent, content1);
+        await CheckForError(() => Client.DeleteAsyncAsUser($"/children/{childId}/remove", username), 
+            HttpStatusCode.Forbidden, 
+            ErrorDTO.UserNotParent);
     }
     
     [Theory]
@@ -228,12 +213,9 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
     [InlineData("teacher1", "e1740f4a-9855-472d-bf47-fb57dce6c1b2")]
     public async Task Test_EditChild_NotParent(string username, Guid childId)
     {
-        HttpResponseMessage response1 = await Client.PutAsJsonAsyncAsUser($"/children/{childId}/edit", new {}, username);
-        Assert.Equal(HttpStatusCode.Forbidden, response1.StatusCode);
-
-        ErrorDTO? content1 = await response1.Content.ReadJsonAsync<ErrorDTO>();
-        Assert.NotNull(content1);
-        Assert.Equal(ErrorDTO.UserNotParent, content1);
+        await CheckForError(() => Client.PutAsJsonAsyncAsUser($"/children/{childId}/edit", new ChildEditDTO(), username), 
+            HttpStatusCode.Forbidden, 
+            ErrorDTO.UserNotParent);
     }
     
     [Theory]
@@ -270,13 +252,10 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
         Assert.NotNull(content1);
         Assert.Single(content1);
         
-        HttpResponseMessage response2 = await Client.PutAsJsonAsyncAsUser($"/children/{childId}/edit",
-            new ChildEditDTO(ChildIcon: newIcon), username);
-        Assert.Equal(HttpStatusCode.UnprocessableEntity, response2.StatusCode);
-
-        ErrorDTO? error = await response2.Content.ReadJsonAsync<ErrorDTO>();
-        Assert.NotNull(error);
-        Assert.Equal(ErrorDTO.InvalidIconIndex, error);
+        await CheckForError(() => Client.PutAsJsonAsyncAsUser($"/children/{childId}/edit", 
+                new ChildEditDTO(ChildIcon: newIcon), username), 
+            HttpStatusCode.UnprocessableEntity, 
+            ErrorDTO.InvalidIconIndex);
         
         HttpResponseMessage response3 = await Client.GetAsyncAsUser($"/children/all", username);
         Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
@@ -380,50 +359,35 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
     [InlineData("61a1be57-69a3-46d5-95cd-8e257d4a553c")]
     public async Task Test_SelectChild_NotLoggedIn(Guid childId)
     {
-        HttpResponseMessage response1 = await Client.PutAsJsonAsync($"/children/{childId}/select", new {});
-        Assert.Equal(HttpStatusCode.Unauthorized, response1.StatusCode);
-
-        ErrorDTO? content1 = await response1.Content.ReadJsonAsync<ErrorDTO>();
-        Assert.NotNull(content1);
-        Assert.Equal(ErrorDTO.Unauthorized, content1);
+        await CheckForError(() => Client.PutAsync($"/children/{childId}/select"), 
+            HttpStatusCode.Unauthorized, 
+            ErrorDTO.Unauthorized);
         
-        HttpResponseMessage response2 = await Client.GetAsync($"/children/selected");
-        Assert.Equal(HttpStatusCode.Unauthorized, response2.StatusCode);
-
-        ErrorDTO? content2 = await response2.Content.ReadJsonAsync<ErrorDTO>();
-        Assert.NotNull(content2);
-        Assert.Equal(ErrorDTO.Unauthorized, content2);
+        await CheckForError(() => Client.GetAsync($"/children/selected"), 
+            HttpStatusCode.Unauthorized, 
+            ErrorDTO.Unauthorized);
     }
     
     [Theory]
     [InlineData("teacher1", "61a1be57-69a3-46d5-95cd-8e257d4a553c")]
     public async Task Test_SelectChild_NotParent(string username, Guid childId)
     {
-        HttpResponseMessage response1 = await Client.PutAsJsonAsyncAsUser($"/children/{childId}/select", new {}, username);
-        Assert.Equal(HttpStatusCode.Forbidden, response1.StatusCode);
-
-        ErrorDTO? content1 = await response1.Content.ReadJsonAsync<ErrorDTO>();
-        Assert.NotNull(content1);
-        Assert.Equal(ErrorDTO.UserNotParent, content1);
+        await CheckForError(() => Client.PutAsyncAsUser($"/children/{childId}/select", username), 
+            HttpStatusCode.Forbidden, 
+            ErrorDTO.UserNotParent);
         
-        HttpResponseMessage response2 = await Client.GetAsyncAsUser($"/children/selected", username);
-        Assert.Equal(HttpStatusCode.Forbidden, response2.StatusCode);
-        
-        ErrorDTO? content2 = await response2.Content.ReadJsonAsync<ErrorDTO>();
-        Assert.NotNull(content2);
-        Assert.Equal(ErrorDTO.UserNotParent, content2);
+        await CheckForError(() => Client.GetAsyncAsUser($"/children/selected", username), 
+            HttpStatusCode.Forbidden, 
+            ErrorDTO.UserNotParent);
     }
     
     [Theory]
-    [InlineData("parent5", "61a1be57-69a3-46d5-95cd-8e257d4a553c")]
-    public async Task Test_SelectChild_WrongParent(string username, Guid childId)
+    [InlineData("parent0", "61a1be57-69a3-46d5-95cd-8e257d4a553c")]
+    public async Task Test_SelectChild_WrongParent_NoOtherChildren(string username, Guid childId)
     {
-        HttpResponseMessage response1 = await Client.PutAsJsonAsyncAsUser($"/children/{childId}/select", new {}, username);
-        Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
-
-        ErrorDTO? content1 = await response1.Content.ReadJsonAsync<ErrorDTO>();
-        Assert.NotNull(content1);
-        Assert.Equal(ErrorDTO.ChildNotFound, content1);
+        await CheckForError(() => Client.PutAsyncAsUser($"/children/{childId}/select", username), 
+            HttpStatusCode.NotFound, 
+            ErrorDTO.ChildNotFound);
         
         HttpResponseMessage response2 = await Client.GetAsyncAsUser($"/children/selected", username);
         Assert.Equal(HttpStatusCode.NoContent, response2.StatusCode);
@@ -433,12 +397,9 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
     [InlineData("parent1", "61a1be57-69a3-46d5-95cd-8e257d4a553c", "ab198b2c-e08b-4f3d-a372-6af43c80e229")]
     public async Task Test_SelectChild_WrongParent_PrevSelection(string username, Guid childId, Guid correctChildId)
     {
-        HttpResponseMessage response1 = await Client.PutAsJsonAsyncAsUser($"/children/{childId}/select", new {}, username);
-        Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
-
-        ErrorDTO? content1 = await response1.Content.ReadJsonAsync<ErrorDTO>();
-        Assert.NotNull(content1);
-        Assert.Equal(ErrorDTO.ChildNotFound, content1);
+        await CheckForError(() => Client.PutAsyncAsUser($"/children/{childId}/select", username), 
+            HttpStatusCode.NotFound, 
+            ErrorDTO.ChildNotFound);
         
         HttpResponseMessage response2 = await Client.GetAsyncAsUser($"/children/selected", username);
         Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
@@ -449,15 +410,12 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
     
     [Theory]
-    [InlineData("parent5", "8f28044c-8dc6-4e4c-9e59-971e0d618910")]
-    public async Task Test_SelectChild_ChildNotExist(string username, Guid childId)
+    [InlineData("parent0", "8f28044c-8dc6-4e4c-9e59-971e0d618910")]
+    public async Task Test_SelectChild_ChildNotExist_NoOtherChildren(string username, Guid childId)
     {
-        HttpResponseMessage response1 = await Client.PutAsJsonAsyncAsUser($"/children/{childId}/select", new {}, username);
-        Assert.Equal(HttpStatusCode.NotFound, response1.StatusCode);
-
-        ErrorDTO? content1 = await response1.Content.ReadJsonAsync<ErrorDTO>();
-        Assert.NotNull(content1);
-        Assert.Equal(ErrorDTO.ChildNotFound, content1);
+        await CheckForError(() => Client.PutAsyncAsUser($"/children/{childId}/select", username), 
+            HttpStatusCode.NotFound, 
+            ErrorDTO.ChildNotFound);
         
         HttpResponseMessage response2 = await Client.GetAsyncAsUser($"/children/selected", username);
         Assert.Equal(HttpStatusCode.NoContent, response2.StatusCode);
@@ -548,8 +506,8 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
     }
 
     [Theory]
-    [InlineData("parent5", "Kaitlin")]
-    public async Task Test_ChildSelectedAfterCreated(string username, string childName)
+    [InlineData("parent0", "Kaitlin")]
+    public async Task Test_ChildSelectedAfterCreated_NoOtherChildren(string username, string childName)
     {
         HttpResponseMessage response1 = await Client.PostAsJsonAsyncAsUser($"/children/add?childName={childName}", new {}, username);
         Assert.Equal(HttpStatusCode.Created, response1.StatusCode);
@@ -661,13 +619,10 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
     [InlineData("parent2", "c5dca20d-849d-418f-b65b-cb79aa723c20", "BadVal")]
     public async Task Test_EditChild_InvalidClassroomCode(string username, Guid childId, string classroomCode)
     {
-        HttpResponseMessage response2 = await Client.PutAsJsonAsyncAsUser($"/children/{childId}/edit", 
-            new ChildEditDTO(ClassroomCode: classroomCode, ReadingLevel: "A5"), username);
-        Assert.Equal(HttpStatusCode.UnprocessableEntity, response2.StatusCode);
-
-        ErrorDTO? content2 = await response2.Content.ReadJsonAsync<ErrorDTO>();
-        Assert.NotNull(content2);
-        Assert.Equal(ErrorDTO.ClassroomNotFound, content2);
+        await CheckForError(() => Client.PutAsJsonAsyncAsUser($"/children/{childId}/edit", 
+                new ChildEditDTO(ClassroomCode: classroomCode, ReadingLevel: "A5"), username), 
+            HttpStatusCode.UnprocessableEntity, 
+            ErrorDTO.ClassroomNotFound);
         
         HttpResponseMessage response3 = await Client.GetAsyncAsUser($"/children/all", username);
         Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
@@ -676,6 +631,16 @@ public class ChildMgmtTests(BaseStartup<Program> factory) : BaseTest(factory)
         Assert.NotNull(children3);
         Assert.Equal(2, children3.Count);
         Assert.Contains(children3,
-            c => c.ChildId == childId && c.ClassroomCode is null);
+            c => c.ChildId == childId && c.ClassroomCode is null && c.ReadingLevel == null);
+    }
+    
+    [Theory]
+    [InlineData("parent2", "c5dca20d-1234-418f-b65b-cb79aa723c20", "newName")]
+    public async Task Test_EditChild_InvalidGuid(string username, Guid childId, string newName)
+    {
+        await CheckForError(() => Client.PutAsJsonAsyncAsUser($"/children/{childId}/edit", 
+                new ChildEditDTO(NewName: newName), username), 
+            HttpStatusCode.NotFound, 
+            ErrorDTO.ChildNotFound);
     }
 }

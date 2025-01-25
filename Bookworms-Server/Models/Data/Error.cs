@@ -1,25 +1,7 @@
 ﻿namespace BookwormsServer.Models.Data;
 
-public class ErrorDTO(string error, string description)
+public record ErrorDTO(string Error, string Description)
 {
-    public override bool Equals(object? other)
-    {
-        if (other is ErrorDTO otherError)
-        {
-            return Error == otherError.Error && Description == otherError.Description;
-        }
-
-        return false;
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Error, Description);
-    }
-
-    public string Error { get; } = error;
-    public string Description { get; } = description;
-
     // Prefab error classes for consistent errors
     public static ErrorDTO Unauthorized => new("Unauthorized", "Valid token required for this route");
     public static ErrorDTO Forbidden => new("Forbidden", "User is not permitted to access this route");
@@ -46,6 +28,18 @@ public class ErrorDTO(string error, string description)
    public static ErrorDTO UserNotTeacher => new("User is not a Teacher",
        "User must be a teacher to access this route.");
 
+   public static ErrorDTO NoChildSelected => new("No Child Selected",
+       "The requested operation is invalid because this route requires a child to be selected.");
+
+   public static ErrorDTO BookshelfNotFound => new("Bookshelf Not Found",
+       "Unable to find a bookshelf with the given name for the currently selected child");
+
+   public static ErrorDTO BookshelfAlreadyExists => new("Bookshelf Already Exists",
+       "Unable to add a bookshelf with the given name as one already exists under the selected child.");
+
+   public static ErrorDTO BookshelfBookNotFound => new("Bookshelf Book Not Found",
+       "Unable to find a book with the given id in this bookshelf");
+   
    public static ErrorDTO ClassroomNotFound =>
        new("Classroom Not Found", "Unable to find a class with the given classroom code");
 

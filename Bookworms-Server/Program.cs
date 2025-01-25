@@ -1,12 +1,10 @@
 using System.Reflection;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using BookwormsServer.Models.Entities;
 using BookwormsServer.Services;
 using BookwormsServer.Services.Interfaces;
 using BookwormsServer.Swagger;
@@ -167,72 +165,11 @@ public partial class Program
 
         using (var serviceScope = app.Services.CreateScope()) {
 	        var dbContext = serviceScope.ServiceProvider.GetRequiredService<BookwormsDbContext>();
-	        PersistTestData(dbContext);
+	        dbContext.SeedTestData();
         }
         
         // -------------------------------------------------------------------------------------------------------------
         
         app.Run();
-    }
-
-    public static void PersistTestData(BookwormsDbContext dbContext)
-    {
-	    JsonSerializerOptions jso = new()
-	    {
-		    PropertyNameCaseInsensitive = true,
-			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-			Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-	    };
-
-	    dbContext.Database.EnsureDeleted();
-        dbContext.Database.Migrate();
-	    
-	    string userData = File.ReadAllText("TestData/UserEntities.json");
-		var users = JsonSerializer.Deserialize<List<User>>(userData, jso)!;
-	    dbContext.Users.ExecuteDelete();
-		dbContext.Users.AddRange(users);
-		dbContext.SaveChanges();
-		
-	    string parentData = File.ReadAllText("TestData/ParentEntities.json");
-		var parents = JsonSerializer.Deserialize<List<Parent>>(parentData, jso)!;
-	    dbContext.Parents.ExecuteDelete();
-		dbContext.Parents.AddRange(parents);
-		dbContext.SaveChanges();
-
-	    string teacherData = File.ReadAllText("TestData/TeacherEntities.json");
-		var teachers = JsonSerializer.Deserialize<List<Teacher>>(teacherData, jso)!;
-	    dbContext.Teachers.ExecuteDelete();
-		dbContext.Teachers.AddRange(teachers);
-		dbContext.SaveChanges();
-		
-	    string bookData = File.ReadAllText("TestData/BookEntities.json");
-		var books = JsonSerializer.Deserialize<List<Book>>(bookData, jso)!;
-	    dbContext.Books.ExecuteDelete();
-		dbContext.Books.AddRange(books);
-		dbContext.SaveChanges();
-		
-	    string reviewData = File.ReadAllText("TestData/ReviewEntities.json");
-		var reviews = JsonSerializer.Deserialize<List<Review>>(reviewData, jso)!;
-	    dbContext.Reviews.ExecuteDelete();
-		dbContext.Reviews.AddRange(reviews);
-		dbContext.SaveChanges();
-		
-	    string childData = File.ReadAllText("TestData/ChildEntities.json");
-		var children = JsonSerializer.Deserialize<List<Child>>(childData, jso)!;
-	    dbContext.Children.ExecuteDelete();
-		dbContext.Children.AddRange(children);
-		
-		dbContext.SaveChanges();
-		
-		// Ensure a child is selected if at least one exists under a parent
-		foreach (var child in dbContext.Children.Include(child => child.Parent))
-		{
-			if (child.Parent is not null && child.Parent.SelectedChild is null)
-			{
-				child.Parent.SelectedChild = child;
-			}
-		}
-		
-		dbContext.SaveChanges();
     }
 }

@@ -11,6 +11,8 @@ public static class Common
 {
     private const string LoginEndpoint = "/user/login";
 
+    // HTTP helpers
+    
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -57,17 +59,33 @@ public static class Common
         string token = await GetUserToken(client, username, password);
         client.DefaultRequestHeaders.Authorization = new("Bearer", token);
     }
-
+    
+    public static async Task<HttpResponseMessage> PostAsync(this HttpClient client, string url)
+    {
+        return await client.PostAsync(url, new StringContent(""));
+    }
+    
+    public static async Task<HttpResponseMessage> PostAsyncAsUser(this HttpClient client, string url, string username, string? password = null)
+    {
+        await VerifyToken(client, username, password ?? username);
+        return await client.PostAsync(url, new StringContent(""));
+    }
+    
+    public static async Task<HttpResponseMessage> PutAsync(this HttpClient client, string url)
+    {
+        return await client.PutAsync(url, new StringContent(""));
+    }
+    
+    public static async Task<HttpResponseMessage> PutAsyncAsUser(this HttpClient client, string url, string username, string? password = null)
+    {
+        await VerifyToken(client, username, password ?? username);
+        return await client.PutAsync(url, new StringContent(""));
+    }
+    
     public static async Task<HttpResponseMessage> GetAsyncAsUser(this HttpClient client, string url, string username, string? password = null)
     {
         await VerifyToken(client, username, password ?? username);
         return await client.GetAsync(url);
-    }
-
-    public static async Task<HttpResponseMessage> PutAsJsonAsyncAsUser<TValue>(this HttpClient client, string url, TValue obj, string username, string? password = null)
-    {
-        await VerifyToken(client, username, password ?? username);
-        return await client.PutAsJsonAsync(url, obj);
     }
 
     public static async Task<HttpResponseMessage> PostAsJsonAsyncAsUser<TValue>(this HttpClient client, string url, TValue obj, string username, string? password = null)
@@ -76,9 +94,26 @@ public static class Common
         return await client.PostAsJsonAsync(url, obj);
     }
 
+    public static async Task<HttpResponseMessage> PutAsJsonAsyncAsUser<TValue>(this HttpClient client, string url, TValue obj, string username, string? password = null)
+    {
+        await VerifyToken(client, username, password ?? username);
+        return await client.PutAsJsonAsync(url, obj);
+    }
+
     public static async Task<HttpResponseMessage> DeleteAsyncAsUser(this HttpClient client, string url, string username, string? password = null)
     {
         await VerifyToken(client, username, password ?? username);
         return await client.DeleteAsync(url);
+    }
+    
+    // Test helpers
+    public static async Task CheckForError(Func<Task<HttpResponseMessage>> func, HttpStatusCode statusCode, ErrorDTO errorType)
+    {
+        HttpResponseMessage response = await func.Invoke();
+        Assert.Equal(statusCode, response.StatusCode);
+        
+        ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
+        Assert.NotNull(content);
+        Assert.Equal(errorType, content);
     }
 }

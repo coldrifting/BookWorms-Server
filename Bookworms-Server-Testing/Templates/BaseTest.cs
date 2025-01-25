@@ -36,7 +36,7 @@ public abstract class BaseTest(WebApplicationFactory<Program> factory)
     // Override this class/method as needed for different types of tests requiring different DB states
     protected virtual Task ResetDatabaseAsync()
     {
-        Program.PersistTestData(Context);
+        Context.SeedTestData();
         return Task.CompletedTask;
     }
 }

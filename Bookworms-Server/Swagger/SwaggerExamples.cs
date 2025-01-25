@@ -45,7 +45,7 @@ public static class SwaggerExamples
     {
         public List<string> GetExamples()
         {
-            return ["XlrMDwAAQBAJ", "sQSDzQEACAAJ", "_BxZ71b-u5QC"];
+            return ["OL3368286W", "OL3368273W", "OL48763W"];
         }
     }
 
@@ -131,10 +131,10 @@ public static class SwaggerExamples
         {
             return
             [
-                new("1IleAgAAQBAJ", "The Giving Tree", ["Shel Silverstein"], 4.3, 10),
-                new("bSSW15rcQbsC", "The Giving Book", ["Ellen Sabin"], 3.7, 15),
-                new("IUnGtgEACAAJ", "The Giving Sack", ["Leanne Hill"], 5, 20),
-                new("jXvSDwAAQBAJ", "The Giving Day", ["Cori Doerrfeld"], 3.3, 15)
+                new("OL3368288W", "The Giving Tree", ["Shel Silverstein"], 4.3, 10),
+                new("OL48763W", "The three robbers", ["Tomi Ungerer"], 3.7, 15),
+                new("OL47935W", "While the Clock Ticked", ["Franklin W. Dixon"], 5, 20),
+                new("OL28633459W", "Silver Door", ["Holly Lisle"], 3.3, 15)
             ];
         }
     }
@@ -185,6 +185,33 @@ public static class SwaggerExamples
                 new("_username_", "_password_", "Ashley Reed", "Parent", "Icon3"),
                 new("_username_", "_password_", "Wyatt Smith", "Admin", "Icon2"),
             ];
+        }
+    }
+
+    public class BookshelfListResponseExample : IExamplesProvider<List<BookshelfPreviewResponseDTO>>
+    {
+        public List<BookshelfPreviewResponseDTO> GetExamples()
+        {
+            return
+            [
+                new("Some Books", [new("bookId1", "Title", "Author"), new("bookId2", "Title", "Author"), new("bookId3", "Title", "Author")]),
+                new("Not many Books", []),
+                new("Some More Books", [new("bookId1", "Title", "Author")])
+            ];
+        }
+    }
+
+    public class BookshelfResponseExample : IExamplesProvider<BookshelfPreviewResponseDTO>
+    {
+        public BookshelfPreviewResponseDTO GetExamples()
+        {
+            return new("Bookshelf Name",
+            [
+                new("bookId1", "Title", "Author"), 
+                new("bookId2", "Title", "Author"), 
+                new("bookId3", "Title", "Author"),
+                new("bookId4", "Title", "Author")
+            ]);
         }
     }
 }
