@@ -15,7 +15,7 @@ public class BookSearchTests(AppFactory<Program> factory) : BaseTestReadOnlyFixt
     [InlineData("Giving", "The Giving Tree")]
     public async Task Test_GetSearchResults(string searchString, string title)
     {
-        await CheckResponse<List<BookDto>>(async () => await Client.GetAsync($"/search/title?query={searchString}"),
+        await CheckResponse<List<BookDto>>(async () => await Client.GetAsync(Routes.Search.Title(searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);

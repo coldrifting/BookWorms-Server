@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BookwormsServer.Models.Data;
 
 namespace BookwormsServer.Models.Entities;
 
@@ -12,7 +11,8 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
     [StringLength(256, MinimumLength = 2, ErrorMessage = "Child name must be between {2} and {1} characters long.")]
     public string Name { get; set; } = name;
 
-    public UserIcon ChildIcon { get; set; } = UserIcon.Icon1;
+    [Range(0, int.MaxValue, ErrorMessage = "{0} must be a positive integer.")]
+    public int ChildIcon { get; set; }
 
     [Range(typeof(DateOnly), "01/01/1900", "01/01/2100",
         ErrorMessage = "Child date of birth must fall between {1} and {2}.")]

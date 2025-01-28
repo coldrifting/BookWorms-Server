@@ -16,7 +16,7 @@ public static class AuthService
     public static byte[] SecretBytes => Encoding.UTF8.GetBytes(Secret);
     
     // Expire time of generated JWT tokens in minutes
-    public const int ExpireTime = 15; 
+    private const int ExpireTime = 120; 
 
     public static string GenerateToken(User user)
     {

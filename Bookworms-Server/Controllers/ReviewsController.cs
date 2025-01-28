@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BookwormsServer.Controllers;
 
 [ApiController]
-[Tags("Reviews")]
+[Tags("Book Reviews")]
 public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
 {
     /// <summary>
@@ -18,8 +18,8 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     /// <param name="start" default="0">The start index from which to start returning reviews (first is 0)</param>
     /// <param name="max" default="-1">The maximum number of reviews to return (use -1 for unconstrained)</param>
     /// <returns>The list of reviews</returns>
-    /// <response code="200">Returns the list of requested reviews</response>
-    /// <response code="404">If the specified book is not found</response>
+    /// <response code="200">Success</response>
+    /// <response code="404">The specified book is not found</response>
     [HttpGet]
     [Route("/books/{bookId}/reviews")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ReviewDTO>))]
@@ -64,10 +64,10 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     /// <param name="bookId">The Google Books ID of the book to target</param>
     /// <param name="reviewDto">The data with which to populate the new/updated review</param>
     /// <returns>The newly created or updated review</returns>
-    /// <response code="200">Returns the updated review</response>
-    /// <response code="201">Returns the newly created review</response>
-    /// <response code="401">If the user is not logged in</response>
-    /// <response code="404">If the specified book is not found</response>
+    /// <response code="200">Success. Review was Updated</response>
+    /// <response code="201">Success. Review was Created</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="404">The specified book is not found</response>
     [HttpPut]
     [Authorize]
     [Route("/books/{bookId}/review")]
@@ -117,10 +117,10 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     /// <summary>
     /// Removes the review by the logged in user for the specified book 
     /// </summary>
-    /// <param name="bookId">The Google Books ID of the book to target</param>
-    /// <response code="204">If the review was removed successfully</response>
-    /// <response code="401">If the user is not logged in</response>
-    /// <response code="404">If the specified book is not found, or the user has not left a review for the book</response>
+    /// <param name="bookId">The book under which to delete a review</param>
+    /// <response code="204">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="404">The book is not found, or the user has not reviewed the book</response>
     [HttpDelete]
     [Authorize]
     [Route("/books/{bookId}/review")]

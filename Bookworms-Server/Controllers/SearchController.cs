@@ -15,7 +15,7 @@ public class SearchController(BookwormsDbContext dbContext, IBookApiService book
     /// </summary>
     /// <param name="query">The string to look for in book titles</param>
     /// <returns>The list of books</returns>
-    /// <response code="200">Returns the list of books</response>
+    /// <response code="200">Success</response>
     [HttpGet]
     [Route("/search/title")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookDto>))]

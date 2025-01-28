@@ -12,7 +12,7 @@ namespace BookwormsServer.Models.Entities;
  */
 
 [Table("Users")]
-public class User(string username, byte[] hash, byte[] salt, string firstName, string lastName, UserIcon userIcon)
+public class User(string username, byte[] hash, byte[] salt, string firstName, string lastName, int userIcon)
 {
     [Key, StringLength(64, MinimumLength = 5, ErrorMessage = "User username must be between {2} and {1} characters long.")]
     public string Username { get; set; } = username;
@@ -23,33 +23,28 @@ public class User(string username, byte[] hash, byte[] salt, string firstName, s
     [StringLength(256, MinimumLength = 2, ErrorMessage = "User last name must be between {2} and {1} characters long.")]
     public string LastName { get; set; } = lastName;
 
-    public string[] Roles { get; set; } = [];
-
-    [Column(TypeName = "nvarchar(64)")]
-    public UserIcon UserIcon { get; set; } = userIcon;
+    [Range(0, int.MaxValue, ErrorMessage = "{0} must be a positive integer.")]
+    public int UserIcon { get; set; } = userIcon;
 
     public byte[] Hash { get; set; } = hash;
     
     public byte[] Salt { get; set; } = salt;
+
+    public string[] Roles { get; set; } = [];
 
     // Navigation
 
     public ICollection<Review> Reviews { get; set; } = null!;
 }
 
-public class Parent(string username, byte[] hash, byte[] salt, string firstName, string lastName, UserIcon userIcon)
+public class Parent(string username, byte[] hash, byte[] salt, string firstName, string lastName, int userIcon)
     : User(username, hash, salt, firstName, lastName, userIcon)
 {
-    public Guid? SelectedChildId { get; set; }
-    
     // Navigation
     public ICollection<Child> Children { get; set; } = null!;
-
-    [ForeignKey(nameof(SelectedChildId))] 
-    public Child? SelectedChild { get; set; }
 }
 
-public class Teacher(string username, byte[] hash, byte[] salt, string firstName, string lastName, UserIcon userIcon)
+public class Teacher(string username, byte[] hash, byte[] salt, string firstName, string lastName, int userIcon)
     : User(username, hash, salt, firstName, lastName, userIcon)
 {
     [StringLength(6, MinimumLength = 6, ErrorMessage = "Teacher classroom code must be exactly {0} characters long.")]

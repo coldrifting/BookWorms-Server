@@ -9,15 +9,15 @@ public record ErrorDTO(string Error, string Description)
     public static ErrorDTO UsernameAlreadyExists => new("Invalid Credentials", "The specified Username already exists");
     public static ErrorDTO LoginFailure => new("Invalid Login Credentials", "Incorrect username and/or password");
     
-    public static ErrorDTO BookNotFound => new("Book Not Found", "Unable to find a book matching the given id");
+    public static ErrorDTO BookNotFound => new("Book Not Found", "Unable to find the specified book");
+    
+    public static ErrorDTO BookIdInvalid => new("Book Id Invalid", "Unable to find a book matching the given id");
 
     public static ErrorDTO BookCoverNotFound => new("Book Cover Not Found",
         "Unable to find the requested book cover on external API server");
 
    public static ErrorDTO ChildNotFound => new("Child Not Found",
        "Unable to find a child with the given name under the logged in parent");
-   public static ErrorDTO ChildAlreadyExists => new("Child Already Exists",
-       "Unable to create a child with the same name under the same parent");
    
    public static ErrorDTO UserNotAdmin => new("User is not an Administrator",
        "User must be an administrator to access this route.");
@@ -27,9 +27,6 @@ public record ErrorDTO(string Error, string Description)
    
    public static ErrorDTO UserNotTeacher => new("User is not a Teacher",
        "User must be a teacher to access this route.");
-
-   public static ErrorDTO NoChildSelected => new("No Child Selected",
-       "The requested operation is invalid because this route requires a child to be selected.");
 
    public static ErrorDTO BookshelfNotFound => new("Bookshelf Not Found",
        "Unable to find a bookshelf with the given name for the currently selected child");

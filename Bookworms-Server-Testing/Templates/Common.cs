@@ -10,8 +10,6 @@ namespace BookwormsServerTesting.Templates;
 
 public static class Common
 {
-    private const string LoginEndpoint = "/user/login";
-
     // HTTP helpers
     
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
@@ -27,7 +25,7 @@ public static class Common
     
     private static async Task<string> GetUserToken(HttpClient client, string username, string password)
     {
-        HttpResponseMessage response = await client.PostAsJsonAsync(LoginEndpoint, new UserLoginDTO(username, password));
+        HttpResponseMessage response = await client.PostAsJsonAsync(Routes.User.Login, new UserLoginDTO(username, password));
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
@@ -164,5 +162,11 @@ public static class Common
         TContent? content = await response.Content.ReadJsonAsync<TContent>();
         Assert.NotNull(content);
         return check.Invoke(content);
+    }
+
+    public static string BlankGuid = "00000000-0000-0000-0000-000000000000";
+    public static Guid GetChildLocation(this HttpResponseHeaders headers)
+    {
+        return Guid.Parse(headers.Location?.ToString().Replace("/children/", "") ?? BlankGuid);
     }
 }

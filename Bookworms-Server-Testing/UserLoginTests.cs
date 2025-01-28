@@ -17,12 +17,12 @@ public abstract class UserLoginTests
         [InlineData("parent2", "parent2")]
         public async Task Test_Login_Basics(string username, string password)
         {
-            await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync($"/user/login", 
+            await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync(Routes.User.Login,
                     new UserLoginDTO(username, password)),
                 HttpStatusCode.OK,
                 content =>
                     Assert.NotNull(content.Token)
-                );
+            );
         }
 
         [Theory]
@@ -31,7 +31,7 @@ public abstract class UserLoginTests
         [InlineData("wrongUsername", "wrongPassword")]
         public async Task Test_LoginBadUsernameAndOrPassword(string username, string password)
         {
-            await CheckForError(() => Client.PostPayloadAsync("/user/login",
+            await CheckForError(() => Client.PostPayloadAsync(Routes.User.Login,
                     new UserLoginDTO(username, password)),
                 HttpStatusCode.BadRequest,
                 ErrorDTO.LoginFailure);
@@ -41,7 +41,7 @@ public abstract class UserLoginTests
         [InlineData("teacher0", "somePassword")]
         public async Task Test_CreateUserUsernameAlreadyExists(string username, string password)
         {
-            await CheckForError(() => Client.PostPayloadAsync("/user/register",
+            await CheckForError(() => Client.PostPayloadAsync(Routes.User.Register,
                     new UserRegisterDTO(username, password, username, username, false)),
                 HttpStatusCode.UnprocessableContent,
                 ErrorDTO.UsernameAlreadyExists);
@@ -50,9 +50,10 @@ public abstract class UserLoginTests
         [Fact]
         public async Task Test_ShowUsersAsAdminShouldOk()
         {
-            await CheckResponse<List<UserDetailsDTO>>(async () => await Client.GetAsync($"/user/all", "admin"),
+            await CheckResponse<List<UserDetailsDTO>>(async () => await Client.GetAsync(Routes.User.All, "admin"),
                 HttpStatusCode.OK,
-                content => {
+                content =>
+                {
                     Assert.NotEmpty(content);
                     Assert.Contains(content, u => u is { Username: "admin", Role: "Admin" });
                     Assert.Contains(content, u => u is { Username: "teacher0", Role: "Teacher" });
@@ -65,7 +66,7 @@ public abstract class UserLoginTests
         [InlineData("teacher3")]
         public async Task Test_ShowUsersAsRegularUserShouldForbid(string username)
         {
-            await CheckForError(() => Client.GetAsync("/user/all", username),
+            await CheckForError(() => Client.GetAsync(Routes.User.All, username),
                 HttpStatusCode.Forbidden,
                 ErrorDTO.UserNotAdmin);
         }
@@ -73,7 +74,7 @@ public abstract class UserLoginTests
         [Fact]
         public async Task Test_ShowUsersAsUnAuthenticatedShouldUnauthorized()
         {
-            await CheckForError(() => Client.GetAsync("/user/all"),
+            await CheckForError(() => Client.GetAsync(Routes.User.All),
                 HttpStatusCode.Unauthorized,
                 ErrorDTO.Unauthorized);
         }
@@ -81,21 +82,22 @@ public abstract class UserLoginTests
         [Fact]
         public async Task Test_UserDetails_NotLoggedInShouldError()
         {
-            await CheckForError(() => Client.GetAsync("/user/details"),
+            await CheckForError(() => Client.GetAsync(Routes.User.Details),
                 HttpStatusCode.Unauthorized,
                 ErrorDTO.Unauthorized);
         }
 
         [Theory]
-        [InlineData("teacher1", "Emma", "Johnson", "Teacher", "Icon2")]
-        [InlineData("parent1", "Liam", "Smith", "Parent", "Icon1")]
-        [InlineData("admin", "Admin", "Admin", "Admin", "Icon3")]
+        [InlineData("teacher1", "Emma", "Johnson", "Teacher", 1)]
+        [InlineData("parent1", "Liam", "Smith", "Parent", 0)]
+        [InlineData("admin", "Admin", "Admin", "Admin", 2)]
         public async Task Test_UserDetails_Basic(string username, string firstName, string lastName, string role,
-            string icon)
+            int icon)
         {
-            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync($"/user/details", username),
+            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync(Routes.User.Details, username),
                 HttpStatusCode.OK,
-                content => {
+                content =>
+                {
                     Assert.Equal(username, content.Username);
                     Assert.Equal(firstName, content.FirstName);
                     Assert.Equal(lastName, content.LastName);
@@ -107,59 +109,9 @@ public abstract class UserLoginTests
         [Fact]
         public async Task Test_UserEdit_NotLoggedInShouldError()
         {
-            await CheckForError(() => Client.PostAsync("/user/edit"),
+            await CheckForError(() => Client.PutAsync(Routes.User.Details),
                 HttpStatusCode.Unauthorized,
                 ErrorDTO.Unauthorized);
-        }
-
-        [Theory]
-        [InlineData("teacher1", "IconX")]
-        [InlineData("parent1", "Blah")]
-        [InlineData("admin", "Iconzzzz")]
-        public async Task Test_UserEdit_IconOnlyInvalid(string username, string newIcon)
-        {
-            await CheckForError(() => Client.PostPayloadAsync("/user/edit",
-                    new UserDetailsEditDTO(Icon: newIcon), username),
-                HttpStatusCode.UnprocessableEntity,
-                ErrorDTO.InvalidIconIndex);
-            
-            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync($"/user/details", username),
-                HttpStatusCode.OK,
-                content => {
-                    Assert.Equal(username, content.Username);
-                    Assert.NotEqual(newIcon, content.Icon);
-                });
-        }
-
-        [Theory]
-        [InlineData("teacher1", "NewFirstName", "NewLastName", "BadIconIndex", "NewPassWord")]
-        [InlineData("parent1", "NewFirstName", "NewLastName", "BadIconIndex", "NewPassWord")]
-        [InlineData("admin", "NewFirstName", "NewLastName", "BadIconIndex", "NewPassWord")]
-        public async Task Test_UserEdit_AllValidExceptIcon(string username, string newFirstName, string newLastName,
-            string newIcon, string newPassword)
-        {
-            await CheckForError(() => Client.PostPayloadAsync("/user/edit",
-                    new UserDetailsEditDTO(newFirstName, newLastName, newIcon, newPassword), username),
-                HttpStatusCode.UnprocessableEntity,
-                ErrorDTO.InvalidIconIndex);
-
-            // Clear token to force re-login with new password
-            Client.DefaultRequestHeaders.Authorization = null;
-
-            // Ensure that password did not change
-            await CheckForError(() => Client.PostPayloadAsync("/user/login",
-                    new UserLoginDTO(username, newPassword), username),
-                HttpStatusCode.BadRequest,
-                ErrorDTO.LoginFailure);
-
-            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync($"/user/details", username),
-                HttpStatusCode.OK,
-                content => {
-                    Assert.Equal(username, content.Username);
-                    Assert.NotEqual(newFirstName, content.FirstName);
-                    Assert.NotEqual(newLastName, content.LastName);
-                    Assert.NotEqual(newIcon, content.Icon);
-                });
         }
     }
 
@@ -171,12 +123,12 @@ public abstract class UserLoginTests
         [InlineData("testTeacher", "testName", false)]
         public async Task Test_CreateNewUser_Basic(string username, string name, bool isParent)
         {
-            await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync($"/user/register", 
+            await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync(Routes.User.Register,
                     new UserRegisterDTO(username, username, name, name, isParent)),
                 HttpStatusCode.OK,
                 content =>
                     Assert.NotNull(content.Token)
-                );
+            );
         }
 
         [Theory]
@@ -184,19 +136,19 @@ public abstract class UserLoginTests
         [InlineData("testTeacher", "testName", false)]
         public async Task Test_CreateNewUser_ThenLogin(string username, string name, bool isParent)
         {
-            await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync($"/user/register", 
+            await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync(Routes.User.Register,
                     new UserRegisterDTO(username, username, name, name, isParent)),
                 HttpStatusCode.OK,
                 content =>
                     Assert.NotNull(content.Token)
-                );
-            
-            await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync($"/user/login", 
+            );
+
+            await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync(Routes.User.Login,
                     new UserLoginDTO(username, username)),
                 HttpStatusCode.OK,
                 content =>
                     Assert.NotNull(content.Token)
-                );
+            );
         }
 
         [Theory]
@@ -205,17 +157,19 @@ public abstract class UserLoginTests
         [InlineData("admin", "Name")]
         public async Task Test_UserEdit_FirstNameOnly(string username, string newFirstName)
         {
-            await CheckResponse<UserDetailsDTO>(async () => await Client.PostPayloadAsync($"/user/edit", 
+            await CheckResponse<UserDetailsDTO>(async () => await Client.PutPayloadAsync(Routes.User.Details,
                     new UserDetailsEditDTO(FirstName: newFirstName), username),
                 HttpStatusCode.OK,
-                content => {
+                content =>
+                {
                     Assert.Equal(username, content.Username);
                     Assert.Equal(newFirstName, content.FirstName);
                 });
-            
-            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync($"/user/details", username),
+
+            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync(Routes.User.Details, username),
                 HttpStatusCode.OK,
-                content => {
+                content =>
+                {
                     Assert.Equal(username, content.Username);
                     Assert.Equal(newFirstName, content.FirstName);
                 });
@@ -227,39 +181,43 @@ public abstract class UserLoginTests
         [InlineData("admin", "Name")]
         public async Task Test_UserEdit_LastNameOnly(string username, string newLastName)
         {
-            await CheckResponse<UserDetailsDTO>(async () => await Client.PostPayloadAsync($"/user/edit", 
+            await CheckResponse<UserDetailsDTO>(async () => await Client.PutPayloadAsync(Routes.User.Details,
                     new UserDetailsEditDTO(LastName: newLastName), username),
                 HttpStatusCode.OK,
-                content => {
+                content =>
+                {
                     Assert.Equal(username, content.Username);
                     Assert.Equal(newLastName, content.LastName);
                 });
-            
-            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync($"/user/details", username),
+
+            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync(Routes.User.Details, username),
                 HttpStatusCode.OK,
-                content => {
+                content =>
+                {
                     Assert.Equal(username, content.Username);
                     Assert.Equal(newLastName, content.LastName);
                 });
         }
 
         [Theory]
-        [InlineData("teacher1", "Icon1")]
-        [InlineData("parent1", "Icon3")]
-        [InlineData("admin", "Icon3")]
-        public async Task Test_UserEdit_IconOnly(string username, string newIcon)
+        [InlineData("teacher1", 0)]
+        [InlineData("parent1", 2)]
+        [InlineData("admin", 1)]
+        public async Task Test_UserEdit_IconOnly(string username, int newIcon)
         {
-            await CheckResponse<UserDetailsDTO>(async () => await Client.PostPayloadAsync($"/user/edit", 
+            await CheckResponse<UserDetailsDTO>(async () => await Client.PutPayloadAsync(Routes.User.Details,
                     new UserDetailsEditDTO(Icon: newIcon), username),
                 HttpStatusCode.OK,
-                content => {
+                content =>
+                {
                     Assert.Equal(username, content.Username);
                     Assert.Equal(newIcon, content.Icon);
                 });
-            
-            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync($"/user/details", username),
+
+            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync(Routes.User.Details, username),
                 HttpStatusCode.OK,
-                content => {
+                content =>
+                {
                     Assert.Equal(username, content.Username);
                     Assert.Equal(newIcon, content.Icon);
                 });
@@ -271,43 +229,42 @@ public abstract class UserLoginTests
         [InlineData("admin", "NewPassWord")]
         public async Task Test_UserEdit_PasswordOnly(string username, string newPassword)
         {
-            await CheckResponse<UserDetailsDTO>(async () => await Client.PostPayloadAsync($"/user/edit", 
+            await CheckResponse<UserDetailsDTO>(async () => await Client.PutPayloadAsync(Routes.User.Details,
                     new UserDetailsEditDTO(Password: newPassword), username),
                 HttpStatusCode.OK,
-                content => {
-                    Assert.Equal(username, content.Username);
-                });
+                content => { Assert.Equal(username, content.Username); });
 
             // Clear token to force re-login with new password
             Client.DefaultRequestHeaders.Authorization = null;
-            
-            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync($"/user/details", username, newPassword),
+
+            await CheckResponse<UserDetailsDTO>(
+                async () => await Client.GetAsync(Routes.User.Details, username, newPassword),
                 HttpStatusCode.OK,
-                content => {
-                    Assert.Equal(username, content.Username);
-                });
+                content => { Assert.Equal(username, content.Username); });
         }
 
         [Theory]
-        [InlineData("teacher1", "NewFirstName", "NewLastName", "Icon2", "NewPassWord")]
-        [InlineData("parent1", "NewFirstName", "NewLastName", "Icon2", "NewPassWord")]
-        [InlineData("admin", "NewFirstName", "NewLastName", "Icon2", "NewPassWord")]
+        [InlineData("teacher1", "NewFirstName", "NewLastName", 3, "NewPassWord")]
+        [InlineData("parent1", "NewFirstName", "NewLastName", 3, "NewPassWord")]
+        [InlineData("admin", "NewFirstName", "NewLastName", 3, "NewPassWord")]
         public async Task Test_UserEdit_AllValid(string username, string newFirstName, string newLastName,
-            string newIcon, string newPassword)
+            int newIcon, string newPassword)
         {
-            await CheckResponse<UserDetailsDTO>(async () => await Client.PostPayloadAsync($"/user/edit", 
+            await CheckResponse<UserDetailsDTO>(async () => await Client.PutPayloadAsync(Routes.User.Details,
                     new UserDetailsEditDTO(newFirstName, newLastName, newIcon, newPassword), username),
                 HttpStatusCode.OK,
-                content => {
+                content =>
+                {
                     Assert.Equal(username, content.Username);
                     Assert.Equal(newFirstName, content.FirstName);
                     Assert.Equal(newLastName, content.LastName);
                     Assert.Equal(newIcon, content.Icon);
                 });
-            
-            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync($"/user/details", username),
+
+            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync(Routes.User.Details, username),
                 HttpStatusCode.OK,
-                content => {
+                content =>
+                {
                     Assert.Equal(username, content.Username);
                     Assert.Equal(newFirstName, content.FirstName);
                     Assert.Equal(newLastName, content.LastName);

@@ -45,7 +45,7 @@ public record UserLoginDTO(
 /// <param name="Token"></param>
 public record UserLoginSuccessDTO(string Token);
 
-public record UserDetailsDTO(string Username, string FirstName, string LastName, string Role, string Icon)
+public record UserDetailsDTO(string Username, string FirstName, string LastName, string Role, int Icon)
 {
     public static UserDetailsDTO From(User userLogin)
     {
@@ -67,7 +67,7 @@ public record UserDetailsDTO(string Username, string FirstName, string LastName,
             userLogin.FirstName, 
             userLogin.LastName, 
             role.ToString(),
-            userLogin.UserIcon.ToString());
+            userLogin.UserIcon);
     }
 }
 
@@ -78,7 +78,8 @@ public record UserDetailsEditDTO(
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)] 
     string? LastName = null, 
     
-    string? Icon = null, 
+    [Range(0, int.MaxValue, ErrorMessage = "{0} must be a positive integer.")]
+    int? Icon = null, 
     
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     string? Password = null);

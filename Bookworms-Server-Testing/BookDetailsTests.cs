@@ -19,7 +19,7 @@ public class BookDetailsTests(AppFactory<Program> factory) : BaseTestReadOnlyFix
     [InlineData("OL48763W", "1570982066")]
     public async Task Test_GetBookDetails(string bookId, string isbn10)
     {
-        await CheckResponse<BookDetailsDTO>(async () => await Client.GetAsync($"/books/{bookId}/details"),
+        await CheckResponse<BookDetailsDTO>(async () => await Client.GetAsync(Routes.Books.Details(bookId)),
             HttpStatusCode.OK,
             content =>
             {
@@ -32,7 +32,7 @@ public class BookDetailsTests(AppFactory<Program> factory) : BaseTestReadOnlyFix
     [InlineData("abc123")]
     public async Task Test_GetBookDetails_InvalidBookId(string bookId)
     {
-        await CheckForError(() => Client.GetAsync($"/books/{bookId}/details"), 
+        await CheckForError(() => Client.GetAsync(Routes.Books.Details(bookId)), 
             HttpStatusCode.NotFound, 
             ErrorDTO.BookNotFound);
     }
@@ -42,7 +42,7 @@ public class BookDetailsTests(AppFactory<Program> factory) : BaseTestReadOnlyFix
     [InlineData("OL48763W", "cc278287bca068865216ecbcc8fa37ab")]
     public async Task Test_GetImage(string bookId, string md5Hash)
     {
-        HttpResponseMessage response = await Client.GetAsync($"/books/{bookId}/cover");
+        HttpResponseMessage response = await Client.GetAsync(Routes.Books.Cover(bookId));
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         byte[] content = await response.Content.ReadAsByteArrayAsync();
@@ -58,7 +58,7 @@ public class BookDetailsTests(AppFactory<Program> factory) : BaseTestReadOnlyFix
     [InlineData("OL3368288W", "f6269ead8320cd8c5c2bfac121fe0019","OL48763W", "cc278287bca068865216ecbcc8fa37ab")]
     public async Task Test_GetImageBatch(string bookId1, string md5Hash1, string bookId2, string md5Hash2)
     {
-        HttpResponseMessage response = await Client.PostAsJsonAsync("/books/covers", new List<string>([bookId1, bookId2]));
+        HttpResponseMessage response = await Client.PostAsJsonAsync(Routes.Books.CoverBatch, new List<string>([bookId1, bookId2]));
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         byte[] content = await response.Content.ReadAsByteArrayAsync();

@@ -6,7 +6,7 @@
     "firstName": "Audrey", 
     "lastName": "Hepburn",
     "email": "audreyhepburn@gmail.com",
-    "userIcon": "Icon1"
+    "userIcon": 0
   },
   {
     "username": "parent1",
@@ -15,7 +15,7 @@
     "firstName": "Liam", 
     "lastName": "Smith",
     "email": "liam.smith@hotmail.com",
-    "userIcon": "Icon1"
+    "userIcon": 0
   },
   {
     "username": "parent2",
@@ -24,7 +24,7 @@
     "firstName": "Noah", 
     "lastName": "Davis",
     "email": "noah.davis@outlook.com",
-    "userIcon": "Icon1"
+    "userIcon": 0
   },
   {
     "username": "parent3",
@@ -33,7 +33,7 @@
     "firstName": "William", 
     "lastName": "Martinez",
     "email": "william.martinez@gmail.com",
-    "userIcon": "Icon1"
+    "userIcon": 0
   },
   {
     "username": "parent4",
@@ -42,7 +42,7 @@
     "firstName": "James", 
     "lastName": "Taylor",
     "email": "james.taylor@gmail.com",
-    "userIcon": "Icon1"
+    "userIcon": 0
   },
   {
     "username": "parent5",
@@ -51,6 +51,6 @@
     "firstName": "Benjamin", 
     "lastName": "Van Moore",
     "email": "benjamin.moore@gmail.com",
-    "userIcon": "Icon1"
+    "userIcon": 0
   }
 ]

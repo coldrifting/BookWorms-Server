@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using System.Text.Json.Nodes;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services.Interfaces;
@@ -15,12 +14,12 @@ namespace BookwormsServer.Controllers;
 public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService bookApiService) : ControllerBase
 {
     /// <summary>
-    /// Returns details about the given book
+    /// Returns details about a book
     /// </summary>
     /// <param name="bookId">The Google Books ID of the book to target</param>
     /// <returns>A BookDetailsDTO object</returns>
-    /// <response code="200">Returns the book details</response>
-    /// <response code="404">If the specified book is not found</response>
+    /// <response code="200">Success</response>
+    /// <response code="404">The book is not found</response>
     [HttpGet]
     [Route("/books/{bookId}/details")]
     [ResponseCache(Duration = 60)]
@@ -43,12 +42,12 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     }
 
     /// <summary>
-    /// Returns the cover image for the specified book
+    /// Gets the cover image for a book
     /// </summary>
     /// <param name="bookId">The Google Books ID of the book to target</param>
     /// <returns>A JPEG file</returns>
-    /// <response code="200">Returns the cover image</response>
-    /// <response code="404">If the specified book is not found</response>
+    /// <response code="200">Success</response>
+    /// <response code="404">The book is not found</response>
     [HttpGet]
     [Route("/books/{bookId}/cover")]
     [ProducesResponseType(typeof(Task<IActionResult>), StatusCodes.Status200OK, "image/jpeg", Type = typeof(File))]
@@ -76,11 +75,11 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     }
 
     /// <summary>
-    /// Returns the cover images for the books specified in the request body
+    /// Gets the cover images for a list of books
     /// </summary>
     /// <param name="bookIds">The Google Books IDs of the books to target</param>
-    /// <returns>A zip archive of JPEG files</returns>
-    /// <response code="200">Returns the zip archive of cover images</response>
+    /// <returns>A zip archive of book cover images</returns>
+    /// <response code="200">Success</response>
     [HttpPost]
     [Route("/books/covers")]
     [ProducesResponseType(typeof(Task<IActionResult>), StatusCodes.Status200OK, "application/zip", Type = typeof(File))]

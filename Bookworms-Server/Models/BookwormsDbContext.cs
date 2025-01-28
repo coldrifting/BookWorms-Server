@@ -62,16 +62,6 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 		var children = JsonSerializer.Deserialize<List<Child>>(childData, jso)!;
 		Children.AddRange(children);
 		SaveChanges();
-		
-		// Ensure a child is selected if at least one exists under a parent
-		foreach (var child in Children.Include(child => child.Parent))
-		{
-			if (child.Parent is not null && child.Parent.SelectedChild is null)
-			{
-				child.Parent.SelectedChild = child;
-			}
-		}
-		SaveChanges();
 
 		string childBookshelfData = File.ReadAllText("TestData/ChildBookshelfEntities.json");
 		var childBookshelf = JsonSerializer.Deserialize<List<ChildBookshelf>>(childBookshelfData, jso)!;

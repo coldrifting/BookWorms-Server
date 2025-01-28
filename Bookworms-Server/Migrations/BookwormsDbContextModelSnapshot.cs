@@ -248,9 +248,8 @@ namespace BookwormsServer.Migrations
                         .IsRequired()
                         .HasColumnType("longblob");
 
-                    b.Property<string>("UserIcon")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(64)");
+                    b.Property<int>("UserIcon")
+                        .HasColumnType("int");
 
                     b.HasKey("Username");
 
@@ -319,11 +318,6 @@ namespace BookwormsServer.Migrations
             modelBuilder.Entity("BookwormsServer.Models.Entities.Parent", b =>
                 {
                     b.HasBaseType("BookwormsServer.Models.Entities.User");
-
-                    b.Property<Guid?>("SelectedChildId")
-                        .HasColumnType("char(36)");
-
-                    b.HasIndex("SelectedChildId");
 
                     b.ToTable("Users");
 
@@ -482,15 +476,6 @@ namespace BookwormsServer.Migrations
                         .IsRequired();
 
                     b.Navigation("Child");
-                });
-
-            modelBuilder.Entity("BookwormsServer.Models.Entities.Parent", b =>
-                {
-                    b.HasOne("BookwormsServer.Models.Entities.Child", "SelectedChild")
-                        .WithMany()
-                        .HasForeignKey("SelectedChildId");
-
-                    b.Navigation("SelectedChild");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.Teacher", b =>

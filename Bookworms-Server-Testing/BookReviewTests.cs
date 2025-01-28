@@ -15,7 +15,8 @@ public abstract class BookReviewTests
         [InlineData("OL3368288W", "I like green")]
         public async Task Test_GetAllReviews(string bookId, string reviewText)
         {
-            await CheckResponse<List<ReviewDTO>>(async () => await Client.GetAsync($"/books/{bookId}/reviews"),
+            await CheckResponse<List<ReviewDTO>>(
+                async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
                 HttpStatusCode.OK,
                 content => {
                     Assert.NotEmpty(content);
@@ -28,7 +29,7 @@ public abstract class BookReviewTests
         public async Task Test_PutReview_NotLoggedIn(string bookId, double rating, string reviewText)
         {
             await CheckForError(
-                () => Client.PutPayloadAsync($"/books/{bookId}/review",
+                () => Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),
                     new ReviewAddOrUpdateRequestDTO(rating, reviewText)),
                 HttpStatusCode.Unauthorized,
                 ErrorDTO.Unauthorized);
@@ -38,7 +39,8 @@ public abstract class BookReviewTests
         [InlineData("InvalidBookId", "teacher1", 3.5, "some review text")]
         public async Task Test_PutReview_InvalidBookId(string bookId, string username, double rating, string reviewText)
         {
-            await CheckForError(() => Client.PutPayloadAsync($"/books/{bookId}/review",
+            await CheckForError(
+                () => Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),
                     new ReviewAddOrUpdateRequestDTO(rating, reviewText), username),
                 HttpStatusCode.NotFound,
                 ErrorDTO.BookNotFound);
@@ -49,15 +51,18 @@ public abstract class BookReviewTests
         public async Task Test_DeleteReview_NotLoggedIn(string bookId)
         {
             int initialSize = 
-            await CheckResponse<List<ReviewDTO>, int>(async () => await Client.GetAsync($"/books/{bookId}/reviews"),
+            await CheckResponse<List<ReviewDTO>, int>(
+                async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
                 HttpStatusCode.OK,
                 content => content.Count);
 
-            await CheckForError(() => Client.DeleteAsync($"/books/{bookId}/review"),
+            await CheckForError(
+                () => Client.DeleteAsync(Routes.Reviews.Edit(bookId)),
                 HttpStatusCode.Unauthorized,
                 ErrorDTO.Unauthorized);
             
-            await CheckResponse<List<ReviewDTO>>(async () => await Client.GetAsync($"/books/{bookId}/reviews"),
+            await CheckResponse<List<ReviewDTO>>(
+                async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
                 HttpStatusCode.OK,
                 content =>
                 {
@@ -71,7 +76,8 @@ public abstract class BookReviewTests
         [InlineData("InvalidBookId", "teacher0")]
         public async Task Test_DeleteReview_InvalidBookId(string bookId, string username)
         {
-            await CheckForError(() => Client.DeleteAsync($"/books/{bookId}/review", username),
+            await CheckForError(
+                () => Client.DeleteAsync(Routes.Reviews.Edit(bookId), username),
                 HttpStatusCode.NotFound,
                 ErrorDTO.BookNotFound);
         }
@@ -82,7 +88,8 @@ public abstract class BookReviewTests
         [InlineData("OL3368288W", 2, 4, 3)]
         public async Task Test_GetReviews_ByBook(string bookId, int start, int max, int expected)
         {
-            await CheckResponse<List<ReviewDTO>>(async () => await Client.GetAsync($"/books/{bookId}/reviews?start={start}&max={max}"),
+            await CheckResponse<List<ReviewDTO>>(
+                async () => await Client.GetAsync(Routes.Reviews.AllParam(bookId, start, max)),
                 HttpStatusCode.OK,
                 content => {
                     Assert.NotEmpty(content);
@@ -94,7 +101,8 @@ public abstract class BookReviewTests
         [InlineData("OL3368288W", 5)]
         public async Task Test_GetReviews_ByBook_NoParams(string bookId, int expected)
         {
-            await CheckResponse<List<ReviewDTO>>(async () => await Client.GetAsync($"/books/{bookId}/reviews"),
+            await CheckResponse<List<ReviewDTO>>(
+                async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
                 HttpStatusCode.OK,
                 content => {
                     Assert.NotEmpty(content);
@@ -108,7 +116,8 @@ public abstract class BookReviewTests
         [InlineData("InvalidBookId", 5, 3)]
         public async Task Test_GetReviews_ByBook_InvalidBookId(string bookId, int start, int max)
         {
-            await CheckForError(() => Client.GetAsync($"/books/{bookId}/reviews?start={start}&max={max}"),
+            await CheckForError(
+                () => Client.GetAsync(Routes.Reviews.AllParam(bookId, start, max)),
                 HttpStatusCode.NotFound,
                 ErrorDTO.BookNotFound);
         }
@@ -121,7 +130,8 @@ public abstract class BookReviewTests
         [InlineData("OL286593W", "teacher1", 4.5, "some review text")]
         public async Task Test_PutReview_ReviewAlreadyExists(string bookId, string username, double rating, string reviewText)
         {
-            await CheckResponse<ReviewDTO>(async () => await Client.PutPayloadAsync($"/books/{bookId}/review",
+            await CheckResponse<ReviewDTO>(
+                async () => await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),
                 new ReviewAddOrUpdateRequestDTO(rating, reviewText), username),
                 HttpStatusCode.OK,
                 content => {
@@ -136,7 +146,8 @@ public abstract class BookReviewTests
         public async Task Test_PutReview_UpdateRatingAndText(string bookId, string username, double rating,
             string reviewText)
         {
-            await CheckResponse<ReviewDTO>(async () => await Client.PutPayloadAsync($"/books/{bookId}/review",
+            await CheckResponse<ReviewDTO>(
+                async () => await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),
                 new ReviewAddOrUpdateRequestDTO(rating, reviewText), username),
                 HttpStatusCode.OK,
                 content => {
@@ -144,7 +155,8 @@ public abstract class BookReviewTests
                     Assert.Equal(content.StarRating, rating);
                 });
             
-            await CheckResponse<List<ReviewDTO>>(async () => await Client.GetAsync($"/books/{bookId}/reviews"),
+            await CheckResponse<List<ReviewDTO>>(
+                async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
                 HttpStatusCode.OK,
                 content => {
                     Assert.NotEmpty(content);
@@ -158,7 +170,8 @@ public abstract class BookReviewTests
         public async Task Test_PutReview_UpdateRating(string bookId, string username, string reviewerFirstName,
             string reviewerLastName, double rating, string reviewText)
         {
-            await CheckResponse<List<ReviewDTO>>(async () => await Client.GetAsync($"/books/{bookId}/reviews?start=0&max=-1"),
+            await CheckResponse<List<ReviewDTO>>(
+                async () => await Client.GetAsync(Routes.Reviews.AllParam(bookId, 0, -1)),
                 HttpStatusCode.OK,
                 content => {
                     ReviewDTO? originalReview = content.SingleOrDefault(r =>
@@ -166,12 +179,14 @@ public abstract class BookReviewTests
                     Assert.NotNull(originalReview);
                 });
 
-            await CheckResponse<ReviewDTO>(async () => await Client.PutPayloadAsync($"/books/{bookId}/review",
+            await CheckResponse<ReviewDTO>(
+                async () => await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),
                     new ReviewAddOrUpdateRequestDTO(rating, reviewText), username),
                 HttpStatusCode.OK,
                 _ => { });
 
-            await CheckResponse<List<ReviewDTO>>(async () => await Client.GetAsync($"/books/{bookId}/reviews"),
+            await CheckResponse<List<ReviewDTO>>(
+                async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
                 HttpStatusCode.OK,
                 content => {
                     Assert.NotEmpty(content);
@@ -185,7 +200,8 @@ public abstract class BookReviewTests
         public async Task Test_PutReview_UpdateText(string bookId, string username, string reviewerFirstName,
             string reviewerLastName, double rating, string reviewText)
         {
-            await CheckResponse<List<ReviewDTO>>(async () => await Client.GetAsync($"/books/{bookId}/reviews?start=0&max=-1"),
+            await CheckResponse<List<ReviewDTO>>(
+                async () => await Client.GetAsync(Routes.Reviews.AllParam(bookId, 0, -1)),
                 HttpStatusCode.OK,
                 content => {
                     ReviewDTO? originalReview = content.SingleOrDefault(r =>
@@ -193,12 +209,14 @@ public abstract class BookReviewTests
                     Assert.NotNull(originalReview);
                 });
 
-            await CheckResponse<ReviewDTO>(async () => await Client.PutPayloadAsync($"/books/{bookId}/review",
+            await CheckResponse<ReviewDTO>(
+                async () => await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),
                     new ReviewAddOrUpdateRequestDTO(rating, reviewText), username),
                 HttpStatusCode.OK,
                 _ => { });
 
-            await CheckResponse<List<ReviewDTO>>(async () => await Client.GetAsync($"/books/{bookId}/reviews"),
+            await CheckResponse<List<ReviewDTO>>(
+                async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
                 HttpStatusCode.OK,
                 content => {
                     Assert.NotEmpty(content);
@@ -210,7 +228,8 @@ public abstract class BookReviewTests
         [InlineData("OL48763W", "teacher1", "Emma", 3.5, "some review text")]
         public async Task Test_PutReview_NewReview(string bookId, string username, string firstName, double rating, string reviewText)
         {
-            await CheckResponse<ReviewDTO>(async () => await Client.PutPayloadAsync($"/books/{bookId}/review",
+            await CheckResponse<ReviewDTO>(
+                async () => await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),
                 new ReviewAddOrUpdateRequestDTO(rating, reviewText), username),
                 HttpStatusCode.Created,
                 content => {
@@ -218,7 +237,8 @@ public abstract class BookReviewTests
                     Assert.Equal(reviewText, content.ReviewText);
                 });
             
-            await CheckResponse<List<ReviewDTO>>(async () => await Client.GetAsync($"/books/{bookId}/reviews"),
+            await CheckResponse<List<ReviewDTO>>(
+                async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
                 HttpStatusCode.OK,
                 content => {
                     Assert.NotEmpty(content);
@@ -231,16 +251,19 @@ public abstract class BookReviewTests
         [InlineData("OL3368288W", "teacher0", "Sally")]
         public async Task Test_DeleteReview(string bookId, string username, string reviewerFirstName)
         {
-             int initialSize = await CheckResponse<List<ReviewDTO>, int>(async () => await Client.GetAsync($"/books/{bookId}/reviews"),
+             int initialSize = await CheckResponse<List<ReviewDTO>, int>(
+                 async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
                 HttpStatusCode.OK,
                 content => {
                     Assert.NotEmpty(content);
                     return content.Count;
                 });
              
-             await CheckResponse(async () => await Client.DeleteAsync($"/books/{bookId}/review", username), HttpStatusCode.NoContent);
+             await CheckResponse(
+                 async () => await Client.DeleteAsync(Routes.Reviews.Edit(bookId), username), HttpStatusCode.NoContent);
 
-             await CheckResponse<List<ReviewDTO>>(async () => await Client.GetAsync($"/books/{bookId}/reviews"),
+             await CheckResponse<List<ReviewDTO>>(
+                 async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
                 HttpStatusCode.OK,
                 content => {
                     Assert.NotEmpty(content);

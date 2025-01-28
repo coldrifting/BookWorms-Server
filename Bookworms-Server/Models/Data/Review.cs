@@ -2,7 +2,7 @@
 
 namespace BookwormsServer.Models.Data;
 
-public record ReviewDTO(string ReviewerFirstName, string ReviewerLastName, string ReviewerRole, UserIcon ReviewerIcon, DateTime ReviewDate, double StarRating, string ReviewText)
+public record ReviewDTO(string ReviewerFirstName, string ReviewerLastName, string ReviewerRole, int ReviewerIcon, DateTime ReviewDate, double StarRating, string ReviewText)
 {
     public static ReviewDTO From(Review r)
     {

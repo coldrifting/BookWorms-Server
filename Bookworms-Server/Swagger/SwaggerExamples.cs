@@ -32,7 +32,7 @@ public static class SwaggerExamples
                         "Liam",
                         "Smith",
                         "Parent",
-                        UserIcon.Icon1,
+                        0,
                         new(2024, 01, 31),
                         0,
                         "We loved the colorful pictures and silly characters")
@@ -56,7 +56,7 @@ public static class SwaggerExamples
     {
         public ChildEditDTO GetExamples()
         {
-            return new("New_Child_Name", UserIcon.Icon1.ToString(), "READA7", "WLF359", DateOnly.Parse("2017-3-4"));
+            return new("New_Child_Name", 0, "READA7", "WLF359", DateOnly.Parse("2017-3-4"));
         }
     }
 
@@ -64,7 +64,7 @@ public static class SwaggerExamples
     {
         public ChildResponseDTO GetExamples()
         {
-            return new(Guid.NewGuid(), "Jackson", UserIcon.Icon2.ToString(), "A5", "CLS098", DateOnly.Parse("2015-04-15"), true);
+            return new(Guid.NewGuid(), "Jackson", 1, "A5", "CLS098", DateOnly.Parse("2015-04-15"));
         }
     }
     
@@ -74,9 +74,9 @@ public static class SwaggerExamples
         {
             return
             [
-                new(Guid.NewGuid(),"Ashley", UserIcon.Icon1.ToString(),  "A7", "CLS098", DateOnly.Parse("2014-08-23"), true),
-                new(Guid.NewGuid(),"Miles", UserIcon.Icon2.ToString(), "B4", "CLS498", null, null),
-                new(Guid.NewGuid(),"Joey", UserIcon.Icon3.ToString(), null, null, DateOnly.Parse("2015-04-15"), null)
+                new(Guid.NewGuid(),"Ashley", 0,  "A7", "CLS098", DateOnly.Parse("2014-08-23")),
+                new(Guid.NewGuid(),"Miles", 1, "B4", "CLS498", null),
+                new(Guid.NewGuid(),"Joey", 2, null, null, DateOnly.Parse("2015-04-15"))
             ];
         }
     }
@@ -92,7 +92,7 @@ public static class SwaggerExamples
                 "Emma",
                 "Johnson",
                 "Teacher",
-                UserIcon.Icon1,
+                0,
                 new(2024, 01, 30),
                 5.0,
                 "Such a sweet and touching story.");
@@ -105,10 +105,10 @@ public static class SwaggerExamples
         {
             return
             [
-                new("Olivia", "Brown", "Teacher", UserIcon.Icon1, new(2024, 02, 15), 0.5, "Heartwarming and enjoyable"),
-                new("Isabella", "Thomas", "Teacher", UserIcon.Icon1, new(2024, 02, 03), 2,
+                new("Olivia", "Brown", "Teacher", 0, new(2024, 02, 15), 0.5, "Heartwarming and enjoyable"),
+                new("Isabella", "Thomas", "Teacher", 0, new(2024, 02, 03), 2,
                     "A heartwarming book that we cherished"),
-                new("Noah", "Davis", "Parent", UserIcon.Icon1, new(2024, 01, 11), 2.5,
+                new("Noah", "Davis", "Parent", 0, new(2024, 01, 11), 2.5,
                     "An exciting adventure we couldn't put down."),
             ];
         }
@@ -171,7 +171,7 @@ public static class SwaggerExamples
     {
         public UserDetailsDTO GetExamples()
         {
-            return new("_username_", "_password_", "John Jackson", "Teacher", "Icon1");
+            return new("_username_", "_password_", "John Jackson", "Teacher", 0);
         }
     }
 
@@ -181,9 +181,9 @@ public static class SwaggerExamples
         {
             return
             [
-                new("_username_", "_password_", "John Jackson", "Teacher", "Icon1"),
-                new("_username_", "_password_", "Ashley Reed", "Parent", "Icon3"),
-                new("_username_", "_password_", "Wyatt Smith", "Admin", "Icon2"),
+                new("_username_", "_password_", "John Jackson", "Teacher", 0),
+                new("_username_", "_password_", "Ashley Reed", "Parent", 2),
+                new("_username_", "_password_", "Wyatt Smith", "Admin", 1),
             ];
         }
     }

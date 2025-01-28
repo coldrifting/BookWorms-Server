@@ -7,7 +7,8 @@ public record ChildEditDTO(
     [StringLength(256, MinimumLength = 2, ErrorMessage = "Child name must be between {2} and {1} characters long.")]
     string? NewName = null,
 
-    string? ChildIcon = null,
+    [Range(0, int.MaxValue, ErrorMessage = "{0} must be a positive integer.")]
+    int? ChildIcon = null,
 
     [StringLength(6)] string? ReadingLevel = null,
 
@@ -18,10 +19,10 @@ public record ChildEditDTO(
         ErrorMessage = "Child date of birth must fall between {1} and {2}.")]
     DateOnly? DateOfBirth = null);
 
-public record ChildResponseDTO(Guid ChildId, string Name, string ChildIcon, string? ReadingLevel, string? ClassroomCode, DateOnly? DateOfBirth, bool? Selected)
+public record ChildResponseDTO(Guid ChildId, string Name, int? ChildIcon, string? ReadingLevel, string? ClassroomCode, DateOnly? DateOfBirth)
 {
-    public static ChildResponseDTO From(Child child, bool? selected = null)
+    public static ChildResponseDTO From(Child child)
     {
-        return new(child.ChildId, child.Name, child.ChildIcon.ToString(), child.ReadingLevel, child.ClassroomCode, child.DateOfBirth, selected);
+        return new(child.ChildId, child.Name, child.ChildIcon, child.ReadingLevel, child.ClassroomCode, child.DateOfBirth);
     }
 }
