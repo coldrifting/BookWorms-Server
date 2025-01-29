@@ -26,30 +26,16 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     public IActionResult All()
     {
-        List<User> users = dbContext.Set<User>().ToList();
+        string curUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var curUser = dbContext.Users.First(l => l.Username == curUsername);
 
-        // Must not be null due to Authorize attribute
-        string loggedInUser = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        
-        if (User.FindFirst(ClaimTypes.Role)?.Value != "Admin")
+        if (!curUser.IsAdmin())
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotAdmin);
         }
         
-        // Put logged-in user at top of list
-        for (int i = 0; i < users.Count; i++)
-        {
-            if (users[0].Username != loggedInUser)
-            {
-                continue;
-            }
-            
-            (users[i], users[0]) = (users[0], users[i]);
-            break;
-        }
-
         List<UserDetailsDTO> usersFormatted = [];
-        usersFormatted.AddRange(users.Select(UserDetailsDTO.From));
+        usersFormatted.AddRange(dbContext.Users.Select(UserDetailsDTO.From));
 
         return Ok(usersFormatted);
     }
@@ -163,14 +149,11 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
             0, payload.IsParent);
         switch (user)
         {
-            case Parent p:
-                dbContext.Parents.Add(p);
-                break;
             case Teacher t:
                 dbContext.Teachers.Add(t);
                 break;
-            default:
-                dbContext.Users.Add(user);
+            case Parent p:
+                dbContext.Parents.Add(p);
                 break;
         }
 
@@ -179,5 +162,49 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
         // Send JWT token to avoid expensive hash calls for each authenticated endpoint
         string token = AuthService.GenerateToken(userMatch.First());
         return Ok(new UserLoginSuccessDTO(token));
+    }
+
+    /// <summary>
+    /// Deletes the logged in or specified user 
+    /// </summary>
+    /// <param username="username">The user to delete if not deleting own account</param>
+    /// <response code="204">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a parent</response>
+    /// <response code="404">The user to delete does not exist</response>
+    [HttpDelete]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    public IActionResult Delete([FromQuery] string? username = null)
+    {
+        string curUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var curUser = dbContext.Users.First(l => l.Username == curUsername);
+            
+        // Own account deletion
+        if (username is null)
+        {
+            dbContext.Users.Remove(curUser);
+            dbContext.SaveChanges();
+            return NoContent();
+        }
+        
+        // Delete other accounts
+        if (!curUser.IsAdmin())
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotAdmin);
+        }
+        
+        var userToDelete = dbContext.Users.FirstOrDefault(l => l.Username == username);
+        if (userToDelete is null)
+        {
+            return UnprocessableEntity(ErrorDTO.UserNotFound);
+        }
+        
+        dbContext.Users.Remove(userToDelete);
+        dbContext.SaveChanges();
+        return NoContent();
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BookwormsServer.Models.Data;
 
 namespace BookwormsServer.Models.Entities;
 
@@ -35,6 +34,11 @@ public class User(string username, byte[] hash, byte[] salt, string firstName, s
     // Navigation
 
     public ICollection<Review> Reviews { get; set; } = null!;
+
+    public bool IsAdmin()
+    {
+        return Roles.Contains("Admin");
+    }
 }
 
 public class Parent(string username, byte[] hash, byte[] salt, string firstName, string lastName, int userIcon)

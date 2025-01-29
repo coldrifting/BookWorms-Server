@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using BookwormsServer;
 using BookwormsServer.Models.Data;
+using BookwormsServer.Models.Entities;
 using BookwormsServerTesting.Templates;
 using static BookwormsServerTesting.Templates.Common;
 
@@ -112,6 +113,33 @@ public abstract class UserLoginTests
             await CheckForError(() => Client.PutAsync(Routes.User.Details),
                 HttpStatusCode.Unauthorized,
                 ErrorDTO.Unauthorized);
+        }
+
+        [Theory]
+        [InlineData("admin", "usernameDoesNotExist")]
+        public async Task Test_DeleteOtherUserNotExist_FromAdmin(string username, string usernameToDelete)
+        {
+            int numUsers = Context.Users.Count();
+            
+            await CheckForError(
+                async () => await Client.DeleteAsync(Routes.User.DeleteParam(usernameToDelete), username),
+                HttpStatusCode.UnprocessableEntity,
+                ErrorDTO.UserNotFound);
+
+            Assert.Equal(numUsers, Context.Users.Count());
+        }
+
+        [Theory]
+        [InlineData("parent3", "parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229")]
+        [InlineData("teacher4", "parent3", "3eda09c6-53ee-44a4-b784-fbd90d5b7b1f")]
+        public async Task Test_DeleteOtherUser_FromNonAdmin(string username, string usernameToDelete, Guid childId)
+        {
+            await CheckForError(
+                async () => await Client.DeleteAsync(Routes.User.DeleteParam(usernameToDelete), username),
+                HttpStatusCode.Forbidden,
+                ErrorDTO.UserNotAdmin);
+
+            Assert.Contains(Context.ChildBookshelves, cb => cb.ChildId == childId);
         }
     }
 
@@ -250,7 +278,8 @@ public abstract class UserLoginTests
         public async Task Test_UserEdit_AllValid(string username, string newFirstName, string newLastName,
             int newIcon, string newPassword)
         {
-            await CheckResponse<UserDetailsDTO>(async () => await Client.PutPayloadAsync(Routes.User.Details,
+            await CheckResponse<UserDetailsDTO>(
+                async () => await Client.PutPayloadAsync(Routes.User.Details,
                     new UserDetailsEditDTO(newFirstName, newLastName, newIcon, newPassword), username),
                 HttpStatusCode.OK,
                 content =>
@@ -261,7 +290,8 @@ public abstract class UserLoginTests
                     Assert.Equal(newIcon, content.Icon);
                 });
 
-            await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync(Routes.User.Details, username),
+            await CheckResponse<UserDetailsDTO>(
+                async () => await Client.GetAsync(Routes.User.Details, username),
                 HttpStatusCode.OK,
                 content =>
                 {
@@ -270,6 +300,76 @@ public abstract class UserLoginTests
                     Assert.Equal(newLastName, content.LastName);
                     Assert.Equal(newIcon, content.Icon);
                 });
+        }
+
+        [Theory]
+        [InlineData("parent0")]
+        [InlineData("parent3")]
+        [InlineData("teacher2")]
+        [InlineData("admin")]
+        public async Task Test_DeleteUser_Basic(string username)
+        {
+            await CheckResponse(
+                async () => await Client.DeleteAsync(Routes.User.Delete, username),
+                HttpStatusCode.NoContent);
+            
+            // Make sure any future requests are denied even though token may still be valid
+            await CheckForError(
+                async () => await Client.DeleteAsync(Routes.User.Delete, username),
+                HttpStatusCode.Unauthorized,
+                ErrorDTO.Unauthorized);
+
+            await CheckForError(
+                async () => await Client.PostPayloadAsync(Routes.User.Login, new UserLoginDTO(username, username)), 
+                HttpStatusCode.BadRequest,
+                ErrorDTO.LoginFailure);
+
+            await CheckForError(
+                async () => await Client.GetAsync(Routes.User.Details), 
+                HttpStatusCode.Unauthorized,
+                ErrorDTO.Unauthorized);
+        }
+
+        [Theory]
+        [InlineData("parent1")]
+        [InlineData("parent3")]
+        public async Task Test_DeleteUser_DeletesChildren(string username)
+        {
+            await CheckResponse(
+                async () => await Client.DeleteAsync(Routes.User.Delete, username),
+                HttpStatusCode.NoContent);
+
+            Child? child = Context.Children.FirstOrDefault(c => c.ParentUsername == username);
+            Assert.Null(child);
+        }
+
+        [Theory]
+        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229")]
+        [InlineData("parent3", "3eda09c6-53ee-44a4-b784-fbd90d5b7b1f")]
+        public async Task Test_DeleteUser_DeletesChildrenBookshelves(string username, Guid childId)
+        {
+            await CheckResponse(
+                async () => await Client.DeleteAsync(Routes.User.Delete, username),
+                HttpStatusCode.NoContent);
+
+            ChildBookshelf? childBookshelf = Context.ChildBookshelves.FirstOrDefault(cb => cb.ChildId == childId);
+            Assert.Null(childBookshelf);
+        }
+
+        [Theory]
+        [InlineData("admin", "parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229")]
+        [InlineData("admin", "parent3", "3eda09c6-53ee-44a4-b784-fbd90d5b7b1f")]
+        public async Task Test_DeleteOtherUser_FromAdmin(string username, string usernameToDelete, Guid childId)
+        {
+            await CheckResponse(
+                async () => await Client.DeleteAsync(Routes.User.DeleteParam(usernameToDelete), username),
+                HttpStatusCode.NoContent);
+
+            User? deletedUser = Context.Users.FirstOrDefault(u => u.Username == usernameToDelete);
+            Assert.Null(deletedUser);
+
+            ChildBookshelf? childBookshelf = Context.ChildBookshelves.FirstOrDefault(cb => cb.ChildId == childId);
+            Assert.Null(childBookshelf);
         }
     }
 }

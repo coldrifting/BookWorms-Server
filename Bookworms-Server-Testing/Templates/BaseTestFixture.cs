@@ -6,46 +6,32 @@ namespace BookwormsServerTesting.Templates;
 
 public abstract class BaseTestReadOnlyFixture(WebApplicationFactory<Program> factory) : IAsyncLifetime, IClassFixture<AppFactory<Program>>
 {
-    private AsyncServiceScope _scope;
     protected HttpClient Client = null!;
+    protected AsyncServiceScope Scope;
+    protected BookwormsDbContext Context = null!;
 
     public virtual Task InitializeAsync()
     {
         Client = factory.CreateClient();
         Client.DefaultRequestHeaders.Add("Accept", "application/json");
-        
-        _scope = factory.Services.CreateAsyncScope();
+        Scope = factory.Services.CreateAsyncScope();
+        Context = Scope.ServiceProvider.GetService<BookwormsDbContext>()!;
         
         return Task.CompletedTask;
     }
 
     public virtual async Task DisposeAsync()
     {
-        await _scope.DisposeAsync();
+        await Scope.DisposeAsync();
     }
 }
 
-public abstract class BaseTestWriteFixture(WebApplicationFactory<Program> factory) : IAsyncLifetime, IClassFixture<AppFactory<Program>>
+public abstract class BaseTestWriteFixture(WebApplicationFactory<Program> factory) : BaseTestReadOnlyFixture(factory)
 {
-    private AsyncServiceScope _scope;
-    private BookwormsDbContext? _context;
-    protected HttpClient Client = null!;
-
-    public virtual Task InitializeAsync()
+    public override async Task DisposeAsync()
     {
-        Client = factory.CreateClient();
-        Client.DefaultRequestHeaders.Add("Accept", "application/json");
+        Context.SeedTestData();
         
-        _scope = factory.Services.CreateAsyncScope();
-        _context = _scope.ServiceProvider.GetService<BookwormsDbContext>();
-        
-        return Task.CompletedTask;
-    }
-
-    public virtual async Task DisposeAsync()
-    {
-        _context?.SeedTestData();
-        
-        await _scope.DisposeAsync();
+        await Scope.DisposeAsync();
     }
 }

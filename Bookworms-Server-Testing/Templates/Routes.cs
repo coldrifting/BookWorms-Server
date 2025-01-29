@@ -70,5 +70,9 @@ public abstract class Routes
             "/user/login";
         public static string Register => 
             "/user/register";
+        public static string Delete => 
+            "/user/delete";
+        public static string DeleteParam(string username) => 
+            $"/user/delete?username={username}";
     }
 }

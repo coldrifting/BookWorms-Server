@@ -70,6 +70,23 @@ public static class AuthService
 	            context.Response.StatusCode = 403;
 
 	            return context.Response.WriteAsJsonAsync(ErrorDTO.Forbidden);
+		    },
+		    OnTokenValidated = context =>
+		    {
+			    var dbContext = context.HttpContext.RequestServices.GetRequiredService<BookwormsDbContext>();
+
+			    if (context.Principal?.Claims is {} claims)
+			    {
+				    const string usernameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+				    string? username = claims.FirstOrDefault(x => x.Type == usernameClaimType)?.Value;
+				    if (dbContext.Users.Any(u => u.Username == username))
+				    {
+					    return Task.CompletedTask;
+				    }
+			    }
+
+			    context.Fail("Invalid Token");
+				return Task.CompletedTask;
 		    }
 	    };
     }
