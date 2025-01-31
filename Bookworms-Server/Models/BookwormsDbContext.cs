@@ -30,8 +30,9 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 			Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
 	    };
 
-	    Database.EnsureDeleted();
-        Database.Migrate();
+	    // Database.EnsureDeleted();
+        // Database.Migrate();
+		Clear();
         
 	    string userData = File.ReadAllText("TestData/UserEntities.json");
 		var users = JsonSerializer.Deserialize<List<User>>(userData, jso)!;
@@ -75,4 +76,16 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 		
 		SaveChanges();
     }
+
+    public void Clear()
+    {
+	    Database.ExecuteSqlRaw("DELETE FROM BookshelfBooks;");
+	    Database.ExecuteSqlRaw("DELETE FROM Bookshelves;");
+	    Database.ExecuteSqlRaw("DELETE FROM ChildBookshelves;");
+	    Database.ExecuteSqlRaw("DELETE FROM Children;");
+	    Database.ExecuteSqlRaw("DELETE FROM Reviews;");
+	    Database.ExecuteSqlRaw("DELETE FROM Books;");
+	    Database.ExecuteSqlRaw("DELETE FROM Users;");
+    }
+    
 }

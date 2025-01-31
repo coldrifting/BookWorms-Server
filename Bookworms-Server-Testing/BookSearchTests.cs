@@ -1,14 +1,15 @@
 using System.Net;
 using BookwormsServer;
 using BookwormsServer.Models.Data;
+using BookwormsServerTesting.Fixtures;
 using BookwormsServerTesting.Templates;
-
+using Microsoft.AspNetCore.Mvc.Testing;
 using static BookwormsServerTesting.Templates.Common;
 
 namespace BookwormsServerTesting;
 
 [Collection("Integration Tests")]
-public class BookSearchTests(AppFactory<Program> factory) : BaseTestReadOnlyFixture(factory)
+public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
 {
     [Theory]
     [InlineData("The Three R", "The Three Robbers")]

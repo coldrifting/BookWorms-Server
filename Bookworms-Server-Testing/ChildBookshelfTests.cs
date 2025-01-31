@@ -1,7 +1,9 @@
 using System.Net;
 using BookwormsServer;
 using BookwormsServer.Models.Data;
+using BookwormsServerTesting.Fixtures;
 using BookwormsServerTesting.Templates;
+using Microsoft.AspNetCore.Mvc.Testing;
 using static BookwormsServerTesting.Templates.Common;
 
 namespace BookwormsServerTesting;
@@ -9,7 +11,7 @@ namespace BookwormsServerTesting;
 public abstract class ChildBookshelfTests
 {
     [Collection("Integration Tests")]
-    public class ChildBookshelfReadOnlyTests(AppFactory<Program> factory) : BaseTestReadOnlyFixture(factory)
+    public class ChildBookshelfReadOnlyTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
     {
         [Theory]
         [InlineData("2a23200c-8fe0-4c8d-9233-3cf095569c01")]
@@ -375,7 +377,7 @@ public abstract class ChildBookshelfTests
     }
 
     [Collection("Integration Tests")]
-    public class ChildBookshelfWriteTests(AppFactory<Program> factory) : BaseTestWriteFixture(factory)
+    public class ChildBookshelfWriteTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
     {
         [Theory]
         [InlineData("parent2", "08dd3c4b-f197-4657-8556-58c76701802b", "Evelyn's bookshelf (Parent2)", 3)]

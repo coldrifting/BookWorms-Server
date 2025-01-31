@@ -5,6 +5,8 @@ using BookwormsServerTesting.Templates;
 using System.IO.Compression;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
+using BookwormsServerTesting.Fixtures;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.IdentityModel.Tokens;
 
 using static BookwormsServerTesting.Templates.Common;
@@ -12,7 +14,7 @@ using static BookwormsServerTesting.Templates.Common;
 namespace BookwormsServerTesting;
 
 [Collection("Integration Tests")]
-public class BookDetailsTests(AppFactory<Program> factory) : BaseTestReadOnlyFixture(factory)
+public class BookDetailsTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
 {
     [Theory]
     [InlineData("OL3368288W", "0060256656")]

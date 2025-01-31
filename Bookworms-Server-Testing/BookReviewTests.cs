@@ -1,7 +1,9 @@
 using System.Net;
 using BookwormsServer;
 using BookwormsServer.Models.Data;
+using BookwormsServerTesting.Fixtures;
 using BookwormsServerTesting.Templates;
+using Microsoft.AspNetCore.Mvc.Testing;
 using static BookwormsServerTesting.Templates.Common;
 
 namespace BookwormsServerTesting;
@@ -9,7 +11,7 @@ namespace BookwormsServerTesting;
 public abstract class BookReviewTests
 {
     [Collection("Integration Tests")]
-    public class BookReviewReadOnlyTests(AppFactory<Program> factory) : BaseTestReadOnlyFixture(factory)
+    public class BookReviewReadOnlyTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
     {
         [Theory]
         [InlineData("OL3368288W", "I like green")]
@@ -124,7 +126,7 @@ public abstract class BookReviewTests
     }
 
     [Collection("Integration Tests")]
-    public class BookReviewWriteTests(AppFactory<Program> factory) : BaseTestWriteFixture(factory)
+    public class BookReviewWriteTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
     {
         [Theory]
         [InlineData("OL286593W", "teacher1", 4.5, "some review text")]

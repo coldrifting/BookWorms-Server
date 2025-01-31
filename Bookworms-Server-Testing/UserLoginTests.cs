@@ -2,7 +2,9 @@
 using BookwormsServer;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
+using BookwormsServerTesting.Fixtures;
 using BookwormsServerTesting.Templates;
+using Microsoft.AspNetCore.Mvc.Testing;
 using static BookwormsServerTesting.Templates.Common;
 
 namespace BookwormsServerTesting;
@@ -10,7 +12,7 @@ namespace BookwormsServerTesting;
 public abstract class UserLoginTests
 {
     [Collection("Integration Tests")]
-    public class UserLoginReadOnlyTests(AppFactory<Program> factory) : BaseTestReadOnlyFixture(factory)
+    public class UserLoginReadOnlyTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
     {
         [Theory]
         [InlineData("admin", "admin")]
@@ -144,7 +146,7 @@ public abstract class UserLoginTests
     }
 
     [Collection("Integration Tests")]
-    public class UserLoginWriteTests(AppFactory<Program> factory) : BaseTestWriteFixture(factory)
+    public class UserLoginWriteTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
     {
         [Theory]
         [InlineData("testParent", "testParentName", true)]

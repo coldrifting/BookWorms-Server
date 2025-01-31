@@ -1,7 +1,9 @@
 using System.Net;
 using BookwormsServer;
 using BookwormsServer.Models.Data;
+using BookwormsServerTesting.Fixtures;
 using BookwormsServerTesting.Templates;
+using Microsoft.AspNetCore.Mvc.Testing;
 using static BookwormsServerTesting.Templates.Common;
 
 namespace BookwormsServerTesting;
@@ -9,7 +11,7 @@ namespace BookwormsServerTesting;
 public abstract class ChildMgmtTests
 {
     [Collection("Integration Tests")]
-    public class ChildMgmtReadOnlyTests(AppFactory<Program> factory) : BaseTestReadOnlyFixture(factory)
+    public class ChildMgmtReadOnlyTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
     {
         [Theory]
         [InlineData("teacher1")]
@@ -102,6 +104,8 @@ public abstract class ChildMgmtTests
                 HttpStatusCode.UnprocessableEntity,
                 ErrorDTO.ClassroomNotFound);
             
+            Context.ChangeTracker.Clear();
+            
             await CheckResponse<List<ChildResponseDTO>>(
                 async () => await Client.GetAsync(Routes.Children.All, username),
                 HttpStatusCode.OK,
@@ -126,7 +130,7 @@ public abstract class ChildMgmtTests
     }
     
     [Collection("Integration Tests")]
-    public class ChildMgmtWriteTests(AppFactory<Program> factory) : BaseTestWriteFixture(factory)
+    public class ChildMgmtWriteTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
     {
         [Theory]
         [InlineData("parent0", "Jason")]
