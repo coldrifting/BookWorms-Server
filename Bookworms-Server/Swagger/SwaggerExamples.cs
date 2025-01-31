@@ -2,6 +2,8 @@
 using BookwormsServer.Models.Data;
 using Swashbuckle.AspNetCore.Filters;
 
+using BookwormsServer.Utils;
+
 namespace BookwormsServer.Swagger;
 
 
@@ -56,7 +58,7 @@ public static class SwaggerExamples
     {
         public ChildEditDTO GetExamples()
         {
-            return new("New_Child_Name", 0, "READA7", "WLF359", DateOnly.Parse("2017-3-4"));
+            return new("New_Child_Name", 0, "ReadA7", "WLF359", DateOnly.Parse("2017-3-4"));
         }
     }
 
@@ -64,7 +66,7 @@ public static class SwaggerExamples
     {
         public ChildResponseDTO GetExamples()
         {
-            return new(Guid.NewGuid(), "Jackson", 1, "A5", "CLS098", DateOnly.Parse("2015-04-15"));
+            return new(Base62.FromGuid(Guid.NewGuid()), "Jackson", 1, "A5", "CLS098", DateOnly.Parse("2015-04-15"));
         }
     }
     
@@ -74,9 +76,9 @@ public static class SwaggerExamples
         {
             return
             [
-                new(Guid.NewGuid(),"Ashley", 0,  "A7", "CLS098", DateOnly.Parse("2014-08-23")),
-                new(Guid.NewGuid(),"Miles", 1, "B4", "CLS498", null),
-                new(Guid.NewGuid(),"Joey", 2, null, null, DateOnly.Parse("2015-04-15"))
+                new(Base62.FromGuid(Guid.NewGuid()),"Ashley", 0,  "A7", "CLS098", DateOnly.Parse("2014-08-23")),
+                new(Base62.FromGuid(Guid.NewGuid()),"Miles", 1, "B4", "CLS498", null),
+                new(Base62.FromGuid(Guid.NewGuid()),"Joey", 2, null, null, DateOnly.Parse("2015-04-15"))
             ];
         }
     }
@@ -125,9 +127,9 @@ public static class SwaggerExamples
     
     // SearchController
 
-    public class BooksResponseExample : IExamplesProvider<List<BookDto>>
+    public class BooksResponseExample : IExamplesProvider<List<BookDTO>>
     {
-        public List<BookDto> GetExamples()
+        public List<BookDTO> GetExamples()
         {
             return
             [

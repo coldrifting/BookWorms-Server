@@ -167,7 +167,7 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     /// <summary>
     /// Deletes the logged in or specified user 
     /// </summary>
-    /// <param username="username">The user to delete if not deleting own account</param>
+    /// <param name="username">The user to delete if not deleting own account</param>
     /// <response code="204">Success</response>
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a parent</response>

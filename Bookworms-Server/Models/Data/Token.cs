@@ -1,6 +1,6 @@
 namespace BookwormsServer.Models.Data;
 
-public class TokenHeaderDTO()
+public class TokenHeaderDTO
 {
     public string Alg => "HS256";
     public string Typ => "JWT";

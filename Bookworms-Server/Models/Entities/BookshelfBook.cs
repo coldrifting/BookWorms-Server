@@ -13,10 +13,10 @@ namespace BookwormsServer.Models.Entities;
 
 [Table("BookshelfBooks")]
 [PrimaryKey(nameof(BookshelfId), nameof(BookId))]
-public class BookshelfBook(Guid bookshelfId, string bookId)
+public class BookshelfBook(int bookshelfId, string bookId)
 {
     [ForeignKey("Bookshelf")]
-    public Guid BookshelfId { get; set; } = bookshelfId;
+    public int BookshelfId { get; set; } = bookshelfId;
     
     [ForeignKey("Book")]
     [StringLength(20)]
@@ -28,7 +28,7 @@ public class BookshelfBook(Guid bookshelfId, string bookId)
     public Book? Book { get; set; }
 }
 
-public class CompletedBookshelfBook(Guid bookshelfId, string bookId, double starRating)
+public class CompletedBookshelfBook(int bookshelfId, string bookId, double starRating)
     : BookshelfBook(bookshelfId, bookId)
 {
     [Range(0, 5, ErrorMessage = "Star rating must be between {0} and {1}.")]

@@ -63,7 +63,7 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
         
         dbContext.SaveChanges();
 
-        return Created($"/children/{child.ChildId.ToString()}", GetAllChildren(parentUsername));
+        return Created($"/children/{child.ChildId}", GetAllChildren(parentUsername));
     }
 
     
@@ -78,13 +78,13 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="422">The classroom code is invalid, or an invalid icon is specified</response>
     [HttpPut]
     [Authorize]
-    [Route("/children/{childId:guid}/[action]")]
+    [Route("/children/{childId}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ChildResponseDTO))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
-    public IActionResult Edit([FromRoute] Guid childId, [FromBody] ChildEditDTO payload)
+    public IActionResult Edit([FromRoute] string childId, [FromBody] ChildEditDTO payload)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
@@ -144,12 +144,12 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="404">The child ID is invalid, or is not managed by the logged in parent</response>
     [HttpDelete]
     [Authorize]
-    [Route("/children/{childId:guid}/[action]")]
+    [Route("/children/{childId}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ChildResponseDTO>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult Remove(Guid childId)
+    public IActionResult Remove(string childId)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 

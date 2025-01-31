@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -48,7 +49,8 @@ namespace BookwormsServer.Migrations
                 name: "Bookshelves",
                 columns: table => new
                 {
-                    BookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BookshelfId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -79,7 +81,7 @@ namespace BookwormsServer.Migrations
                 {
                     BooksBookId = table.Column<string>(type: "varchar(20)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    BookshelvesBookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                    BookshelvesBookshelfId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -103,7 +105,7 @@ namespace BookwormsServer.Migrations
                 name: "BookshelfBooks",
                 columns: table => new
                 {
-                    BookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BookshelfId = table.Column<int>(type: "int", nullable: false),
                     BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -129,7 +131,7 @@ namespace BookwormsServer.Migrations
                 name: "ClassroomBookshelves",
                 columns: table => new
                 {
-                    BookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BookshelfId = table.Column<int>(type: "int", nullable: false),
                     ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -186,7 +188,8 @@ namespace BookwormsServer.Migrations
                 name: "Children",
                 columns: table => new
                 {
-                    ChildId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ChildId = table.Column<string>(type: "char(22)", maxLength: 22, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ChildIcon = table.Column<int>(type: "int", nullable: false),
@@ -251,8 +254,9 @@ namespace BookwormsServer.Migrations
                 name: "ChildBookshelves",
                 columns: table => new
                 {
-                    BookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    ChildId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                    BookshelfId = table.Column<int>(type: "int", nullable: false),
+                    ChildId = table.Column<string>(type: "char(22)", maxLength: 22, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -276,8 +280,9 @@ namespace BookwormsServer.Migrations
                 name: "CompletedBookshelves",
                 columns: table => new
                 {
-                    BookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    ChildId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                    BookshelfId = table.Column<int>(type: "int", nullable: false),
+                    ChildId = table.Column<string>(type: "char(22)", maxLength: 22, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -301,8 +306,9 @@ namespace BookwormsServer.Migrations
                 name: "InProgressBookshelves",
                 columns: table => new
                 {
-                    BookshelfId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    ChildId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                    BookshelfId = table.Column<int>(type: "int", nullable: false),
+                    ChildId = table.Column<string>(type: "char(22)", maxLength: 22, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {

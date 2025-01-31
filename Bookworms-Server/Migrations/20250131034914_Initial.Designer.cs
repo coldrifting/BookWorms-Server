@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookwormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
-    [Migration("20250128113145_Initial")]
+    [Migration("20250131034914_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -30,8 +30,8 @@ namespace BookwormsServer.Migrations
                     b.Property<string>("BooksBookId")
                         .HasColumnType("varchar(20)");
 
-                    b.Property<Guid>("BookshelvesBookshelfId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("BookshelvesBookshelfId")
+                        .HasColumnType("int");
 
                     b.HasKey("BooksBookId", "BookshelvesBookshelfId");
 
@@ -95,9 +95,11 @@ namespace BookwormsServer.Migrations
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.Bookshelf", b =>
                 {
-                    b.Property<Guid>("BookshelfId")
+                    b.Property<int>("BookshelfId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BookshelfId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -113,8 +115,8 @@ namespace BookwormsServer.Migrations
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.BookshelfBook", b =>
                 {
-                    b.Property<Guid>("BookshelfId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("BookshelfId")
+                        .HasColumnType("int");
 
                     b.Property<string>("BookId")
                         .HasMaxLength(20)
@@ -129,9 +131,9 @@ namespace BookwormsServer.Migrations
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.Child", b =>
                 {
-                    b.Property<Guid>("ChildId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                    b.Property<string>("ChildId")
+                        .HasMaxLength(22)
+                        .HasColumnType("char");
 
                     b.Property<int>("ChildIcon")
                         .HasColumnType("int");
@@ -267,8 +269,10 @@ namespace BookwormsServer.Migrations
                 {
                     b.HasBaseType("BookwormsServer.Models.Entities.Bookshelf");
 
-                    b.Property<Guid>("ChildId")
-                        .HasColumnType("char(36)")
+                    b.Property<string>("ChildId")
+                        .IsRequired()
+                        .HasMaxLength(22)
+                        .HasColumnType("char(22)")
                         .HasColumnName("ChildId");
 
                     b.HasIndex("ChildId");
@@ -294,8 +298,10 @@ namespace BookwormsServer.Migrations
                 {
                     b.HasBaseType("BookwormsServer.Models.Entities.Bookshelf");
 
-                    b.Property<Guid>("ChildId")
-                        .HasColumnType("char(36)")
+                    b.Property<string>("ChildId")
+                        .IsRequired()
+                        .HasMaxLength(22)
+                        .HasColumnType("char(22)")
                         .HasColumnName("ChildId");
 
                     b.HasIndex("ChildId")
@@ -308,8 +314,10 @@ namespace BookwormsServer.Migrations
                 {
                     b.HasBaseType("BookwormsServer.Models.Entities.Bookshelf");
 
-                    b.Property<Guid>("ChildId")
-                        .HasColumnType("char(36)")
+                    b.Property<string>("ChildId")
+                        .IsRequired()
+                        .HasMaxLength(22)
+                        .HasColumnType("char(22)")
                         .HasColumnName("ChildId");
 
                     b.HasIndex("ChildId")

@@ -7,7 +7,7 @@ namespace BookwormsServer.Models.Entities;
 public abstract class Bookshelf(string name)
 {
     [Key]
-    public Guid BookshelfId { get; set; }
+    public int BookshelfId { get; set; }
 
     [StringLength(256, ErrorMessage = "Bookshelf name cannot be longer than {0} characters.")] 
     public string Name { get; set; } = name;
@@ -20,10 +20,11 @@ public abstract class Bookshelf(string name)
 
 
 [Table("CompletedBookshelves")]
-public class CompletedBookshelf(Guid childId) : Bookshelf("Completed")
+public class CompletedBookshelf(string childId) : Bookshelf("Completed")
 {
     [Column(nameof(ChildId))]
-    public Guid ChildId { get; set; } = childId;
+    [StringLength(22)]
+    public string ChildId { get; set; } = childId;
 
     // Navigation
     
@@ -32,10 +33,11 @@ public class CompletedBookshelf(Guid childId) : Bookshelf("Completed")
 }
 
 [Table("InProgressBookshelves")]
-public class InProgressBookshelf(Guid childId) : Bookshelf("In Progress")
+public class InProgressBookshelf(string childId) : Bookshelf("In Progress")
 {
     [Column(nameof(ChildId))]
-    public Guid ChildId { get; set; } = childId;
+    [StringLength(22)]
+    public string ChildId { get; set; } = childId;
 
     // Navigation
     
@@ -44,10 +46,11 @@ public class InProgressBookshelf(Guid childId) : Bookshelf("In Progress")
 }
 
 [Table("ChildBookshelves")]
-public class ChildBookshelf(string name, Guid childId) : Bookshelf(name)
+public class ChildBookshelf(string name, string childId) : Bookshelf(name)
 {
     [Column(nameof(ChildId))]
-    public Guid ChildId { get; set; } = childId;
+    [StringLength(22)]
+    public string ChildId { get; set; } = childId;
 
     // Navigation
     

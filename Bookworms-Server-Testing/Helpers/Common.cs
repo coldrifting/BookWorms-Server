@@ -164,9 +164,8 @@ public static class Common
         return check.Invoke(content);
     }
 
-    public static string BlankGuid = "00000000-0000-0000-0000-000000000000";
-    public static Guid GetChildLocation(this HttpResponseHeaders headers)
+    public static string? GetChildLocation(this HttpResponseHeaders headers)
     {
-        return Guid.Parse(headers.Location?.ToString().Replace("/children/", "") ?? BlankGuid);
+        return headers.Location?.ToString().Replace("/children/", "");
     }
 }

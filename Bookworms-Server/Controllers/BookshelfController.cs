@@ -24,12 +24,12 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="404">The child does not exist</response>
     [HttpGet]
     [Authorize]
-    [Route("/children/{childId:guid}/shelves")]
+    [Route("/children/{childId}/shelves")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfPreviewResponseDTO>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult All(Guid childId)
+    public IActionResult All(string childId)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
@@ -70,12 +70,12 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="404">The child or bookshelf does not exist</response>
     [HttpGet]
     [Authorize]
-    [Route("/children/{childId:guid}/shelves/{bookshelfName}/[action]")]
+    [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookshelfPreviewResponseDTO))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult Details(Guid childId, string bookshelfName)
+    public IActionResult Details(string childId, string bookshelfName)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
@@ -124,13 +124,13 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="422">A bookshelf with the same name already exists for the selected child</response>
     [HttpPost]
     [Authorize]
-    [Route("/children/{childId:guid}/shelves/{bookshelfName}/[action]")]
+    [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfPreviewResponseDTO>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
-    public IActionResult Add(Guid childId, string bookshelfName)
+    public IActionResult Add(string childId, string bookshelfName)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
@@ -177,13 +177,13 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="422">A bookshelf with the new name already exists for this child</response>
     [HttpPost]
     [Authorize]
-    [Route("/children/{childId:guid}/shelves/{bookshelfName}/[action]")]
+    [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfPreviewResponseDTO>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
-    public IActionResult Rename(Guid childId, string bookshelfName, [FromQuery] string newName)
+    public IActionResult Rename(string childId, string bookshelfName, [FromQuery] string newName)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
@@ -237,13 +237,13 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="422">The book id is invalid</response>
     [HttpPut]
     [Authorize]
-    [Route("/children/{childId:guid}/shelves/{bookshelfName}/[action]")]
+    [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookshelfPreviewResponseDTO))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
-    public IActionResult Insert(Guid childId, string bookshelfName, [FromQuery] string bookId)
+    public IActionResult Insert(string childId, string bookshelfName, [FromQuery] string bookId)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
@@ -299,12 +299,12 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="404">The child or bookshelf does not exist, or the book id was not found in the bookshelf</response>
     [HttpDelete]
     [Authorize]
-    [Route("/children/{childId:guid}/shelves/{bookshelfName}/[action]")]
+    [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookshelfPreviewResponseDTO))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult Remove(Guid childId, string bookshelfName, [FromQuery] string bookId)
+    public IActionResult Remove(string childId, string bookshelfName, [FromQuery] string bookId)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
@@ -355,12 +355,12 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="404">The child or bookshelf does not exist</response>
     [HttpDelete]
     [Authorize]
-    [Route("/children/{childId:guid}/shelves/{bookshelfName}/[action]")]
+    [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult Clear(Guid childId, string bookshelfName)
+    public IActionResult Clear(string childId, string bookshelfName)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
@@ -405,12 +405,12 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="404">The child or bookshelf does not exist</response>
     [HttpDelete]
     [Authorize]
-    [Route("/children/{childId:guid}/shelves/{bookshelfName}/[action]")]
+    [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfPreviewResponseDTO>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult Delete(Guid childId, string bookshelfName)
+    public IActionResult Delete(string childId, string bookshelfName)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 

@@ -16,7 +16,7 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("Giving", "The Giving Tree")]
     public async Task Test_GetSearchResults(string searchString, string title)
     {
-        await CheckResponse<List<BookDto>>(async () => await Client.GetAsync(Routes.Search.Title(searchString)),
+        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search.Title(searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);

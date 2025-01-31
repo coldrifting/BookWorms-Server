@@ -8,29 +8,29 @@ public abstract class Routes
             "/children/all";
         public static string Add(string childName) =>
             $"/children/add?childName={childName}";
-        public static string Edit(Guid childId) =>
+        public static string Edit(string childId) =>
             $"/children/{childId}/edit";
-        public static string Remove(Guid childId) =>
+        public static string Remove(string childId) =>
             $"/children/{childId}/remove";
     }
 
     public static class Bookshelves
     {
-        public static string All(Guid childId) =>
+        public static string All(string childId) =>
             $"/children/{childId}/shelves";
-        public static string Details(Guid childId, string bookshelfName) =>
+        public static string Details(string childId, string bookshelfName) =>
             $"/children/{childId}/shelves/{bookshelfName}/details";
-        public static string Add(Guid childId, string bookshelfName) =>
+        public static string Add(string childId, string bookshelfName) =>
             $"/children/{childId}/shelves/{bookshelfName}/add";
-        public static string Rename(Guid childId, string bookshelfName, string newName) =>
+        public static string Rename(string childId, string bookshelfName, string newName) =>
             $"/children/{childId}/shelves/{bookshelfName}/rename?newName={newName}";
-        public static string Delete(Guid childId, string bookshelfName) =>
+        public static string Delete(string childId, string bookshelfName) =>
             $"/children/{childId}/shelves/{bookshelfName}/delete";
-        public static string Clear(Guid childId, string bookshelfName) =>
+        public static string Clear(string childId, string bookshelfName) =>
             $"/children/{childId}/shelves/{bookshelfName}/clear";
-        public static string Insert(Guid childId, string bookshelfName, string bookId) =>
+        public static string Insert(string childId, string bookshelfName, string bookId) =>
             $"/children/{childId}/shelves/{bookshelfName}/insert?bookId={bookId}";
-        public static string Remove(Guid childId, string bookshelfName, string bookId) =>
+        public static string Remove(string childId, string bookshelfName, string bookId) =>
             $"/children/{childId}/shelves/{bookshelfName}/remove?bookId={bookId}";
     }
 

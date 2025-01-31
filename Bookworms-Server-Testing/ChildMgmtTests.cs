@@ -57,8 +57,8 @@ public abstract class ChildMgmtTests
         }
 
         [Theory]
-        [InlineData("parent1", "389b78f0-13f1-4003-8be4-9a72cb145d9e", "ab198b2c-e08b-4f3d-a372-6af43c80e229")]
-        public async Task Test_RemoveChild_ChildNotExist(string username, Guid invalidChildId, Guid existingChildId)
+        [InlineData("parent1", Constants.InvalidChildId, Constants.Parent1Child1Id)]
+        public async Task Test_RemoveChild_ChildNotExist(string username, string invalidChildId, string existingChildId)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Children.Remove(invalidChildId), username),
@@ -75,8 +75,8 @@ public abstract class ChildMgmtTests
         }
 
         [Theory]
-        [InlineData("teacher1", "389b78f0-13f1-4003-8be4-9a72cb145d9e")]
-        public async Task Test_RemoveChild_NotParent(string username, Guid childId)
+        [InlineData("teacher1", Constants.Parent3Child1Id)]
+        public async Task Test_RemoveChild_NotParent(string username, string childId)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Children.Remove(childId), username),
@@ -85,8 +85,8 @@ public abstract class ChildMgmtTests
         }
 
         [Theory]
-        [InlineData("teacher1", "e1740f4a-9855-472d-bf47-fb57dce6c1b2")]
-        public async Task Test_EditChild_NotParent(string username, Guid childId)
+        [InlineData("teacher1", Constants.Parent3Child1Id)]
+        public async Task Test_EditChild_NotParent(string username, string childId)
         {
             await CheckForError(
                 () => Client.PutPayloadAsync(Routes.Children.Edit(childId), new ChildEditDTO(), username),
@@ -95,8 +95,8 @@ public abstract class ChildMgmtTests
         }
         
         [Theory]
-        [InlineData("parent2", "c5dca20d-849d-418f-b65b-cb79aa723c20", "BadVal")]
-        public async Task Test_EditChild_InvalidClassroomCode(string username, Guid childId, string classroomCode)
+        [InlineData("parent2", Constants.Parent2Child2Id, "BadVal")]
+        public async Task Test_EditChild_InvalidClassroomCode(string username, string childId, string classroomCode)
         {
             await CheckForError(
                 () => Client.PutPayloadAsync(Routes.Children.Edit(childId),
@@ -118,8 +118,8 @@ public abstract class ChildMgmtTests
         }
 
         [Theory]
-        [InlineData("parent2", "c5dca20d-1234-418f-b65b-cb79aa723c20", "newName")]
-        public async Task Test_EditChild_InvalidGuid(string username, Guid childId, string newName)
+        [InlineData("parent2", Constants.InvalidChildId, "newName")]
+        public async Task Test_EditChild_InvalidId(string username, string childId, string newName)
         {
             await CheckForError(
                 () => Client.PutPayloadAsync(Routes.Children.Edit(childId),
@@ -140,7 +140,7 @@ public abstract class ChildMgmtTests
                 async () => await Client.PostAsync(Routes.Children.Add(childName), username),
                 HttpStatusCode.Created,
                 (content, headers) => {
-                    Guid? childGuid = headers.GetChildLocation();
+                    string? childGuid = headers.GetChildLocation();
                     Assert.NotNull(childGuid);
                     Assert.Single(content);
                     Assert.Contains(content, c => c.ChildId == childGuid);
@@ -155,7 +155,7 @@ public abstract class ChildMgmtTests
                 async () => await Client.PostAsync(Routes.Children.Add(childName), username),
                 HttpStatusCode.Created,
                 (content, headers) => {
-                    Guid? childGuid = headers.GetChildLocation();
+                    string? childGuid = headers.GetChildLocation();
                     Assert.NotNull(childGuid);
                     Assert.Equal(2, content.Count);
                     Assert.Contains(content, c => c.ChildId == childGuid);
@@ -167,27 +167,27 @@ public abstract class ChildMgmtTests
         [InlineData("parent0", "joey", "joey")]
         public async Task Test_AddChild_MultipleSameParent(string username, string childName1, string childName2)
         {
-            Guid childGuid1 = await CheckResponse<List<ChildResponseDTO>, Guid>(
+            string childGuid1 = await CheckResponse<List<ChildResponseDTO>, string>(
                 async () => await Client.PostAsync(Routes.Children.Add(childName1), username),
                 HttpStatusCode.Created,
                 (content, headers) => {
-                    Guid? childGuid = headers.GetChildLocation();
+                    string? childGuid = headers.GetChildLocation();
                     Assert.NotNull(childGuid);
                     Assert.Single(content);
                     Assert.Contains(content, c => c.ChildId == childGuid && c.Name == childName1);
-                    return childGuid.Value;
+                    return childGuid;
                 });
             
-            Guid childGuid2 = await CheckResponse<List<ChildResponseDTO>, Guid>(
+            string childGuid2 = await CheckResponse<List<ChildResponseDTO>, string>(
                 async () => await Client.PostAsync(Routes.Children.Add(childName2), username),
                 HttpStatusCode.Created,
                 (content, headers) => {
-                    Guid? childGuid = headers.GetChildLocation();
+                    string? childGuid = headers.GetChildLocation();
                     Assert.NotNull(childGuid);
                     Assert.Equal(2, content.Count);
                     Assert.Contains(content, c => c.ChildId == childGuid && c.Name == childName2);
                     Assert.Contains(content, c => c.ChildId == childGuid1 && c.Name == childName1);
-                    return childGuid.Value;
+                    return childGuid;
                 });
             
             await CheckResponse<List<ChildResponseDTO>>(
@@ -241,8 +241,8 @@ public abstract class ChildMgmtTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229")]
-        public async Task Test_RemoveChild_Basic(string username, Guid childId)
+        [InlineData("parent1", Constants.Parent1Child1Id)]
+        public async Task Test_RemoveChild_Basic(string username, string childId)
         {
             await CheckResponse<List<ChildResponseDTO>>(
                 async () => await Client.DeleteAsync(Routes.Children.Remove(childId), username),
@@ -256,8 +256,8 @@ public abstract class ChildMgmtTests
         }
 
         [Theory]
-        [InlineData("parent2", "c5dca20d-849d-418f-b65b-cb79aa723c20", "08dd3c4b-f197-4657-8556-58c76701802b")]
-        public async Task Test_RemoveChild_DoesNotDeleteOtherChildren(string username, Guid childToRemoveId, Guid childLeftId)
+        [InlineData("parent2", Constants.Parent2Child2Id, Constants.Parent2Child1Id)]
+        public async Task Test_RemoveChild_DoesNotDeleteOtherChildren(string username, string childToRemoveId, string childLeftId)
         {
             await CheckResponse<List<ChildResponseDTO>>(
                 async () => await Client.DeleteAsync(Routes.Children.Remove(childToRemoveId), username),
@@ -277,8 +277,8 @@ public abstract class ChildMgmtTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Rachel")]
-        public async Task Test_EditChild_ChangeName_Basic(string username, Guid childId, string newName)
+        [InlineData("parent1", Constants.Parent1Child1Id, "Rachel")]
+        public async Task Test_EditChild_ChangeName_Basic(string username, string childId, string newName)
         {
             await CheckResponse<ChildResponseDTO>(
                 async () => await Client.PutPayloadAsync(Routes.Children.Edit(childId), 
@@ -298,8 +298,8 @@ public abstract class ChildMgmtTests
         }
 
         [Theory]
-        [InlineData("parent3", "2a23200c-8fe0-4c8d-9233-3cf095569c01", 2)]
-        public async Task Test_EditChild_ChangeIcon_Basic(string username, Guid childId, int newIcon)
+        [InlineData("parent3", Constants.Parent3Child2Id, 2)]
+        public async Task Test_EditChild_ChangeIcon_Basic(string username, string childId, int newIcon)
         {
             await CheckResponse<ChildResponseDTO>(
                 async () => await Client.PutPayloadAsync(Routes.Children.Edit(childId),
@@ -320,9 +320,9 @@ public abstract class ChildMgmtTests
         }
 
         [Theory]
-        [InlineData("parent3", "2a23200c-8fe0-4c8d-9233-3cf095569c01", "3eda09c6-53ee-44a4-b784-fbd90d5b7b1f",
+        [InlineData("parent3", Constants.Parent3Child2Id, Constants.Parent3Child3Id,
             "Costanza")]
-        public async Task Test_EditChild_ChangeName_NameAlreadyExistsUnderParent(string username, Guid childId, Guid childId2, string newName)
+        public async Task Test_EditChild_ChangeName_NameAlreadyExistsUnderParent(string username, string childId, string childId2, string newName)
         {
             await CheckResponse<ChildResponseDTO>(
                 async () => await Client.PutPayloadAsync(Routes.Children.Edit(childId),
@@ -344,8 +344,8 @@ public abstract class ChildMgmtTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "A4")]
-        public async Task Test_EditChild_ChangeReadingLevel_Basic(string username, Guid childId, string readingLevel)
+        [InlineData("parent1", Constants.Parent1Child1Id, "A4")]
+        public async Task Test_EditChild_ChangeReadingLevel_Basic(string username, string childId, string readingLevel)
         {
             await CheckResponse<ChildResponseDTO>(
                 async () => await Client.PutPayloadAsync(Routes.Children.Edit(childId),
@@ -366,8 +366,8 @@ public abstract class ChildMgmtTests
         }
 
         [Theory]
-        [InlineData("parent3", "3eda09c6-53ee-44a4-b784-fbd90d5b7b1f", "1960-08-31")]
-        public async Task Test_EditChild_ChangeDOB_Basic(string username, Guid childId, string dob)
+        [InlineData("parent3", Constants.Parent3Child3Id, "1960-08-31")]
+        public async Task Test_EditChild_ChangeDOB_Basic(string username, string childId, string dob)
         {
             await CheckResponse<ChildResponseDTO>(
                 async () => await Client.PutPayloadAsync(Routes.Children.Edit(childId),

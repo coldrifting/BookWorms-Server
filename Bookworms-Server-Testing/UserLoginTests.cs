@@ -132,9 +132,9 @@ public abstract class UserLoginTests
         }
 
         [Theory]
-        [InlineData("parent3", "parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229")]
-        [InlineData("teacher4", "parent3", "3eda09c6-53ee-44a4-b784-fbd90d5b7b1f")]
-        public async Task Test_DeleteOtherUser_FromNonAdmin(string username, string usernameToDelete, Guid childId)
+        [InlineData("parent3", "parent1", Constants.Parent1Child1Id)]
+        [InlineData("teacher4", "parent3", Constants.Parent3Child3Id)]
+        public async Task Test_DeleteOtherUser_FromNonAdmin(string username, string usernameToDelete, string childId)
         {
             await CheckForError(
                 async () => await Client.DeleteAsync(Routes.User.DeleteParam(usernameToDelete), username),
@@ -346,9 +346,9 @@ public abstract class UserLoginTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229")]
-        [InlineData("parent3", "3eda09c6-53ee-44a4-b784-fbd90d5b7b1f")]
-        public async Task Test_DeleteUser_DeletesChildrenBookshelves(string username, Guid childId)
+        [InlineData("parent1", Constants.Parent1Child1Id)]
+        [InlineData("parent3", Constants.Parent3Child3Id)]
+        public async Task Test_DeleteUser_DeletesChildrenBookshelves(string username, string childId)
         {
             await CheckResponse(
                 async () => await Client.DeleteAsync(Routes.User.Delete, username),
@@ -359,9 +359,9 @@ public abstract class UserLoginTests
         }
 
         [Theory]
-        [InlineData("admin", "parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229")]
-        [InlineData("admin", "parent3", "3eda09c6-53ee-44a4-b784-fbd90d5b7b1f")]
-        public async Task Test_DeleteOtherUser_FromAdmin(string username, string usernameToDelete, Guid childId)
+        [InlineData("admin", "parent1", Constants.Parent1Child1Id)]
+        [InlineData("admin", "parent3", Constants.Parent3Child3Id)]
+        public async Task Test_DeleteOtherUser_FromAdmin(string username, string usernameToDelete, string childId)
         {
             await CheckResponse(
                 async () => await Client.DeleteAsync(Routes.User.DeleteParam(usernameToDelete), username),

@@ -14,8 +14,8 @@ public abstract class ChildBookshelfTests
     public class ChildBookshelfReadOnlyTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
     {
         [Theory]
-        [InlineData("2a23200c-8fe0-4c8d-9233-3cf095569c01")]
-        public async Task Test_GetAllBookshelves_AsLoggedOutShouldError(Guid childId)
+        [InlineData(Constants.Parent3Child2Id)]
+        public async Task Test_GetAllBookshelves_AsLoggedOutShouldError(string childId)
         {
             await CheckForError(
                 () => Client.GetAsync(Routes.Bookshelves.All(childId)),
@@ -24,8 +24,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("teacher1", "2a23200c-8fe0-4c8d-9233-3cf095569c01")]
-        public async Task Test_GetAllBookshelves_AsTeacherShouldError(string username, Guid childId)
+        [InlineData("teacher1", Constants.Parent3Child2Id)]
+        public async Task Test_GetAllBookshelves_AsTeacherShouldError(string username, string childId)
         {
             await CheckForError(
                 () => Client.GetAsync(Routes.Bookshelves.All(childId), username),
@@ -34,8 +34,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent0", "2a23200c-8fe0-4c8d-9233-3cf095569c01")]
-        public async Task Test_GetAllBookshelves_NoChildrenShouldError(string username, Guid childId)
+        [InlineData("parent0", Constants.Parent3Child2Id)]
+        public async Task Test_GetAllBookshelves_NoChildrenShouldError(string username, string childId)
         {
             await CheckForError(
                 () => Client.GetAsync(Routes.Bookshelves.All(childId), username),
@@ -44,8 +44,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("2a23200c-8fe0-4c8d-9233-3cf095569c01", "bookshelf")]
-        public async Task Test_GetBookshelf_AsLoggedOutShouldError(Guid childId, string bookshelfName)
+        [InlineData(Constants.Parent3Child2Id, "bookshelf")]
+        public async Task Test_GetBookshelf_AsLoggedOutShouldError(string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName)),
@@ -54,8 +54,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("teacher1", "2a23200c-8fe0-4c8d-9233-3cf095569c01", "bookshelf")]
-        public async Task Test_GetBookshelf_AsTeacherShouldError(string username, Guid childId, string bookshelfName)
+        [InlineData("teacher1", Constants.Parent3Child2Id, "bookshelf")]
+        public async Task Test_GetBookshelf_AsTeacherShouldError(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
@@ -64,8 +64,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent0", "00000000-0000-0000-0000-000000000000", "bookshelfName")]
-        public async Task Test_GetBookshelf_NoChildrenShouldError(string username, Guid childId, string bookshelfName)
+        [InlineData("parent0", Constants.EmptyChildId, "bookshelfName")]
+        public async Task Test_GetBookshelf_NoChildrenShouldError(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
@@ -74,8 +74,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "bookshelfName")]
-        public async Task Test_GetBookshelf_BookshelfNotExist_ShouldError(string username, Guid childId, string bookshelfName)
+        [InlineData("parent1", Constants.Parent1Child1Id, "bookshelfName")]
+        public async Task Test_GetBookshelf_BookshelfNotExist_ShouldError(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
@@ -84,8 +84,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("00000000-0000-0000-0000-000000000000", "bookshelf")]
-        public async Task Test_AddBookshelf_AsLoggedOutShouldError(Guid childId, string bookshelfName)
+        [InlineData(Constants.EmptyChildId, "bookshelf")]
+        public async Task Test_AddBookshelf_AsLoggedOutShouldError(string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName)),
@@ -94,8 +94,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("teacher1", "00000000-0000-0000-0000-000000000000", "bookshelf")]
-        public async Task Test_AddBookshelf_AsTeacherShouldError(string username, Guid childId, string bookshelfName)
+        [InlineData("teacher1", Constants.EmptyChildId, "bookshelf")]
+        public async Task Test_AddBookshelf_AsTeacherShouldError(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName), username),
@@ -104,8 +104,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent0", "00000000-0000-0000-0000-000000000000", "bookshelfName")]
-        public async Task Test_AddBookshelf_NoChildrenShouldError(string username, Guid childId, string bookshelfName)
+        [InlineData("parent0", Constants.EmptyChildId, "bookshelfName")]
+        public async Task Test_AddBookshelf_NoChildrenShouldError(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName), username),
@@ -114,8 +114,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Evelyn's bookshelf (Parent1)")]
-        public async Task Test_AddBookshelf_BookshelfNameAlreadyExists(string username, Guid childId, string bookshelfName)
+        [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)")]
+        public async Task Test_AddBookshelf_BookshelfNameAlreadyExists(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName), username),
@@ -124,8 +124,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("00000000-0000-0000-0000-000000000000", "bookshelf")]
-        public async Task Test_RemoveBookshelf_AsLoggedOutShouldError(Guid childId, string bookshelfName)
+        [InlineData(Constants.EmptyChildId, "bookshelf")]
+        public async Task Test_RemoveBookshelf_AsLoggedOutShouldError(string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName)),
@@ -134,8 +134,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("teacher1", "00000000-0000-0000-0000-000000000000", "bookshelf")]
-        public async Task Test_RemoveBookshelf_AsTeacherShouldError(string username, Guid childId, string bookshelfName)
+        [InlineData("teacher1", Constants.EmptyChildId, "bookshelf")]
+        public async Task Test_RemoveBookshelf_AsTeacherShouldError(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
@@ -144,8 +144,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent0",  "00000000-0000-0000-0000-000000000000", "bookshelfName")]
-        public async Task Test_RemoveBookshelf_NoChildrenShouldError(string username, Guid childId, string bookshelfName)
+        [InlineData("parent0",  Constants.EmptyChildId, "bookshelfName")]
+        public async Task Test_RemoveBookshelf_NoChildrenShouldError(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
@@ -154,8 +154,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("00000000-0000-0000-0000-000000000000", "bookshelf", "newBookshelf")]
-        public async Task Test_RenameBookshelf_AsLoggedOutShouldError(Guid childId, string bookshelfName, string newBookshelfName)
+        [InlineData(Constants.EmptyChildId, "bookshelf", "newBookshelf")]
+        public async Task Test_RenameBookshelf_AsLoggedOutShouldError(string childId, string bookshelfName, string newBookshelfName)
         {
             await CheckForError(
                 () => Client.PostAsync(Routes.Bookshelves.Rename(childId, bookshelfName, newBookshelfName)),
@@ -164,8 +164,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("teacher1", "00000000-0000-0000-0000-000000000000", "bookshelf", "newBookshelf")]
-        public async Task Test_RenameBookshelf_AsTeacherShouldError(string username, Guid childId, string bookshelfName, string newBookshelfName)
+        [InlineData("teacher1", Constants.EmptyChildId, "bookshelf", "newBookshelf")]
+        public async Task Test_RenameBookshelf_AsTeacherShouldError(string username, string childId, string bookshelfName, string newBookshelfName)
         {
             await CheckForError(
                 () => Client.PostAsync(Routes.Bookshelves.Rename(childId, bookshelfName, newBookshelfName), username),
@@ -174,8 +174,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent0", "00000000-0000-0000-0000-000000000000", "bookshelfName", "newBookshelf")]
-        public async Task Test_RenameBookshelf_NoChildrenShouldError(string username, Guid childId, string bookshelfName, string newBookshelfName)
+        [InlineData("parent0", Constants.EmptyChildId, "bookshelfName", "newBookshelf")]
+        public async Task Test_RenameBookshelf_NoChildrenShouldError(string username, string childId, string bookshelfName, string newBookshelfName)
         {
             await CheckForError(
                 () => Client.PostAsync(Routes.Bookshelves.Rename(childId, bookshelfName, newBookshelfName), username),
@@ -184,8 +184,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "invalidBookshelf", "newBookshelfName")]
-        public async Task Test_RenameBookshelf_BookshelfNotExist(string username, Guid childId, string bookshelfName, string newBookshelfName)
+        [InlineData("parent1", Constants.Parent1Child1Id, "invalidBookshelf", "newBookshelfName")]
+        public async Task Test_RenameBookshelf_BookshelfNotExist(string username, string childId, string bookshelfName, string newBookshelfName)
         {
             await CheckForError(
                 () => Client.PostAsync(Routes.Bookshelves.Rename(childId, bookshelfName, newBookshelfName), username),
@@ -194,8 +194,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("teacher1", "94706c0e-2be9-45b5-ab3d-b42d61ae6c47", "Ryn's Empty Bookshelf", "OL3368273W")]
-        public async Task Test_BookshelfInsert_NotParent_ShouldError(string username, Guid childId, string bookshelfName, string bookId)
+        [InlineData("teacher1", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", "OL3368273W")]
+        public async Task Test_BookshelfInsert_NotParent_ShouldError(string username, string childId, string bookshelfName, string bookId)
         {
             await CheckForError(
                 () => Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
@@ -204,8 +204,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent0", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Ryn's Empty Bookshelf", "OL3368273W")]
-        public async Task Test_BookshelfInsert_NoChildren_ShouldError(string username, Guid childId, string bookshelfName, string bookId)
+        [InlineData("parent0", Constants.Parent1Child1Id, "Ryn's Empty Bookshelf", "OL3368273W")]
+        public async Task Test_BookshelfInsert_NoChildren_ShouldError(string username, string childId, string bookshelfName, string bookId)
         {
             await CheckForError(
                 () => Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
@@ -214,8 +214,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Ryn's Empty Bookshelf", "OL3368273W")]
-        public async Task Test_BookshelfInsert_BookshelfNameNotExist_ShouldError(string username, Guid childId, string bookshelfName, string bookId)
+        [InlineData("parent1", Constants.Parent1Child1Id, "Ryn's Empty Bookshelf", "OL3368273W")]
+        public async Task Test_BookshelfInsert_BookshelfNameNotExist_ShouldError(string username, string childId, string bookshelfName, string bookId)
         {
             await CheckForError(
                 () => Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
@@ -224,8 +224,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent5", "94706c0e-2be9-45b5-ab3d-b42d61ae6c47", "Ryn's Empty Bookshelf", "InvalidBookId")]
-        public async Task Test_BookshelfInsert_BookIdNotValid_ShouldError(string username, Guid childId, string bookshelfName, string bookId)
+        [InlineData("parent5", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", "InvalidBookId")]
+        public async Task Test_BookshelfInsert_BookIdNotValid_ShouldError(string username, string childId, string bookshelfName, string bookId)
         {
             await CheckForError(
                 () => Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
@@ -234,8 +234,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("teacher1", "94706c0e-2be9-45b5-ab3d-b42d61ae6c47", "Ryn's Empty Bookshelf", "OL3368273W")]
-        public async Task Test_BookshelfRemove_NotParent_ShouldError(string username, Guid childId, string bookshelfName, string bookId)
+        [InlineData("teacher1", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", "OL3368273W")]
+        public async Task Test_BookshelfRemove_NotParent_ShouldError(string username, string childId, string bookshelfName, string bookId)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, bookId), username),
@@ -244,8 +244,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent0", "94706c0e-2be9-45b5-ab3d-b42d61ae6c47", "Ryn's Empty Bookshelf", "OL3368273W")]
-        public async Task Test_BookshelfRemove_NoChildren_ShouldError(string username, Guid childId, string bookshelfName,
+        [InlineData("parent0", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", "OL3368273W")]
+        public async Task Test_BookshelfRemove_NoChildren_ShouldError(string username, string childId, string bookshelfName,
             string bookId)
         {
             await CheckForError(
@@ -255,8 +255,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Ryn's Empty Bookshelf")]
-        public async Task Test_BookshelfDelete_BookshelfNotFound_ShouldError(string username, Guid childId, string bookshelfName)
+        [InlineData("parent1", Constants.Parent1Child1Id, "Ryn's Empty Bookshelf")]
+        public async Task Test_BookshelfDelete_BookshelfNotFound_ShouldError(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
@@ -265,8 +265,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent2", "08dd3c4b-f197-4657-8556-58c76701802b", "Not a valid bookshelf", "OL3368273W")]
-        public async Task Test_RemoveBookshelfItem_InvalidBookshelf(string username, Guid childId, string bookshelfName, string bookId)
+        [InlineData("parent2", Constants.Parent2Child1Id, "Not a valid bookshelf", "OL3368273W")]
+        public async Task Test_RemoveBookshelfItem_InvalidBookshelf(string username, string childId, string bookshelfName, string bookId)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, bookId), username),
@@ -275,8 +275,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent5", "94706c0e-2be9-45b5-ab3d-b42d61ae6c47", "Ryn's Empty Bookshelf", "OL3368273W")]
-        public async Task Test_RemoveBookshelfItem_EmptyBookshelf(string username, Guid childId, string bookshelfName, string bookId)
+        [InlineData("parent5", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", "OL3368273W")]
+        public async Task Test_RemoveBookshelfItem_EmptyBookshelf(string username, string childId, string bookshelfName, string bookId)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, bookId), username),
@@ -285,8 +285,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent4", "61a1be57-69a3-46d5-95cd-8e257d4a553c", "Madison's collection", "invalidBookId")]
-        public async Task Test_RemoveBookshelfItem_InvalidBookId(string username, Guid childId, string bookshelfName, string invalidBookId)
+        [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", "invalidBookId")]
+        public async Task Test_RemoveBookshelfItem_InvalidBookId(string username, string childId, string bookshelfName, string invalidBookId)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, invalidBookId), username),
@@ -295,8 +295,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("teacher1", "00000000-0000-0000-0000-000000000000", "Ryn's Empty Bookshelf")]
-        public async Task Test_BookshelfClear_NotParent_ShouldError(string username, Guid childId, string bookshelfName)
+        [InlineData("teacher1", Constants.EmptyChildId, "Ryn's Empty Bookshelf")]
+        public async Task Test_BookshelfClear_NotParent_ShouldError(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Bookshelves.Clear(childId, bookshelfName), username),
@@ -305,8 +305,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent0", "00000000-0000-0000-0000-000000000000", "Ryn's Empty Bookshelf")]
-        public async Task Test_BookshelfClear_NoChildren_ShouldError(string username, Guid childId, string bookshelfName)
+        [InlineData("parent0", Constants.EmptyChildId, "Ryn's Empty Bookshelf")]
+        public async Task Test_BookshelfClear_NoChildren_ShouldError(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Bookshelves.Clear(childId, bookshelfName), username),
@@ -315,8 +315,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Ryn's Empty Bookshelf")]
-        public async Task Test_BookshelfClear_BookshelfNotFound_ShouldError(string username, Guid childId, string bookshelfName)
+        [InlineData("parent1", Constants.Parent1Child1Id, "Ryn's Empty Bookshelf")]
+        public async Task Test_BookshelfClear_BookshelfNotFound_ShouldError(string username, string childId, string bookshelfName)
         {
             await CheckForError(
                 () => Client.DeleteAsync(Routes.Bookshelves.Clear(childId, bookshelfName), username),
@@ -325,10 +325,10 @@ public abstract class ChildBookshelfTests
         }
         
         [Theory]
-        [InlineData("parent5", "94706c0e-2be9-45b5-ab3d-b42d61ae6c47", "Ryn's Empty Bookshelf", 0)]
-        [InlineData("parent4", "61a1be57-69a3-46d5-95cd-8e257d4a553c", "Madison's collection", 1)]
-        [InlineData("parent2", "08dd3c4b-f197-4657-8556-58c76701802b", "Evelyn's bookshelf (Parent2)", 3)]
-        public async Task Test_GetBookshelfDetails_Basic(string username, Guid childId, string bookshelfName, int expectedBooks)
+        [InlineData("parent5", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", 0)]
+        [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", 1)]
+        [InlineData("parent2", Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent2)", 3)]
+        public async Task Test_GetBookshelfDetails_Basic(string username, string childId, string bookshelfName, int expectedBooks)
         {
             await CheckResponse<BookshelfPreviewResponseDTO>(
                 async () => await Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
@@ -349,10 +349,10 @@ public abstract class ChildBookshelfTests
         }
         
         [Theory]
-        [InlineData("parent5", "94706c0e-2be9-45b5-ab3d-b42d61ae6c47", "Ryn's Empty Bookshelf", 0)]
-        [InlineData("parent4", "61a1be57-69a3-46d5-95cd-8e257d4a553c", "Madison's collection", 1)]
-        [InlineData("parent2", "08dd3c4b-f197-4657-8556-58c76701802b", "Evelyn's bookshelf (Parent2)", 3)]
-        public async Task Test_GetAllBookshelves_Basic(string username, Guid childId, string bookshelfName, int expectedBooks)
+        [InlineData("parent5", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", 0)]
+        [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", 1)]
+        [InlineData("parent2", Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent2)", 3)]
+        public async Task Test_GetAllBookshelves_Basic(string username, string childId, string bookshelfName, int expectedBooks)
         {
             await CheckResponse<List<BookshelfPreviewResponseDTO>>(
                 async () => await Client.GetAsync(Routes.Bookshelves.All(childId), username),
@@ -380,8 +380,8 @@ public abstract class ChildBookshelfTests
     public class ChildBookshelfWriteTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
     {
         [Theory]
-        [InlineData("parent2", "08dd3c4b-f197-4657-8556-58c76701802b", "Evelyn's bookshelf (Parent2)", 3)]
-        public async Task Test_GetAllBookshelves_MultipleBookshelves(string username, Guid childId, string bookshelfName, int expectedBooks)
+        [InlineData("parent2", Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent2)", 3)]
+        public async Task Test_GetAllBookshelves_MultipleBookshelves(string username, string childId, string bookshelfName, int expectedBooks)
         {
             await Client.PostAsync(Routes.Bookshelves.Add(childId, "New"), username);
             
@@ -390,13 +390,13 @@ public abstract class ChildBookshelfTests
                 HttpStatusCode.OK,
                 content => {
                     Assert.Equal(2, content.Count);
-                    Assert.Contains(content, c => c.Name == bookshelfName && c.Books.Length == 3);
+                    Assert.Contains(content, c => c.Name == bookshelfName && c.Books.Length == expectedBooks);
                 });
         }
         
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Evelyn's bookshelf (Parent1)", "Evelyn_books")]
-        public async Task Test_RenameBookshelf_BookshelfNameAlreadyExists(string username, Guid childId, string bookshelfName1,
+        [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "Evelyn_books")]
+        public async Task Test_RenameBookshelf_BookshelfNameAlreadyExists(string username, string childId, string bookshelfName1,
             string bookshelfName2)
         {
             await Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName2), username);
@@ -408,8 +408,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent3", "1560bea2-7dcd-4b87-a9d3-e89012262270", "Books")]
-        public async Task Test_AddBookshelf_Basic_ChildWithNoBookshelves(string username, Guid childId,
+        [InlineData("parent3", Constants.Parent3Child1Id, "Books")]
+        public async Task Test_AddBookshelf_Basic_ChildWithNoBookshelves(string username, string childId,
             string bookshelfName)
         {
             await CheckResponse<List<BookshelfPreviewResponseDTO>>(
@@ -452,22 +452,22 @@ public abstract class ChildBookshelfTests
             string bookshelfName1, string bookshelfName2,
             string bookId)
         {
-            Guid child1Guid = await CheckResponse<List<ChildResponseDTO>, Guid>(
+            string child1Guid = await CheckResponse<List<ChildResponseDTO>, string>(
                 async () => await Client.PostAsync(Routes.Children.Add(childName1), username1),
                 HttpStatusCode.Created,
                 (_, headers) => {
-                    Guid? childGuid = headers.GetChildLocation();
+                    string? childGuid = headers.GetChildLocation();
                     Assert.NotNull(childGuid);
-                    return childGuid.Value;
+                    return childGuid;
                 });
             
-            Guid child2Guid = await CheckResponse<List<ChildResponseDTO>, Guid>(
+            string child2Guid = await CheckResponse<List<ChildResponseDTO>, string>(
                 async () => await Client.PostAsync(Routes.Children.Add(childName2), username2),
                 HttpStatusCode.Created,
                 (_, headers) => {
-                    Guid? childGuid = headers.GetChildLocation();
+                    string? childGuid = headers.GetChildLocation();
                     Assert.NotNull(childGuid);
-                    return childGuid.Value;
+                    return childGuid;
                 });
             
             await CheckResponse<List<BookshelfPreviewResponseDTO>>(
@@ -516,8 +516,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent3", "3eda09c6-53ee-44a4-b784-fbd90d5b7b1f", "Costanza's curation")]
-        public async Task Test_DeleteBookshelf_BasicWithoutBooks(string username, Guid childId, string bookshelfName)
+        [InlineData("parent3", Constants.Parent3Child3Id, "Costanza's curation")]
+        public async Task Test_DeleteBookshelf_BasicWithoutBooks(string username, string childId, string bookshelfName)
         {
             await CheckResponse<List<BookshelfPreviewResponseDTO>>(
                 async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
@@ -526,8 +526,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Evelyn's bookshelf (Parent1)")]
-        public async Task Test_DeleteBookshelf_BasicWithBooks(string username, Guid childId, string bookshelfName)
+        [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)")]
+        public async Task Test_DeleteBookshelf_BasicWithBooks(string username, string childId, string bookshelfName)
         {
             await CheckResponse<List<BookshelfPreviewResponseDTO>>(
                 async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
@@ -536,8 +536,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Evelyn's bookshelf (Parent1)", "bookshelf2")]
-        public async Task Test_DeleteBookshelf_DeleteSingle_MultipleBookshelvesExistSameChild(string username, Guid childId, string existingBookshelf, string newBookshelf)
+        [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "bookshelf2")]
+        public async Task Test_DeleteBookshelf_DeleteSingle_MultipleBookshelvesExistSameChild(string username, string childId, string existingBookshelf, string newBookshelf)
         {
             await Client.PostAsync(Routes.Bookshelves.Add(childId, newBookshelf), username);
 
@@ -553,8 +553,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Evelyn's bookshelf (Parent1)", "NEW books")]
-        public async Task Test_RenameBookshelf_Basic(string username, Guid childId, string oldBookshelfName, string newBookshelfName)
+        [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "NEW books")]
+        public async Task Test_RenameBookshelf_Basic(string username, string childId, string oldBookshelfName, string newBookshelfName)
         {
             await CheckResponse<List<BookshelfPreviewResponseDTO>>(
                 async () => await Client.PostAsync(Routes.Bookshelves.Rename(childId, oldBookshelfName, newBookshelfName), username),
@@ -578,8 +578,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Evelyn's bookshelf (Parent1)", "NEW books")]
-        public async Task Test_RenameBookshelf_BookshelfAlreadyExists(string username, Guid childId, string oldBookshelfName, string newBookshelfName)
+        [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "NEW books")]
+        public async Task Test_RenameBookshelf_BookshelfAlreadyExists(string username, string childId, string oldBookshelfName, string newBookshelfName)
         {
             await Client.PostAsync(Routes.Bookshelves.Add(childId, newBookshelfName), username);
 
@@ -599,10 +599,10 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "parent2", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "08dd3c4b-f197-4657-8556-58c76701802b", "Evelyn's bookshelf (Parent1)", "Evelyn's bookshelf (Parent2)")]
+        [InlineData("parent1", "parent2", Constants.Parent1Child1Id, Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent1)", "Evelyn's bookshelf (Parent2)")]
         public async Task Test_RenameBookshelf_BookshelfSameNameSameChildNameDiffParents(
             string username1, string username2, 
-            Guid childId1, Guid childId2,
+            string childId1, string childId2,
             string bookshelfName1, string bookshelfName2)
         {
             await CheckResponse<List<BookshelfPreviewResponseDTO>>(
@@ -631,10 +631,10 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "parent2", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "08dd3c4b-f197-4657-8556-58c76701802b", "Evelyn's bookshelf (Parent1)", "Evelyn's bookshelf (Parent2)")]
+        [InlineData("parent1", "parent2", Constants.Parent1Child1Id, Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent1)", "Evelyn's bookshelf (Parent2)")]
         public async Task Test_DeleteBookshelf_BookshelfSameNameSameChildNameDiffParents(
             string username1, string username2, 
-            Guid childId1, Guid childId2, 
+            string childId1, string childId2, 
             string bookshelfName1, string bookshelfName2)
         {
             await CheckResponse<List<BookshelfPreviewResponseDTO>>(
@@ -657,8 +657,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent3", "2a23200c-8fe0-4c8d-9233-3cf095569c01", "1560bea2-7dcd-4b87-a9d3-e89012262270", "Eric's books")]
-        public async Task Test_RemoveBookshelf_SameParentDiffChildSameBookshelfName(string username, Guid childId1, Guid childId2, string bookshelfName)
+        [InlineData("parent3", Constants.Parent3Child2Id, Constants.Parent3Child1Id, "Eric's books")]
+        public async Task Test_RemoveBookshelf_SameParentDiffChildSameBookshelfName(string username, string childId1, string childId2, string bookshelfName)
         {
             await Client.PostAsync(Routes.Bookshelves.Add(childId2, bookshelfName), username);
             
@@ -677,8 +677,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent5", "94706c0e-2be9-45b5-ab3d-b42d61ae6c47", "Ryn's Empty Bookshelf", "OL3368273W")]
-        public async Task Test_BookshelfInsert_EmptyBookshelf(string username, Guid childId, string bookshelfName, string bookId)
+        [InlineData("parent5", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", "OL3368273W")]
+        public async Task Test_BookshelfInsert_EmptyBookshelf(string username, string childId, string bookshelfName, string bookId)
         {
             await CheckResponse<BookshelfPreviewResponseDTO>(
                 async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
@@ -691,8 +691,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent4", "61a1be57-69a3-46d5-95cd-8e257d4a553c", "Madison's collection", "OL3368273W", "OL48763W")]
-        public async Task Test_BookshelfInsert_NonEmptyBookshelf_BookNotAlreadyInBookshelf(string username, Guid childId, string bookshelfName, string bookId, string existingBookId)
+        [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", "OL3368273W", "OL48763W")]
+        public async Task Test_BookshelfInsert_NonEmptyBookshelf_BookNotAlreadyInBookshelf(string username, string childId, string bookshelfName, string bookId, string existingBookId)
         {
             await CheckResponse<BookshelfPreviewResponseDTO>(
                 async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
@@ -705,8 +705,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent4", "61a1be57-69a3-46d5-95cd-8e257d4a553c", "Madison's collection", "OL48763W")]
-        public async Task Test_BookshelfInsert_NonEmptyBookshelf_BookAlreadyInBookshelf(string username, Guid childId, string bookshelfName, string bookId)
+        [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", "OL48763W")]
+        public async Task Test_BookshelfInsert_NonEmptyBookshelf_BookAlreadyInBookshelf(string username, string childId, string bookshelfName, string bookId)
         {
             await CheckResponse<BookshelfPreviewResponseDTO>(
                 async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
@@ -719,8 +719,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent3", "2a23200c-8fe0-4c8d-9233-3cf095569c01", "Eric's books", "OL3368286W", "OL48763W")]
-        public async Task Test_BookshelfInsert_Multiple_NeitherAlreadyExists(string username, Guid childId,
+        [InlineData("parent3", Constants.Parent3Child2Id, "Eric's books", "OL3368286W", "OL48763W")]
+        public async Task Test_BookshelfInsert_Multiple_NeitherAlreadyExists(string username, string childId,
             string bookshelfName, string bookId1, string bookId2)
         {
             await CheckResponse<BookshelfPreviewResponseDTO>(
@@ -744,9 +744,9 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent3", "2a23200c-8fe0-4c8d-9233-3cf095569c01", "Eric's books", "OL28633459W", "OL48763W", 2, 3)]
-        [InlineData("parent3", "2a23200c-8fe0-4c8d-9233-3cf095569c01", "Eric's books", "OL48763W", "OL28633459W", 3, 3)]
-        public async Task Test_BookshelfInsert_Multiple_OneAlreadyExists(string username, Guid childId,
+        [InlineData("parent3", Constants.Parent3Child2Id, "Eric's books", "OL28633459W", "OL48763W", 2, 3)]
+        [InlineData("parent3", Constants.Parent3Child2Id, "Eric's books", "OL48763W", "OL28633459W", 3, 3)]
+        public async Task Test_BookshelfInsert_Multiple_OneAlreadyExists(string username, string childId,
             string bookshelfName, string bookId1, string bookId2, int expectedFirst, int expectedSecond)
         {
             await CheckResponse<BookshelfPreviewResponseDTO>(
@@ -770,8 +770,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent3", "2a23200c-8fe0-4c8d-9233-3cf095569c01", "Eric's books", "OL28633459W", "OL3368273W")]
-        public async Task Test_BookshelfInsert_Multiple_BothAlreadyExists(string username, Guid childId,
+        [InlineData("parent3", Constants.Parent3Child2Id, "Eric's books", "OL28633459W", "OL3368273W")]
+        public async Task Test_BookshelfInsert_Multiple_BothAlreadyExists(string username, string childId,
             string bookshelfName, string bookId1, string bookId2)
         {
             await CheckResponse<BookshelfPreviewResponseDTO>(
@@ -796,8 +796,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent4", "61a1be57-69a3-46d5-95cd-8e257d4a553c", "Madison's collection", "OL48763W")]
-        public async Task Test_RemoveBookshelfItem_SingleItemInBookshelf(string username, Guid childId, string bookshelfName,
+        [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", "OL48763W")]
+        public async Task Test_RemoveBookshelfItem_SingleItemInBookshelf(string username, string childId, string bookshelfName,
             string bookId)
         {
             await CheckResponse<BookshelfPreviewResponseDTO>(
@@ -810,11 +810,11 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Evelyn's bookshelf (Parent1)", "OL3368288W")]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Evelyn's bookshelf (Parent1)", "OL48763W")]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Evelyn's bookshelf (Parent1)", "OL28633459W")]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Evelyn's bookshelf (Parent1)", "OL3368286W")]
-        public async Task Test_RemoveBookshelfItem_MultipleItemsInBookshelf(string username, Guid childId, string bookshelfName,
+        [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "OL3368288W")]
+        [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "OL48763W")]
+        [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "OL28633459W")]
+        [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "OL3368286W")]
+        public async Task Test_RemoveBookshelfItem_MultipleItemsInBookshelf(string username, string childId, string bookshelfName,
             string bookId)
         {
             await CheckResponse<BookshelfPreviewResponseDTO>(
@@ -827,8 +827,8 @@ public abstract class ChildBookshelfTests
         }
 
         [Theory]
-        [InlineData("parent1", "ab198b2c-e08b-4f3d-a372-6af43c80e229", "Evelyn's bookshelf (Parent1)")]
-        public async Task Test_ClearBookshelf_Basic(string username, Guid childId, string bookshelfName)
+        [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)")]
+        public async Task Test_ClearBookshelf_Basic(string username, string childId, string bookshelfName)
         {
             await CheckResponse(
                 async () => await Client.DeleteAsync(Routes.Bookshelves.Clear(childId, bookshelfName), username), 

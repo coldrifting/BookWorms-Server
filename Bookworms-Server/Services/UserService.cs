@@ -1,5 +1,4 @@
-﻿using BookwormsServer.Models.Data;
-using BookwormsServer.Models.Entities;
+﻿using BookwormsServer.Models.Entities;
 
 namespace BookwormsServer.Services;
 
