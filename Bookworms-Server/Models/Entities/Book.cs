@@ -39,7 +39,7 @@ public class Book(string bookId, string title, List<string> authors, string desc
     [Range(0, 100, ErrorMessage = "Level must be in [0, 100]")]
     public int? Level { get; set; }
 
-    [Range(0, 5, ErrorMessage = "Star rating must be between {0} and {1}.")]
+    [Range(0.0, 5.0, ErrorMessage = "Star rating must be between {0} and {1}.")]
     public double? StarRating { get; set; }
     
     // Navigation
@@ -47,4 +47,12 @@ public class Book(string bookId, string title, List<string> authors, string desc
     public ICollection<Review> Reviews { get; set; } = null!;
     public ICollection<BookshelfBook> BookshelfBooks { get; set; } = null!;
     public ICollection<Bookshelf> Bookshelves { get; set; } = null!; // Skip-navigation (many-to-many)
+
+    public void UpdateStarRating()
+    {
+        const int numDecPlaces = 2;
+        StarRating = Reviews.Count > 0 
+            ? Math.Round(Reviews.Average(r => r.StarRating), numDecPlaces) 
+            : -1.0;
+    }
 }

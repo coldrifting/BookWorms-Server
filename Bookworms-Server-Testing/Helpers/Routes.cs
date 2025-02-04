@@ -1,6 +1,6 @@
-﻿namespace BookwormsServerTesting.Templates;
+﻿namespace BookwormsServerTesting.Helpers;
 
-public abstract class Routes
+public static class Routes
 {
     public static class Children
     {
@@ -34,10 +34,61 @@ public abstract class Routes
             $"/children/{childId}/shelves/{bookshelfName}/remove?bookId={bookId}";
     }
 
-    public static class Search
+    public static string Search(
+        string? query = null,
+        string? title = null,
+        string? author = null,
+        List<string>? subjects = null,
+        double? ratingMin = null,
+        int? levelMin = null,
+        int? levelMax = null
+        )
     {
-        public static string Title(string title) =>
-            $"/search/title?query={title}";
+        const string baseUrl = "/search";
+
+        List<String> parameters = new List<string>();
+        
+        if (query is not null)
+        {
+            parameters.Add($"query={query}");
+        }
+        
+        if (title is not null)
+        {
+            parameters.Add($"title={title}");
+        }
+        
+        if (author is not null)
+        {
+            parameters.Add($"author={author}");
+        }
+        
+        if (subjects is not null)
+        {
+            foreach (var subject in subjects)
+            {
+                parameters.Add($"subjects={subject}");
+            }
+        }
+        
+        if (ratingMin is not null)
+        {
+            parameters.Add($"ratingMin={ratingMin}");
+        }
+        
+        if (levelMin is not null)
+        {
+            parameters.Add($"levelMin={levelMin}");
+        }
+        
+        if (levelMax is not null)
+        {
+            parameters.Add($"levelMax={levelMax}");
+        }
+
+        string parametersString = String.Join('&', parameters);
+        
+        return $"{baseUrl}?{parametersString}";
     }
 
     public static class Books
@@ -57,6 +108,8 @@ public abstract class Routes
         public static string AllParam(string bookId, int start, int max) => 
             $"/books/{bookId}/reviews?start={start}&max={max}";
         public static string Edit(string bookId) => 
+            $"/books/{bookId}/review";
+        public static string Remove(string bookId) => 
             $"/books/{bookId}/review";
     }
 

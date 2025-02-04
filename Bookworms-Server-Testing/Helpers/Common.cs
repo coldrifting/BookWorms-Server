@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using BookwormsServer.Models.Data;
 
-namespace BookwormsServerTesting.Templates;
+namespace BookwormsServerTesting.Helpers;
 
 public static class Common
 {

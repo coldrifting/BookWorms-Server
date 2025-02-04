@@ -35,8 +35,10 @@ public class DatabaseFixture : IDisposable
     public BookwormsDbContext CreateDbContext()
     {
         var dbContextOptions = new DbContextOptionsBuilder<BookwormsDbContext>()
-            .UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString))
-            .Options;
+            .UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString), o =>
+            {
+                o.EnablePrimitiveCollectionsSupport();
+            }).Options;
         var dbContext = new BookwormsDbContext(dbContextOptions);
         return dbContext;
     }

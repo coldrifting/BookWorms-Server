@@ -18,8 +18,13 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // Establish database context ----------------------------------------------------------------------------------
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<BookwormsDbContext>(o =>
-	o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddDbContext<BookwormsDbContext>(opt =>
+{
+	opt.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mySqlOpt =>
+	{
+		mySqlOpt.EnablePrimitiveCollectionsSupport();
+	});
+});
 
 // Configure Swagger -------------------------------------------------------------------------------------------
 
@@ -171,5 +176,4 @@ app.Run();
 
 // -------------------------------------------------------------------------------------------------------------
 
-
-public partial class Program;
+public abstract partial class Program;

@@ -17,4 +17,4 @@ public record ReviewDTO(string ReviewerFirstName, string ReviewerLastName, strin
     }
 }
 
-public record ReviewAddOrUpdateRequestDTO(double StarRating, string? ReviewText);
+public record ReviewAddOrUpdateRequestDTO(double StarRating, string? ReviewText = null);

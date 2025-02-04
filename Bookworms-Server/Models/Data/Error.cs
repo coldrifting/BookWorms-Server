@@ -15,6 +15,9 @@ public record ErrorDTO(string Error, string Description)
     public static ErrorDTO LoginFailure => new("Invalid Login Credentials", 
         "Incorrect username and/or password");
     
+    public static ErrorDTO ReviewNotFound => new("Review Not Found", 
+        "The user has not reviewed the specified book");
+    
     public static ErrorDTO BookNotFound => new("Book Not Found", 
         "Unable to find the specified book");
     

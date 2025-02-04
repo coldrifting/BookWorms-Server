@@ -19,7 +19,7 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     /// <param name="max" default="-1">The maximum number of reviews to return (use -1 for unconstrained)</param>
     /// <returns>The list of reviews</returns>
     /// <response code="200">Success</response>
-    /// <response code="404">The specified book is not found</response>
+    /// <response code="404">The book is not found</response>
     [HttpGet]
     [Route("/books/{bookId}/reviews")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ReviewDTO>))]
@@ -67,7 +67,7 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="200">Success. Review was Updated</response>
     /// <response code="201">Success. Review was Created</response>
     /// <response code="401">The user is not logged in</response>
-    /// <response code="404">The specified book is not found</response>
+    /// <response code="404">The book is not found</response>
     [HttpPut]
     [Authorize]
     [Route("/books/{bookId}/review")]
@@ -77,7 +77,11 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public IActionResult AddOrUpdate(string bookId, [FromBody] ReviewAddOrUpdateRequestDTO reviewDto)
     {
-        if (!dbContext.Books.Any(b => b.BookId == bookId))
+        Book? book = dbContext.Books
+            .Include(b => b.Reviews)
+            .ThenInclude(r => r.Reviewer)
+            .FirstOrDefault(b => b.BookId == bookId);
+        if (book is null)
         {
             return NotFound(ErrorDTO.BookNotFound);
         }
@@ -85,37 +89,37 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
         // Will not be null thanks to Authorize attribute
         string username = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        Review? review = dbContext.Reviews
-            .Include(r => r.Reviewer)
-            .FirstOrDefault(r => r.BookId == bookId && 
-                                 r.Reviewer!.Username == username);
+        Review? review = book.Reviews.FirstOrDefault(r => r.Username == username);
 
         int statusCode;
         if (review is not null)
         {
             review.StarRating = reviewDto.StarRating;
             review.ReviewText = reviewDto.ReviewText;
-            statusCode = 200;
+            statusCode = StatusCodes.Status200OK;
         }
         else
         {
             review = new(bookId, username, reviewDto.StarRating, reviewDto.ReviewText, DateTime.Now);
-            statusCode = 201;
+            statusCode = StatusCodes.Status201Created;
         }
-
+        
         dbContext.Reviews.Update(review);
         dbContext.SaveChanges();
         
-        var rx = dbContext.Reviews
-            .Where(r => r.ReviewId == review.ReviewId)
-            .Include(r => r.Reviewer)
-            .FirstOrDefault();
+        book.UpdateStarRating();
+        dbContext.Books.Update(book);
+        dbContext.SaveChanges();
 
-        return StatusCode(statusCode, ReviewDTO.From(rx!));
+        var reviewOutput = dbContext.Reviews
+            .Include(r => r.Reviewer)
+            .First(r => r.Username == username && r.BookId == bookId);
+
+        return StatusCode(statusCode, ReviewDTO.From(reviewOutput));
     }
     
     /// <summary>
-    /// Removes the review by the logged in user for the specified book 
+    /// Removes the review by the logged-in user for the specified book 
     /// </summary>
     /// <param name="bookId">The book under which to delete a review</param>
     /// <response code="204">Success</response>
@@ -129,23 +133,31 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public IActionResult Delete(string bookId)
     {
-        // Will not be null thanks to Authorize attribute
-        string username = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        
-        Review? review = dbContext.Reviews
-            .Include(r => r.Reviewer)
-            .FirstOrDefault(r => r.BookId == bookId && 
-                                        r.Reviewer!.Username == username);
-
-        if (review is null)
+        Book? book = dbContext.Books
+            .Include(b => b.Reviews)
+            .ThenInclude(r => r.Reviewer)
+            .FirstOrDefault(b => b.BookId == bookId);
+        if (book is null)
         {
             return NotFound(ErrorDTO.BookNotFound);
         }
 
+        // Will not be null thanks to Authorize attribute
+        string username = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        Review? review = book.Reviews.FirstOrDefault(r => r.Username == username);
+
+        if (review is null)
+        {
+            return NotFound(ErrorDTO.ReviewNotFound);
+        }
+        
         dbContext.Remove(review);
         dbContext.SaveChanges();
-
-        Response.Headers.Append("location", "");
+        
+        book.UpdateStarRating();
+        dbContext.Books.Update(book);
+        dbContext.SaveChanges();
         
         return NoContent();
     }

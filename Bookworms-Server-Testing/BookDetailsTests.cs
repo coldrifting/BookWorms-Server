@@ -1,15 +1,13 @@
 using System.Net;
-using BookwormsServer;
 using BookwormsServer.Models.Data;
-using BookwormsServerTesting.Templates;
+using BookwormsServerTesting.Helpers;
 using System.IO.Compression;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using BookwormsServerTesting.Fixtures;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.IdentityModel.Tokens;
 
-using static BookwormsServerTesting.Templates.Common;
+using static BookwormsServerTesting.Helpers.Common;
 
 namespace BookwormsServerTesting;
 

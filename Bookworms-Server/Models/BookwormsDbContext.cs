@@ -46,6 +46,15 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	    Seed<Child>();
 	    Seed<ChildBookshelf>();
 	    Seed<BookshelfBook>();
+	    
+	    // Fix any inconsistencies that result from inserting directly into DB
+	    foreach (Book book in Books.Include(b => b.Reviews))
+	    {
+			book.UpdateStarRating();
+		    Books.Update(book);
+	    }
+
+	    SaveChanges();
     }
 
     public void Clear()
