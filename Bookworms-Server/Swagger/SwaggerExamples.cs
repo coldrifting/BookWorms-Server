@@ -66,7 +66,7 @@ public static class SwaggerExamples
     {
         public ChildResponseDTO GetExamples()
         {
-            return new(Base62.FromGuid(Guid.NewGuid()), "Jackson", 1, "A5", "CLS098", DateOnly.Parse("2015-04-15"));
+            return new(Snowflake.Generate(), "Jackson", 1, "A5", "CLS098", DateOnly.Parse("2015-04-15"));
         }
     }
     
@@ -76,9 +76,9 @@ public static class SwaggerExamples
         {
             return
             [
-                new(Base62.FromGuid(Guid.NewGuid()),"Ashley", 0,  "A7", "CLS098", DateOnly.Parse("2014-08-23")),
-                new(Base62.FromGuid(Guid.NewGuid()),"Miles", 1, "B4", "CLS498", null),
-                new(Base62.FromGuid(Guid.NewGuid()),"Joey", 2, null, null, DateOnly.Parse("2015-04-15"))
+                new(Snowflake.Generate(),"Ashley", 0,  "A7", "CLS098", DateOnly.Parse("2014-08-23")),
+                new(Snowflake.Generate(),"Miles", 1, "B4", "CLS498", null),
+                new(Snowflake.Generate(),"Joey", 2, null, null, DateOnly.Parse("2015-04-15"))
             ];
         }
     }

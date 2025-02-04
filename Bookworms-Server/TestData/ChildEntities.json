@@ -1,12 +1,12 @@
 ﻿[
   {
-    "childId": "2PWfeFCO9yMdKIlKEFCxQR",
+    "childId": "2bc5ae6239c988",
     "name": "Evelyn",
     "childIcon": 0,
     "parentUsername": "parent1"
   },
   {
-    "childId": "c429e742d4e56dab433647",
+    "childId": "2bc5b121b46b4a",
     "name": "Evelyn",
     "childIcon": 0,
     "dateOfBirth": "2017-04-13",
@@ -14,40 +14,40 @@
     "parentUsername": "parent2"
   },
   {
-    "childId": "1zi5Wng0rlxlZxp3FnqhPi",
+    "childId": "2bc5b21dcd7110",
     "name": "Evelyn",
     "childIcon": 1,
     "parentUsername": "parent2"
   },
   {
-    "childId": "2IWLLNaFPvBcypflWYS5Kz",
+    "childId": "2bc5b2a4771d7f",
     "name": "Alice",
     "childIcon": 0,
     "parentUsername": "parent3"
   },
   {
-    "childId": "2KS6sByRqufGMS81MfRzl4",
+    "childId": "2bc5b325697a55",
     "name": "Eric",
     "childIcon": 2,
     "readingLevel": "B4",
     "parentUsername": "parent3"
   },
   {
-    "childId": "25WZjCImLdqp9jazVa8gVj",
+    "childId": "2bc5b3b701b2ee",
     "name": "Costanza",
     "childIcon": 1,
     "dateOfBirth": "2019-12-31",
     "parentUsername": "parent3"
   },
   {
-    "childId": "29ezY6IkWWoJ7Jl9bKXkph",
+    "childId": "2bc5b4544b34e7",
     "name": "Madison",
     "childIcon": 0,
     "dateOfBirth": "2018-01-01",
     "parentUsername": "parent4"
   },
   {
-    "childId": "27XGVD6YGXLKwWra6I5Nhj",
+    "childId": "2bc5b4ec4f452c",
     "name": "Ryn",
     "childIcon": 0,
     "parentUsername": "parent5"

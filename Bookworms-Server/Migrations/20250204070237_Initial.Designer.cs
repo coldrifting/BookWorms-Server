@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookwormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
-    [Migration("20250131034914_Initial")]
+    [Migration("20250204070237_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -132,7 +132,7 @@ namespace BookwormsServer.Migrations
             modelBuilder.Entity("BookwormsServer.Models.Entities.Child", b =>
                 {
                     b.Property<string>("ChildId")
-                        .HasMaxLength(22)
+                        .HasMaxLength(14)
                         .HasColumnType("char");
 
                     b.Property<int>("ChildIcon")

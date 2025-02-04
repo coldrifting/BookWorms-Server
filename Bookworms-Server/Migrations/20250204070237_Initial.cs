@@ -188,7 +188,7 @@ namespace BookwormsServer.Migrations
                 name: "Children",
                 columns: table => new
                 {
-                    ChildId = table.Column<string>(type: "char(22)", maxLength: 22, nullable: false)
+                    ChildId = table.Column<string>(type: "char(14)", maxLength: 14, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),

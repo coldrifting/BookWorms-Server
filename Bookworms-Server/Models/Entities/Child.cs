@@ -7,9 +7,9 @@ namespace BookwormsServer.Models.Entities;
 public class Child(string name, string parentUsername, DateOnly? dateOfBirth = null, string? readingLevel = null)
 {
     [Key]
-    [StringLength(22)]
+    [StringLength(14)]
     [Column(TypeName="char")]
-    public string ChildId { get; set; } = Base62.FromGuid(Guid.NewGuid());
+    public string ChildId { get; set; } = Snowflake.Generate();
     
     [StringLength(256, MinimumLength = 2, ErrorMessage = "Child name must be between {2} and {1} characters long.")]
     public string Name { get; set; } = name;

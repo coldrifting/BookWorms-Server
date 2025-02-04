@@ -129,7 +129,7 @@ namespace BookwormsServer.Migrations
             modelBuilder.Entity("BookwormsServer.Models.Entities.Child", b =>
                 {
                     b.Property<string>("ChildId")
-                        .HasMaxLength(22)
+                        .HasMaxLength(14)
                         .HasColumnType("char");
 
                     b.Property<int>("ChildIcon")
