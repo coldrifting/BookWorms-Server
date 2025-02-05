@@ -120,6 +120,7 @@ using (var serviceScope = app.Services.CreateScope()) {
 	// If running the application or the tests fails here, you need to drop your database and then try again
 	if (dbContext.Database.GetPendingMigrations().Any())
 	{
+		dbContext.Database.EnsureDeleted();
 		dbContext.Database.Migrate();
 	}
 }
