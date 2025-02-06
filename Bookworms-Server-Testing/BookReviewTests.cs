@@ -2,7 +2,6 @@ using System.Net;
 using BookwormsServer.Models.Data;
 using BookwormsServerTesting.Fixtures;
 using BookwormsServerTesting.Helpers;
-
 using static BookwormsServerTesting.Helpers.Common;
 
 namespace BookwormsServerTesting;
@@ -49,25 +48,14 @@ public class BookReviewTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("OL3368288W")]
     public async Task Test_DeleteReview_NotLoggedIn(string bookId)
     {
-        int initialSize = 
-        await CheckResponse<List<ReviewDTO>, int>(
-            async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
-            HttpStatusCode.OK,
-            content => content.Count);
+        int initialSize = Context.Reviews.Count(r => r.BookId == bookId);
 
         await CheckForError(
-            () => Client.DeleteAsync(Routes.Reviews.Edit(bookId)),
+            () => Client.DeleteAsync(Routes.Reviews.Remove(bookId)),
             HttpStatusCode.Unauthorized,
             ErrorDTO.Unauthorized);
         
-        await CheckResponse<List<ReviewDTO>>(
-            async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
-            HttpStatusCode.OK,
-            content =>
-            {
-                Assert.NotEmpty(content);
-                Assert.Equal(content.Count, initialSize);
-            });
+        Assert.Equal(initialSize, Context.Reviews.Count(r => r.BookId == bookId));
     }
 
     [Theory]
@@ -160,30 +148,20 @@ public class BookReviewTests(CompositeFixture fixture) : BookwormsIntegrationTes
                 Assert.Equal(content.ReviewText, reviewText);
                 Assert.Equal(content.StarRating, rating);
             });
-        
-        await CheckResponse<List<ReviewDTO>>(
-            async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
-            HttpStatusCode.OK,
-            content => {
-                Assert.NotEmpty(content);
-                Assert.Contains(content, r => r.ReviewText == reviewText);
-            });
+
+        Assert.Contains(Context.Reviews,
+            r => r.ReviewText == reviewText && Math.Abs(r.StarRating - rating) < 0.001);
     }
 
     [Theory]
-    [InlineData("OL3368288W", "parent0", "Audrey", "Hepburn", 1.0, "I like green")]
-    [InlineData("OL3368288W", "teacher0", "Sally", "Field", 1.5, "I like trees")]
-    public async Task Test_PutReview_UpdateRating(string bookId, string username, string reviewerFirstName,
-        string reviewerLastName, double rating, string reviewText)
+    [InlineData("OL3368288W", "parent0", 1.0, "I like green")]
+    [InlineData("OL3368288W", "teacher0", 1.5, "I like trees")]
+    public async Task Test_PutReview_UpdateRating(string bookId, string username, double rating, string reviewText)
     {
-        await CheckResponse<List<ReviewDTO>>(
-            async () => await Client.GetAsync(Routes.Reviews.AllParam(bookId, 0, -1)),
-            HttpStatusCode.OK,
-            content => {
-                ReviewDTO? originalReview = content.SingleOrDefault(r =>
-                    r.ReviewerFirstName == reviewerFirstName && r.ReviewerLastName == reviewerLastName);
-                Assert.NotNull(originalReview);
-            });
+        // Assert that targeted review exists
+        Assert.NotNull(Context.Reviews
+            .Where(r => r.BookId == bookId)
+            .SingleOrDefault(r => r.Reviewer != null && r.Username == username));
 
         await CheckResponse<ReviewDTO>(
             async () => await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),
@@ -191,29 +169,19 @@ public class BookReviewTests(CompositeFixture fixture) : BookwormsIntegrationTes
             HttpStatusCode.OK,
             _ => { });
 
-        await CheckResponse<List<ReviewDTO>>(
-            async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
-            HttpStatusCode.OK,
-            content => {
-                Assert.NotEmpty(content);
-                Assert.Contains(content, r => r.ReviewerFirstName == reviewerFirstName && Math.Abs(r.StarRating - rating) < 0.001);
-            });
+        Assert.Contains(Context.Reviews.Where(r => r.BookId == bookId),
+            r => r.Username == username && Math.Abs(r.StarRating - rating) < 0.001);
     }
 
     [Theory]
-    [InlineData("OL3368288W", "parent0", "Audrey", "Hepburn", 4.5, "New text")]
-    [InlineData("OL3368288W", "teacher0", "Sally", "Field", 5.0, "New text")]
-    public async Task Test_PutReview_UpdateText(string bookId, string username, string reviewerFirstName,
-        string reviewerLastName, double rating, string reviewText)
+    [InlineData("OL3368288W", "parent0", 4.5, "New text")]
+    [InlineData("OL3368288W", "teacher0", 5.0, "New text")]
+    public async Task Test_PutReview_UpdateText(string bookId, string username, double rating, string reviewText)
     {
-        await CheckResponse<List<ReviewDTO>>(
-            async () => await Client.GetAsync(Routes.Reviews.AllParam(bookId, 0, -1)),
-            HttpStatusCode.OK,
-            content => {
-                ReviewDTO? originalReview = content.SingleOrDefault(r =>
-                    r.ReviewerFirstName == reviewerFirstName && r.ReviewerLastName == reviewerLastName);
-                Assert.NotNull(originalReview);
-            });
+        // Assert that targeted review exists
+        Assert.NotNull(Context.Reviews
+            .Where(r => r.BookId == bookId)
+            .SingleOrDefault(r => r.Reviewer != null && r.Username == username));
 
         await CheckResponse<ReviewDTO>(
             async () => await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),
@@ -221,18 +189,13 @@ public class BookReviewTests(CompositeFixture fixture) : BookwormsIntegrationTes
             HttpStatusCode.OK,
             _ => { });
 
-        await CheckResponse<List<ReviewDTO>>(
-            async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
-            HttpStatusCode.OK,
-            content => {
-                Assert.NotEmpty(content);
-                Assert.Contains(content, r => r.ReviewerFirstName == reviewerFirstName && r.ReviewText == reviewText);
-            });
+        Assert.Contains(Context.Reviews.Where(r => r.BookId == bookId),
+            r => r.Username == username && r.ReviewText == reviewText);
     }
 
     [Theory]
-    [InlineData("OL48763W", "teacher1", "Emma", 3.5, "some review text")]
-    public async Task Test_PutReview_NewReview(string bookId, string username, string firstName, double rating, string reviewText)
+    [InlineData("OL48763W", "teacher1", 3.5, "some review text")]
+    public async Task Test_PutReview_NewReview(string bookId, string username, double rating, string reviewText)
     {
         await CheckResponse<ReviewDTO>(
             async () => await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),
@@ -243,13 +206,8 @@ public class BookReviewTests(CompositeFixture fixture) : BookwormsIntegrationTes
                 Assert.Equal(reviewText, content.ReviewText);
             });
         
-        await CheckResponse<List<ReviewDTO>>(
-            async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
-            HttpStatusCode.OK,
-            content => {
-                Assert.NotEmpty(content);
-                Assert.Contains(content, c => c.ReviewerFirstName == firstName && c.ReviewText == reviewText && Math.Abs(c.StarRating - rating) < 0.01);
-            });
+        Assert.Contains(Context.Reviews.Where(r => r.BookId == bookId),
+            r => r.Username == username && r.ReviewText == reviewText && Math.Abs(r.StarRating - rating) < 0.001);
     }
 
     [Theory]
@@ -257,24 +215,14 @@ public class BookReviewTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("OL3368288W", "teacher0", "Sally")]
     public async Task Test_DeleteReview(string bookId, string username, string reviewerFirstName)
     {
-         int initialSize = await CheckResponse<List<ReviewDTO>, int>(
-             async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
-            HttpStatusCode.OK,
-            content => {
-                Assert.NotEmpty(content);
-                return content.Count;
-            });
+        int initialSize = Context.Reviews.Count(r => r.BookId == bookId);
+        Assert.NotEqual(0, initialSize);
          
-         await CheckResponse(
-             async () => await Client.DeleteAsync(Routes.Reviews.Edit(bookId), username), HttpStatusCode.NoContent);
+        await CheckResponse(
+            async () => await Client.DeleteAsync(Routes.Reviews.Edit(bookId), username), HttpStatusCode.NoContent);
 
-         await CheckResponse<List<ReviewDTO>>(
-             async () => await Client.GetAsync(Routes.Reviews.All(bookId)),
-            HttpStatusCode.OK,
-            content => {
-                Assert.NotEmpty(content);
-                Assert.Equal(initialSize - 1, content.Count);
-                Assert.DoesNotContain(content, r => r.ReviewerFirstName == reviewerFirstName);
-            });
+        Assert.Equal(initialSize - 1, Context.Reviews.Count(r => r.BookId == bookId));
+        Assert.DoesNotContain(Context.Reviews.Where(r => r.BookId == bookId),
+            r => r.Username == reviewerFirstName);
     }
 }

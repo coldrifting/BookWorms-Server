@@ -189,14 +189,10 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
                 Assert.Equal(username, content.Username);
                 Assert.Equal(newFirstName, content.FirstName);
             });
-
-        await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync(Routes.User.Details, username),
-            HttpStatusCode.OK,
-            content =>
-            {
-                Assert.Equal(username, content.Username);
-                Assert.Equal(newFirstName, content.FirstName);
-            });
+        
+        User newUser = Context.Users.First(u => u.Username == username); 
+        Assert.Equal(username, newUser.Username);
+        Assert.Equal(newFirstName, newUser.FirstName);
     }
 
     [Theory]
@@ -213,14 +209,10 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
                 Assert.Equal(username, content.Username);
                 Assert.Equal(newLastName, content.LastName);
             });
-
-        await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync(Routes.User.Details, username),
-            HttpStatusCode.OK,
-            content =>
-            {
-                Assert.Equal(username, content.Username);
-                Assert.Equal(newLastName, content.LastName);
-            });
+        
+        User newUser = Context.Users.First(u => u.Username == username); 
+        Assert.Equal(username, newUser.Username);
+        Assert.Equal(newLastName, newUser.LastName);
     }
 
     [Theory]
@@ -237,14 +229,10 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
                 Assert.Equal(username, content.Username);
                 Assert.Equal(newIcon, content.Icon);
             });
-
-        await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync(Routes.User.Details, username),
-            HttpStatusCode.OK,
-            content =>
-            {
-                Assert.Equal(username, content.Username);
-                Assert.Equal(newIcon, content.Icon);
-            });
+        
+        User newUser = Context.Users.First(u => u.Username == username); 
+        Assert.Equal(username, newUser.Username);
+        Assert.Equal(newIcon, newUser.UserIcon);
     }
 
     [Theory]
@@ -285,17 +273,12 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
                 Assert.Equal(newLastName, content.LastName);
                 Assert.Equal(newIcon, content.Icon);
             });
-
-        await CheckResponse<UserDetailsDTO>(
-            async () => await Client.GetAsync(Routes.User.Details, username),
-            HttpStatusCode.OK,
-            content =>
-            {
-                Assert.Equal(username, content.Username);
-                Assert.Equal(newFirstName, content.FirstName);
-                Assert.Equal(newLastName, content.LastName);
-                Assert.Equal(newIcon, content.Icon);
-            });
+        
+        User newUser = Context.Users.First(u => u.Username == username); 
+        Assert.Equal(username, newUser.Username);
+        Assert.Equal(newFirstName, newUser.FirstName);
+        Assert.Equal(newLastName, newUser.LastName);
+        Assert.Equal(newIcon, newUser.UserIcon);
     }
 
     [Theory]

@@ -1,8 +1,10 @@
 using System.Net;
 using BookwormsServer.Models.Data;
+using BookwormsServer.Models.Entities;
 using BookwormsServerTesting.Fixtures;
 using BookwormsServerTesting.Helpers;
 using BookwormsServerTesting.Templates;
+using Microsoft.EntityFrameworkCore;
 using static BookwormsServerTesting.Helpers.Common;
 
 namespace BookwormsServerTesting;
@@ -62,13 +64,9 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
             HttpStatusCode.NotFound,
             ErrorDTO.ChildNotFound);
         
-        await CheckResponse<List<ChildResponseDTO>>(
-            async () => await Client.GetAsync(Routes.Children.All, username),
-            HttpStatusCode.OK,
-            content => {
-                Assert.Single(content);
-                Assert.Contains(content, c => c.ChildId == existingChildId);
-            });
+        List<Child> children = Context.Children.Where(c => c.ParentUsername == username).ToList();
+        Assert.Single(children);
+        Assert.Contains(children, c => c.ChildId == existingChildId);
     }
 
     [Theory]
@@ -101,17 +99,9 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
             HttpStatusCode.UnprocessableEntity,
             ErrorDTO.ClassroomNotFound);
         
-        Context.ChangeTracker.Clear();
-        
-        await CheckResponse<List<ChildResponseDTO>>(
-            async () => await Client.GetAsync(Routes.Children.All, username),
-            HttpStatusCode.OK,
-            content => {
-                Assert.Equal(2, content.Count);
-                Assert.Contains(content, c => c.ChildId == childId && 
-                                                                   c.ClassroomCode is null && 
-                                                                   c.ReadingLevel == null);
-            });
+        List<Child> children = Context.Children.Where(c => c.ParentUsername == username).ToList();
+        Assert.Equal(2, children.Count);
+        Assert.Contains(children, c => c.ChildId == childId && c.ClassroomCode is null && c.ReadingLevel is null);
     }
 
     [Theory]
@@ -160,7 +150,7 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
     [InlineData("parent0", "joey", "joey")]
     public async Task Test_AddChild_MultipleSameParent(string username, string childName1, string childName2)
     {
-        string childGuid1 = await CheckResponse<List<ChildResponseDTO>, string>(
+        string child1Id = await CheckResponse<List<ChildResponseDTO>, string>(
             async () => await Client.PostAsync(Routes.Children.Add(childName1), username),
             HttpStatusCode.Created,
             (content, headers) => {
@@ -171,7 +161,7 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
                 return childGuid;
             });
         
-        string childGuid2 = await CheckResponse<List<ChildResponseDTO>, string>(
+        string child2Id = await CheckResponse<List<ChildResponseDTO>, string>(
             async () => await Client.PostAsync(Routes.Children.Add(childName2), username),
             HttpStatusCode.Created,
             (content, headers) => {
@@ -179,7 +169,7 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
                 Assert.NotNull(childGuid);
                 Assert.Equal(2, content.Count);
                 Assert.Contains(content, c => c.ChildId == childGuid && c.Name == childName2);
-                Assert.Contains(content, c => c.ChildId == childGuid1 && c.Name == childName1);
+                Assert.Contains(content, c => c.ChildId == child1Id && c.Name == childName1);
                 return childGuid;
             });
         
@@ -188,8 +178,8 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(2, content.Count);
-                Assert.Contains(content, c => c.ChildId == childGuid1 && c.Name == childName1);
-                Assert.Contains(content, c => c.ChildId == childGuid2 && c.Name == childName2);
+                Assert.Contains(content, c => c.ChildId == child1Id && c.Name == childName1);
+                Assert.Contains(content, c => c.ChildId == child2Id && c.Name == childName2);
             });
     }
 
@@ -214,23 +204,15 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
                 Assert.Contains(content, c => c.Name != childName);
                 Assert.Contains(content, c => c.Name == childName);
             });
-
-        await CheckResponse<List<ChildResponseDTO>>(
-            async () => await Client.GetAsync(Routes.Children.All, username1),
-            HttpStatusCode.OK,
-            content => {
-                Assert.Single(content);
-                Assert.Contains(content, c => c.Name == childName);
-            });
-
-        await CheckResponse<List<ChildResponseDTO>>(
-            async () => await Client.GetAsync(Routes.Children.All, username2),
-            HttpStatusCode.OK,
-            content => {
-                Assert.Equal(2, content.Count);
-                Assert.Contains(content, c => c.Name != childName);
-                Assert.Contains(content, c => c.Name == childName);
-            });
+        
+        List<Child> user1Children = Context.Children.Where(c => c.ParentUsername == username1).ToList();
+        Assert.Single(user1Children);
+        Assert.Contains(user1Children, c => c.Name == childName);
+        
+        List<Child> user2Children = Context.Children.Where(c => c.ParentUsername == username2).ToList();
+        Assert.Equal(2, user2Children.Count);
+        Assert.Contains(user2Children, c => c.Name == childName);
+        Assert.Contains(user2Children, c => c.Name != childName);
     }
 
     [Theory]
@@ -242,10 +224,7 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
             HttpStatusCode.OK,
             Assert.Empty);
         
-        await CheckResponse<List<ChildResponseDTO>>(
-            async () => await Client.GetAsync(Routes.Children.All, username),
-            HttpStatusCode.OK,
-            Assert.Empty);
+        Assert.Empty(Context.Children.Where(c => c.ParentUsername == username));
     }
 
     [Theory]
@@ -260,13 +239,9 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
                 Assert.Contains(content, c => c.ChildId == childLeftId);
             });
         
-        await CheckResponse<List<ChildResponseDTO>>(
-            async () => await Client.GetAsync(Routes.Children.All, username),
-            HttpStatusCode.OK,
-            content => {
-                Assert.Single(content);
-                Assert.Contains(content, c => c.ChildId == childLeftId);
-            });
+        List<Child> children = Context.Children.Where(c => c.ParentUsername == username).ToList();
+        Assert.Single(children);
+        Assert.Contains(children, c => c.ChildId == childLeftId);
     }
 
     [Theory]
@@ -280,14 +255,10 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
             content => {
                 Assert.Equal(newName, content.Name);
             });
-
-        await CheckResponse<List<ChildResponseDTO>>(
-            async () => await Client.GetAsync(Routes.Children.All, username),
-            HttpStatusCode.OK,
-            content => {
-                Assert.Single(content);
-                Assert.Contains(content, c => c.ChildId == childId && c.Name == newName);
-            });
+        
+        List<Child> children = Context.Children.Where(c => c.ParentUsername == username).ToList();
+        Assert.Single(children);
+        Assert.Contains(children, c => c.ChildId == childId && c.Name == newName);
     }
 
     [Theory]
@@ -303,37 +274,28 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
                 Assert.Equal(newIcon, content.ChildIcon);
             });
         
-        await CheckResponse<List<ChildResponseDTO>>(
-            async () => await Client.GetAsync(Routes.Children.All, username),
-            HttpStatusCode.OK,
-            content => {
-                Assert.Equal(3, content.Count);
-                Assert.Contains(content, c => c.ChildId == childId && c.ChildIcon == newIcon);
-            });
+        List<Child> children = Context.Children.Where(c => c.ParentUsername == username).ToList();
+        Assert.Equal(3, children.Count);
+        Assert.Contains(children, c => c.ChildId == childId && c.ChildIcon == newIcon);
     }
 
     [Theory]
     [InlineData("parent3", Constants.Parent3Child2Id, Constants.Parent3Child3Id,
         "Costanza")]
-    public async Task Test_EditChild_ChangeName_NameAlreadyExistsUnderParent(string username, string childId, string childId2, string newName)
+    public async Task Test_EditChild_ChangeName_NameAlreadyExistsUnderParent(string username, string child1Id, string child2Id, string newName)
     {
         await CheckResponse<ChildResponseDTO>(
-            async () => await Client.PutPayloadAsync(Routes.Children.Edit(childId),
+            async () => await Client.PutPayloadAsync(Routes.Children.Edit(child1Id),
             new ChildEditDTO(NewName: newName), username),
             HttpStatusCode.OK,
             content => {
-                Assert.Equal(childId, content.ChildId);
+                Assert.Equal(child1Id, content.ChildId);
                 Assert.Equal(newName, content.Name);
             });
-        
-        await CheckResponse<List<ChildResponseDTO>>(
-            async () => await Client.GetAsync(Routes.Children.All, username),
-            HttpStatusCode.OK,
-            content => {
-                Assert.Equal(3, content.Count);
-                Assert.Contains(content, c => c.Name == newName && c.ChildId == childId);
-                Assert.Contains(content, c => c.Name == newName && c.ChildId == childId2);
-            });
+        List<Child> children = Context.Children.Where(c => c.ParentUsername == username).ToList();
+        Assert.Equal(3, children.Count);
+        Assert.Contains(children, c => c.ChildId == child1Id && c.Name == newName);
+        Assert.Contains(children, c => c.ChildId == child2Id && c.Name == newName);
     }
 
     [Theory]
@@ -349,13 +311,9 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
                 Assert.Equal(readingLevel, content.ReadingLevel);
             });
         
-        await CheckResponse<List<ChildResponseDTO>>(
-            async () => await Client.GetAsync(Routes.Children.All, username),
-            HttpStatusCode.OK,
-            content => {
-                Assert.Single(content);
-                Assert.Contains(content, c => c.ChildId == childId && c.ReadingLevel == readingLevel);
-            });
+        List<Child> children = Context.Children.Where(c => c.ParentUsername == username).ToList();
+        Assert.Single(children);
+        Assert.Contains(children, c => c.ChildId == childId && c.ReadingLevel == readingLevel);
     }
 
     [Theory]
@@ -371,13 +329,9 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
                 Assert.Equal(DateOnly.Parse(dob), content.DateOfBirth);
             });
         
-        await CheckResponse<List<ChildResponseDTO>>(
-            async () => await Client.GetAsync(Routes.Children.All, username),
-            HttpStatusCode.OK,
-            content => {
-                Assert.Equal(3, content.Count);
-                Assert.Contains(content, c => c.ChildId == childId && c.DateOfBirth == DateOnly.Parse(dob));
-            });
+        List<Child> children = Context.Children.Where(c => c.ParentUsername == username).ToList();
+        Assert.Equal(3, children.Count);
+        Assert.Contains(children, c => c.ChildId == childId && c.DateOfBirth == DateOnly.Parse(dob));
     }
 
     // TODO - Add more classroom code edit validation when classrooms are added

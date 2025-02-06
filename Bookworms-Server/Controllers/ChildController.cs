@@ -3,7 +3,6 @@ using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServer.Controllers;
 
@@ -99,6 +98,16 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
             return NotFound(ErrorDTO.ChildNotFound);
         }
 
+        if (payload.ClassroomCode is not null)
+        {
+            if (!dbContext.Classrooms.Any(c => c.ClassroomCode == payload.ClassroomCode))
+            {
+                return UnprocessableEntity(ErrorDTO.ClassroomNotFound);
+            }
+            
+            child.ClassroomCode = payload.ClassroomCode;
+        }
+
         if (payload.NewName is not null)
         {
             child.Name = payload.NewName;
@@ -117,16 +126,6 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
         if (payload.ChildIcon is not null)
         {
             child.ChildIcon = payload.ChildIcon.Value;
-        }
-
-        if (payload.ClassroomCode is not null)
-        {
-            if (!dbContext.Classrooms.Any(c => c.ClassroomCode == payload.ClassroomCode))
-            {
-                return UnprocessableEntity(ErrorDTO.ClassroomNotFound);
-            }
-            
-            child.ClassroomCode = payload.ClassroomCode;
         }
 
         dbContext.SaveChanges();
