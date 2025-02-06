@@ -16,7 +16,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     /// <summary>
     /// Returns details about a book
     /// </summary>
-    /// <param name="bookId">The Google Books ID of the book to target</param>
+    /// <param name="bookId">The Book ID of the book to target</param>
     /// <returns>A BookDetailsDTO object</returns>
     /// <response code="200">Success</response>
     /// <response code="404">The book is not found</response>
@@ -44,7 +44,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     /// <summary>
     /// Gets the cover image for a book
     /// </summary>
-    /// <param name="bookId">The Google Books ID of the book to target</param>
+    /// <param name="bookId">The Book ID of the book to target</param>
     /// <returns>A JPEG file</returns>
     /// <response code="200">Success</response>
     /// <response code="404">The book is not found</response>
@@ -77,7 +77,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     /// <summary>
     /// Gets the cover images for a list of books
     /// </summary>
-    /// <param name="bookIds">The Google Books IDs of the books to target</param>
+    /// <param name="bookIds">The Book IDs of the books to target</param>
     /// <returns>A zip archive of book cover images</returns>
     /// <response code="200">Success</response>
     [HttpPost]
