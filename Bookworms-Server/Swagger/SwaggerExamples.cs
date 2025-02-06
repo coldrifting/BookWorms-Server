@@ -18,11 +18,15 @@ public static class SwaggerExamples
 {
     // BookDetailsController
     
-    public class BookDetailsResponseExample : IExamplesProvider<BookDetailsDTO>
+    public class BookDetailsExtendedResponseExample : IExamplesProvider<BookDetailsExtendedDTO>
     {
-        public BookDetailsDTO GetExamples()
+        public BookDetailsExtendedDTO GetExamples()
         {
             return new(
+                "OL35966594M",
+                "Giving Day",
+                ["Cori Doerrfeld"],
+                3.5,
                 "<b>A sweet, fun-filled follow-up to <i>The Welcome Wagon</i> from acclaimed author Cori Doerrfeld!</b><br> <br> Every year, the town of Cubby Hill comes together for the Great Giving Festival, celebrating the spirit of giving and community that makes their town such a great place to live. And this year, Cooper Cub has a very special task: delivering his grandmother’s special honey to everyone in town! But with such a big job, can Cooper find a way to help his friends and sweeten up the Festival?<br> In this sweet follow-up to <i>The Welcome Wagon</i>, Cori Doerrfeld’s adorable animal citizens of Cubby Hill celebrate sharing with your community and offering a helping hand!<br>",
                 [],
                 "1683359046",

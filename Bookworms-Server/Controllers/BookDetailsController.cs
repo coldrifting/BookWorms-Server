@@ -17,15 +17,17 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     /// Returns details about a book
     /// </summary>
     /// <param name="bookId">The Book ID of the book to target</param>
-    /// <returns>A BookDetailsDTO object</returns>
+    /// <param name="extended">When true, retrieve extended book details</param>
+    /// <returns>A BookDetailsDTO or BookDetailsExtendedDTO object</returns>
     /// <response code="200">Success</response>
     /// <response code="404">The book is not found</response>
     [HttpGet]
     [Route("/books/{bookId}/details")]
     [ResponseCache(Duration = 60)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsExtendedDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public Task<IActionResult> Get(string bookId)
+    public Task<IActionResult> Get(string bookId, [FromQuery] bool extended = false)
     {
         Book? bookEntity = dbContext.Books
             .Include(b => b.Reviews)
@@ -36,9 +38,13 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
         {
             return Task.FromResult<IActionResult>(NotFound(ErrorDTO.BookNotFound));
         }
+
+        if (extended)
+        {
+            return Task.FromResult<IActionResult>(Ok(BookDetailsExtendedDTO.From(bookEntity)));
+        }
         
-        var details = BookDetailsDTO.From(bookEntity);
-        return Task.FromResult<IActionResult>(Ok(details));
+        return Task.FromResult<IActionResult>(Ok(BookDetailsDTO.From(bookEntity)));
     }
 
     /// <summary>
