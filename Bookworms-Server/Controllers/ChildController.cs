@@ -93,7 +93,7 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
         }
 
-        Child? child = dbContext.Children.FirstOrDefault(c => c.ChildId == childId);
+        Child? child = dbContext.Children.Find(childId);
         if (child is null || child.ParentUsername != parentUsername)
         {
             return NotFound(ErrorDTO.ChildNotFound);
@@ -158,7 +158,7 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
         }
 
-        Child? child = dbContext.Children.FirstOrDefault(c => c.ChildId == childId);
+        Child? child = dbContext.Children.Find(childId);
         if (child is null || child.ParentUsername != parentUsername)
         {
             return NotFound(ErrorDTO.ChildNotFound);
@@ -173,16 +173,10 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     
     private List<ChildResponseDTO> GetAllChildren(string parentUsername)
     {
-        Parent parent = dbContext.Parents
-            .Include(parent => parent.Children)
-            .First(p => p.Username == parentUsername);
-        
-        List<ChildResponseDTO> children = [];
-        foreach (Child c in parent.Children)
-        {
-            children.Add(ChildResponseDTO.From(c));
-        }
-
-        return children;
+        return dbContext.Children
+            .Where(c => c.ParentUsername == parentUsername)
+            .AsEnumerable()
+            .Select(ChildResponseDTO.From)
+            .ToList();
     }
 }

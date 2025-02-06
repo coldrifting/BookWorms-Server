@@ -34,26 +34,17 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
         {
             return NotFound(ErrorDTO.BookNotFound);
         }
-        
-        List<ReviewDTO> output = [];
 
-        List<Review> x = dbContext.Reviews
+        IQueryable<Review> q = dbContext.Reviews
             .Include(review => review.Reviewer)
             .Where(r => r.BookId == bookId)
-            .OrderByDescending(r => r.ReviewDate).ToList();
+            .OrderByDescending(r => r.ReviewDate)
+            .Skip(start);
+        
+        if (max > 0)
+            q = q.Take(max);
 
-        for (int i = 0; i < x.Count; i++)
-        {
-            if (i >= start)
-            {
-                output.Add(ReviewDTO.From(x[i]));
-            }
-
-            if (max > 0 && i >= start + max - 1)
-            {
-                break;
-            }
-        }
+        List<ReviewDTO> output = q.AsEnumerable().Select(ReviewDTO.From).ToList();
             
         return Ok(output);
     }
@@ -105,7 +96,6 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
         }
         
         dbContext.Reviews.Update(review);
-        dbContext.SaveChanges();
         
         book.UpdateStarRating();
         dbContext.Books.Update(book);
@@ -153,7 +143,7 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
         }
         
         dbContext.Remove(review);
-        dbContext.SaveChanges();
+        book.Reviews.Remove(review);  // manually detach from the Book, so .SaveChanges() doesn't have to be called twice
         
         book.UpdateStarRating();
         dbContext.Books.Update(book);

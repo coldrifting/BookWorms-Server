@@ -26,16 +26,15 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
     public IActionResult All()
     {
-        string curUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        var curUser = dbContext.Users.First(l => l.Username == curUsername);
+        string loggedInUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var loggedInUser = dbContext.Users.Find(loggedInUsername)!;
 
-        if (!curUser.IsAdmin())
+        if (!loggedInUser.IsAdmin())
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotAdmin);
         }
         
-        List<UserDetailsDTO> usersFormatted = [];
-        usersFormatted.AddRange(dbContext.Users.Select(UserDetailsDTO.From));
+        List<UserDetailsDTO> usersFormatted = dbContext.Users.Select(UserDetailsDTO.From).ToList();
 
         return Ok(usersFormatted);
     }
@@ -54,11 +53,10 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     public IActionResult Details()
     {
         // Must not be null due to Authorize attribute
-        string loggedInUser = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        string loggedInUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        User loggedInUser = dbContext.Users.Find(loggedInUsername)!;
 
-        User user = dbContext.Users.First(u => u.Username == loggedInUser);
-
-        return Ok(UserDetailsDTO.From(user));
+        return Ok(UserDetailsDTO.From(loggedInUser));
     }
 
     /// <summary>
@@ -75,33 +73,32 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     public IActionResult Edit(UserDetailsEditDTO payload)
     {
         // Must not be null due to Authorize attribute
-        string loggedInUser = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        User user = dbContext.Users.First(u => u.Username == loggedInUser);
+        string loggedInUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        User loggedInUser = dbContext.Users.Find(loggedInUsername)!;
 
         if (payload.FirstName is not null)
         {
-            user.FirstName = payload.FirstName;
+            loggedInUser.FirstName = payload.FirstName;
         }
 
         if (payload.LastName is not null)
         {
-            user.LastName = payload.LastName;
+            loggedInUser.LastName = payload.LastName;
         }
 
         if (payload.Icon is not null)
         {
-            user.UserIcon = payload.Icon.Value;
+            loggedInUser.UserIcon = payload.Icon.Value;
         }
 
         if (payload.Password is not null)
         {
-            UserService.UpdatePassword(user, payload.Password);
+            UserService.UpdatePassword(loggedInUser, payload.Password);
         }
 
         dbContext.SaveChanges();
         
-        return Ok(UserDetailsDTO.From(user));
+        return Ok(UserDetailsDTO.From(loggedInUser));
     }
     
     /// <summary>
@@ -116,14 +113,15 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDTO))]
     public IActionResult Login(UserLoginDTO payload)
     {
-        IQueryable<User> userMatch = dbContext.Users.Where(u => u.Username == payload.Username);
-        
-        if (userMatch.FirstOrDefault() is not { } candidateUser || 
-            !AuthService.VerifyPassword(payload.Password, candidateUser.Hash, candidateUser.Salt))
+        User? user = dbContext.Users.Find(payload.Username);
+
+        if (user is null || !AuthService.VerifyPassword(payload.Password, user.Hash, user.Salt))
+        {
             return BadRequest(ErrorDTO.LoginFailure);
-        
+        }
+
         // Send JWT token to avoid expensive hash calls for each authenticated endpoint
-        string token = AuthService.GenerateToken(userMatch.First());
+        string token = AuthService.GenerateToken(user);
         return Ok(new UserLoginSuccessDTO(token));
     }
 
@@ -139,15 +137,15 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
     public IActionResult Register(UserRegisterDTO payload)
     {
-        IQueryable<User> userMatch = dbContext.Users.Where(l => l.Username == payload.Username);
-        if (userMatch.Any())
+        User? existingUser = dbContext.Users.Find(payload.Username);
+        if (existingUser is not null)
         {
             return UnprocessableEntity(ErrorDTO.UsernameAlreadyExists);
         }
 
-        User user = UserService.CreateUser(payload.Username, payload.Password, payload.FirstName, payload.LastName,
+        User newUser = UserService.CreateUser(payload.Username, payload.Password, payload.FirstName, payload.LastName,
             0, payload.IsParent);
-        switch (user)
+        switch (newUser)
         {
             case Teacher t:
                 dbContext.Teachers.Add(t);
@@ -160,7 +158,7 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
         dbContext.SaveChanges();
 
         // Send JWT token to avoid expensive hash calls for each authenticated endpoint
-        string token = AuthService.GenerateToken(userMatch.First());
+        string token = AuthService.GenerateToken(newUser);
         return Ok(new UserLoginSuccessDTO(token));
     }
 
@@ -180,24 +178,24 @@ public class UserController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public IActionResult Delete([FromQuery] string? username = null)
     {
-        string curUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        var curUser = dbContext.Users.First(l => l.Username == curUsername);
+        string loggedInUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var loggedInUser = dbContext.Users.Find(loggedInUsername)!;
             
         // Own account deletion
         if (username is null)
         {
-            dbContext.Users.Remove(curUser);
+            dbContext.Users.Remove(loggedInUser);
             dbContext.SaveChanges();
             return NoContent();
         }
         
         // Delete other accounts
-        if (!curUser.IsAdmin())
+        if (!loggedInUser.IsAdmin())
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotAdmin);
         }
         
-        var userToDelete = dbContext.Users.FirstOrDefault(l => l.Username == username);
+        var userToDelete = dbContext.Users.Find(username);
         if (userToDelete is null)
         {
             return UnprocessableEntity(ErrorDTO.UserNotFound);

@@ -33,7 +33,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        Parent? parent = dbContext.Parents.FirstOrDefault(p => p.Username == parentUsername);
+        Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
@@ -76,7 +76,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        Parent? parent = dbContext.Parents.FirstOrDefault(p => p.Username == parentUsername);
+        Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
@@ -123,7 +123,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        Parent? parent = dbContext.Parents.FirstOrDefault(p => p.Username == parentUsername);
+        Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
@@ -173,7 +173,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        Parent? parent = dbContext.Parents.FirstOrDefault(p => p.Username == parentUsername);
+        Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
@@ -230,7 +230,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        Parent? parent = dbContext.Parents.FirstOrDefault(p => p.Username == parentUsername);
+        Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
@@ -253,7 +253,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         
         if (childBookshelf.BookshelfBooks.All(b => b.BookId != bookId))
         {
-            Book? book = dbContext.Books.FirstOrDefault(b => b.BookId == bookId);
+            Book? book = dbContext.Books.Find(bookId);
             if (book is null)
             {
                 return UnprocessableEntity(ErrorDTO.BookIdInvalid);
@@ -288,7 +288,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        Parent? parent = dbContext.Parents.FirstOrDefault(p => p.Username == parentUsername);
+        Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
@@ -341,7 +341,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        Parent? parent = dbContext.Parents.FirstOrDefault(p => p.Username == parentUsername);
+        Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
@@ -389,7 +389,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        Parent? parent = dbContext.Parents.FirstOrDefault(p => p.Username == parentUsername);
+        Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
