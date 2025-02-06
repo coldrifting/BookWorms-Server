@@ -66,6 +66,6 @@ public class Book(string bookId, string title, List<string> authors, string desc
         const int numDecPlaces = 2;
         StarRating = Reviews.Count > 0 
             ? Math.Round(Reviews.Average(r => r.StarRating), numDecPlaces) 
-            : -1.0;
+            : null;
     }
 }
