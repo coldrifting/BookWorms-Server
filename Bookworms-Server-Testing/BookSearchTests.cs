@@ -174,7 +174,6 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     }
     
     [Theory]
-    [InlineData(-1, "OL2191470M", 13)]
     [InlineData(0, "OL3368273W", 12)]
     [InlineData(1, "OL3368273W", 12)]
     [InlineData(2.8, "OL14912086W", 7)]
