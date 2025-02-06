@@ -42,11 +42,24 @@ public class Book(string bookId, string title, List<string> authors, string desc
     [Range(0.0, 5.0, ErrorMessage = "Star rating must be between {0} and {1}.")]
     public double? StarRating { get; set; }
     
+    // This is only to have parity with how the data retriever script works 
+    [Column(TypeName = "datetime(0)")]
+    public DateTime? TimeAdded { get; set; }
+    
     // Navigation
     
     public ICollection<Review> Reviews { get; set; } = null!;
-    public ICollection<BookshelfBook> BookshelfBooks { get; set; } = null!;
-    public ICollection<Bookshelf> Bookshelves { get; set; } = null!; // Skip-navigation (many-to-many)
+    
+    public ICollection<CompletedBookshelfBook> CompletedBookshelfBooks { get; set; } = null!;
+    public ICollection<InProgressBookshelfBook> InProgressBookshelfBooks { get; set; } = null!;
+    public ICollection<ChildBookshelfBook> ChildBookshelfBooks { get; set; } = null!;
+    public ICollection<ClassroomBookshelfBook> ClassroomBookshelfBooks { get; set; } = null!;
+    
+    // Skip-navigations (many-to-many) -- NotMapped, because we're mapping the M2M relationship ourselves
+    [InverseProperty("Books")] public ICollection<CompletedBookshelf> CompletedBookshelves { get; set; } = null!;
+    [InverseProperty("Books")] public ICollection<InProgressBookshelf> InProgressBookshelves { get; set; } = null!;
+    [InverseProperty("Books")] public ICollection<ChildBookshelf> ChildBookshelves { get; set; } = null!;
+    [InverseProperty("Books")] public ICollection<ClassroomBookshelf> ClassroomBookshelves { get; set; } = null!;
 
     public void UpdateStarRating()
     {

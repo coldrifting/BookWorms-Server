@@ -41,9 +41,6 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
 
         Child? child = dbContext.Children
             .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
-            .ThenInclude(bookshelfBook => bookshelfBook.Book)
-            .Include(child => child.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
@@ -53,7 +50,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         
         List<BookshelfPreviewResponseDTO> bookshelves = [];
         bookshelves.AddRange(child.Bookshelves.Select(cb =>
-            BookshelfPreviewResponseDTO.From(cb.Name, cb.BookshelfBooks.Take(3).Select(c => c.Book)!)));
+            BookshelfPreviewResponseDTO.From(cb.Name, cb.Books.Take(3))));
         return Ok(bookshelves);
     }
     
@@ -87,9 +84,6 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
 
         Child? child = dbContext.Children
             .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
-            .ThenInclude(bookshelfBook => bookshelfBook.Book)
-            .Include(child => child.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
@@ -102,13 +96,8 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         {
             return NotFound(ErrorDTO.BookshelfNotFound);
         }
-
-        var bookshelf = dbContext.Bookshelves
-            .Include(b => b.Books)
-            .Include(bookshelf => bookshelf.BookshelfBooks)
-            .First(b => b.BookshelfId == childBookshelf.BookshelfId);
         
-        return Ok(BookshelfPreviewResponseDTO.From(bookshelf.Name, bookshelf.BookshelfBooks));
+        return Ok(BookshelfPreviewResponseDTO.From(childBookshelf.Name, childBookshelf.Books));
     }
 
     /// <summary>
@@ -142,9 +131,6 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
 
         Child? child = dbContext.Children
             .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
-            .ThenInclude(bookshelfBook => bookshelfBook.Book).Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
@@ -157,7 +143,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             return UnprocessableEntity(ErrorDTO.BookshelfAlreadyExists);
         }
         
-        dbContext.Bookshelves.Add(new ChildBookshelf(bookshelfName, child.ChildId));
+        dbContext.ChildBookshelves.Add(new(bookshelfName, child.ChildId));
         dbContext.SaveChanges();
         
         return All(childId);
@@ -195,9 +181,6 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
 
         Child? child = dbContext.Children
             .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
-            .ThenInclude(bookshelfBook => bookshelfBook.Book).Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
@@ -256,9 +239,6 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         Child? child = dbContext.Children
             .Include(child => child.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
-            .ThenInclude(bookshelfBook => bookshelfBook.Book)
-            .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
@@ -317,9 +297,6 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         Child? child = dbContext.Children
             .Include(child => child.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
-            .ThenInclude(bookshelfBook => bookshelfBook.Book)
-            .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
@@ -332,13 +309,13 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             return NotFound(ErrorDTO.BookshelfNotFound);
         }
 
-        BookshelfBook? bookshelfBook = childBookshelf.BookshelfBooks.FirstOrDefault(b => b.BookId == bookId);
+        ChildBookshelfBook? bookshelfBook = childBookshelf.BookshelfBooks.FirstOrDefault(b => b.BookId == bookId);
         if (bookshelfBook is null)
         {
             return NotFound(ErrorDTO.BookshelfBookNotFound);
         }
 
-        dbContext.BookshelfBooks.Remove(bookshelfBook);
+        dbContext.ChildBookshelfBooks.Remove(bookshelfBook);
         dbContext.SaveChanges();
         
         return Details(childId, bookshelfName);
@@ -373,8 +350,6 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         Child? child = dbContext.Children
             .Include(child => child.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
-            .ThenInclude(bookshelfBook => bookshelfBook.Book).Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
@@ -422,10 +397,8 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
 
         Child? child = dbContext.Children
             .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
-            .ThenInclude(bookshelfBook => bookshelfBook.Book).Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
+        
         if (child is null)
         {
             return NotFound(ErrorDTO.ChildNotFound);

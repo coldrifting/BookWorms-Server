@@ -40,7 +40,7 @@ public class BookshelfPreviewResponseDTO(string name, BookshelfBookPreviewDTO[] 
         return HashCode.Combine(Name, Books);
     }
 
-    public static BookshelfPreviewResponseDTO From(string name, IEnumerable<BookshelfBook> books)
+    public static BookshelfPreviewResponseDTO From(string name, IEnumerable<ChildBookshelfBook> books)
     {
         List<BookshelfBookPreviewDTO> bookPreviews = [];
         foreach (var bookshelfBook in books)

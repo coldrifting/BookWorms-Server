@@ -16,16 +16,40 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     
     public DbSet<Child> Children { get; set; }
     public DbSet<ChildBookshelf> ChildBookshelves { get; set; }
-    public DbSet<Bookshelf> Bookshelves { get; set; }
-    public DbSet<BookshelfBook> BookshelfBooks { get; set; }
-    
+    public DbSet<ChildBookshelfBook> ChildBookshelfBooks { get; set; }
     public DbSet<CompletedBookshelf> CompletedBookshelves { get; set; }
+    public DbSet<CompletedBookshelfBook> CompletedBookshelfBooks { get; set; }
     public DbSet<InProgressBookshelf> InProgressBookshelves { get; set; }
+    public DbSet<InProgressBookshelfBook> InProgressBookshelfBooks { get; set; }
     
     public DbSet<Classroom> Classrooms { get; set; }
     public DbSet<ClassroomBookshelf> ClassroomBookshelves { get; set; }
-
-    readonly JsonSerializerOptions _jso = new()
+    public DbSet<ClassroomBookshelfBook> ClassroomBookshelfBooks { get; set; }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+	    modelBuilder.Entity<CompletedBookshelf>()
+		    .HasMany(cbb => cbb.Books)
+		    .WithMany(b => b.CompletedBookshelves)
+		    .UsingEntity<CompletedBookshelfBook>();
+	    
+	    modelBuilder.Entity<InProgressBookshelf>()
+		    .HasMany(cbb => cbb.Books)
+		    .WithMany(b => b.InProgressBookshelves)
+		    .UsingEntity<InProgressBookshelfBook>();
+	    
+	    modelBuilder.Entity<ChildBookshelf>()
+		    .HasMany(cbb => cbb.Books)
+		    .WithMany(b => b.ChildBookshelves)
+		    .UsingEntity<ChildBookshelfBook>();
+	    
+	    modelBuilder.Entity<ClassroomBookshelf>()
+		    .HasMany(cbb => cbb.Books)
+		    .WithMany(b => b.ClassroomBookshelves)
+		    .UsingEntity<ClassroomBookshelfBook>();
+    }
+    
+    private readonly JsonSerializerOptions _jso = new()
     {
 	    PropertyNameCaseInsensitive = true,
 		PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -45,7 +69,7 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 		    
 	    Seed<Child>();
 	    Seed<ChildBookshelf>();
-	    Seed<BookshelfBook>();
+	    Seed<ChildBookshelfBook>();
 	    
 	    // Fix any inconsistencies that result from inserting directly into DB
 	    foreach (Book book in Books.Include(b => b.Reviews))
@@ -59,13 +83,23 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 
     public void Clear()
     {
-	    Database.ExecuteSqlRaw("DELETE FROM BookshelfBooks;");
-		Database.ExecuteSqlRaw("DELETE FROM Bookshelves;");
-		Database.ExecuteSqlRaw("DELETE FROM ChildBookshelves;");
-		Database.ExecuteSqlRaw("DELETE FROM Children;");
-		Database.ExecuteSqlRaw("DELETE FROM Reviews;");
-		Database.ExecuteSqlRaw("DELETE FROM Books;");
-		Database.ExecuteSqlRaw("DELETE FROM Users;");
+	    Database.ExecuteSqlRaw("""
+	                           SET FOREIGN_KEY_CHECKS = 0;
+	                           DELETE FROM Books;
+	                           DELETE FROM ChildBookshelfBooks;
+	                           DELETE FROM ChildBookshelves;
+	                           DELETE FROM Children;
+	                           DELETE FROM ClassroomBookshelfBooks;
+	                           DELETE FROM ClassroomBookshelves;
+	                           DELETE FROM Classrooms;
+	                           DELETE FROM CompletedBookshelfBooks;
+	                           DELETE FROM CompletedBookshelves;
+	                           DELETE FROM InProgressBookshelfBooks;
+	                           DELETE FROM InProgressBookshelves;
+	                           DELETE FROM Reviews;
+	                           DELETE FROM Users;
+	                           SET FOREIGN_KEY_CHECKS = 1;
+	                           """);
     }
     
     private void Seed<T>() where T : class
