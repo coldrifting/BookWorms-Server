@@ -5,8 +5,6 @@ using System.IO.Compression;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using BookwormsServerTesting.Fixtures;
-using Microsoft.IdentityModel.Tokens;
-
 using static BookwormsServerTesting.Helpers.Common;
 
 namespace BookwormsServerTesting;

@@ -1,4 +1,4 @@
-namespace BookwormsServerTesting.Templates;
+namespace BookwormsServerTesting.Helpers;
 
 public static class Constants
 {

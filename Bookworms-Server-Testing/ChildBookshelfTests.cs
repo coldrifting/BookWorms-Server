@@ -3,7 +3,6 @@ using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using BookwormsServerTesting.Fixtures;
 using BookwormsServerTesting.Helpers;
-using BookwormsServerTesting.Templates;
 using Microsoft.EntityFrameworkCore;
 using static BookwormsServerTesting.Helpers.Common;
 
@@ -584,10 +583,9 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     }
 
     [Theory]
-    [InlineData("parent1", "parent2", Constants.Parent1Child1Id, Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent1)", "Evelyn's bookshelf (Parent2)")]
+    [InlineData("parent1", Constants.Parent1Child1Id, Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent1)", "Evelyn's bookshelf (Parent2)")]
     public async Task Test_RenameBookshelf_BookshelfSameNameSameChildNameDiffParents(
-        string username1, string username2, 
-        string child1Id, string child2Id,
+        string username1, string child1Id, string child2Id,
         string bookshelfName1, string bookshelfName2)
     {
         await CheckResponse<List<BookshelfPreviewResponseDTO>>(
@@ -612,9 +610,9 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     }
 
     [Theory]
-    [InlineData("parent1", "parent2", Constants.Parent1Child1Id, Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent1)", "Evelyn's bookshelf (Parent2)")]
+    [InlineData("parent1", Constants.Parent1Child1Id, Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent1)", "Evelyn's bookshelf (Parent2)")]
     public async Task Test_DeleteBookshelf_BookshelfSameNameSameChildNameDiffParents(
-        string username1, string username2,
+        string username1,
         string child1Id, string child2Id,
         string bookshelfName1, string bookshelfName2)
     {

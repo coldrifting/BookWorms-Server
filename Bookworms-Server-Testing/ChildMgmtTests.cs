@@ -3,8 +3,6 @@ using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using BookwormsServerTesting.Fixtures;
 using BookwormsServerTesting.Helpers;
-using BookwormsServerTesting.Templates;
-using Microsoft.EntityFrameworkCore;
 using static BookwormsServerTesting.Helpers.Common;
 
 namespace BookwormsServerTesting;
