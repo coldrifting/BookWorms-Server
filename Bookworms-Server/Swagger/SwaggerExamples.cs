@@ -18,6 +18,19 @@ public static class SwaggerExamples
 {
     // BookDetailsController
     
+    public class BookDetailsResponseExample : IExamplesProvider<BookDetailsDTO>
+    {
+        public BookDetailsDTO GetExamples()
+        {
+            return new(
+                "OL35966594M",
+                "Giving Day",
+                ["Cori Doerrfeld"],
+                3.5
+            );
+        }
+    }
+    
     public class BookDetailsExtendedResponseExample : IExamplesProvider<BookDetailsExtendedDTO>
     {
         public BookDetailsExtendedDTO GetExamples()

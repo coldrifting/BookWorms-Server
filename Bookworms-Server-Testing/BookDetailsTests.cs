@@ -40,7 +40,7 @@ public class BookDetailsTests(CompositeFixture fixture) : BookwormsIntegrationTe
                                                   string description, string[] subjects, string? isbn10, string? isbn13,
                                                   int publishYear, int? pageCount, int numReviews)
     {
-        await CheckResponse<BookDetailsExtendedDTO>(async () => await Client.GetAsync(Routes.Books.Details(bookId, true)),
+        await CheckResponse<BookDetailsExtendedDTO>(async () => await Client.GetAsync(Routes.Books.DetailsExtended(bookId)),
             HttpStatusCode.OK,
             content =>
             {
@@ -61,11 +61,14 @@ public class BookDetailsTests(CompositeFixture fixture) : BookwormsIntegrationTe
     }
 
     [Theory]
-    [InlineData("abc123", true)]
-    [InlineData("abc123", false)]
-    public async Task Test_GetBookDetails_InvalidBookId(string bookId, bool extended)
+    [InlineData("abc123")]
+    public async Task Test_GetBookDetails_InvalidBookId(string bookId)
     {
-        await CheckForError(() => Client.GetAsync(Routes.Books.Details(bookId, extended)), 
+        await CheckForError(() => Client.GetAsync(Routes.Books.Details(bookId)), 
+            HttpStatusCode.NotFound, 
+            ErrorDTO.BookNotFound);
+        
+        await CheckForError(() => Client.GetAsync(Routes.Books.DetailsExtended(bookId)), 
             HttpStatusCode.NotFound, 
             ErrorDTO.BookNotFound);
     }

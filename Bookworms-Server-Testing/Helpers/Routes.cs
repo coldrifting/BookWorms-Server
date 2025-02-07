@@ -93,8 +93,10 @@ public static class Routes
 
     public static class Books
     {
-        public static string Details(string bookId, bool extended = false) => 
-            $"/books/{bookId}/details?extended={extended}";
+        public static string Details(string bookId) => 
+            $"/books/{bookId}/details";
+        public static string DetailsExtended(string bookId) => 
+            $"/books/{bookId}/details/all";
         public static string Cover (string bookId) =>
             $"/books/{bookId}/cover";
         public static string CoverBatch =>
