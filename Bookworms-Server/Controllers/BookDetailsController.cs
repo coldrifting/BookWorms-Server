@@ -23,7 +23,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     [HttpGet]
     [Route("/books/{bookId}/details")]
     [ResponseCache(Duration = 60)]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public Task<IActionResult> GetBasic(string bookId)
     {
@@ -37,7 +37,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
             return Task.FromResult<IActionResult>(NotFound(ErrorDTO.BookNotFound));
         }
         
-        return Task.FromResult<IActionResult>(Ok(BookDetailsDTO.From(bookEntity)));
+        return Task.FromResult<IActionResult>(Ok(BookDTO.From(bookEntity)));
     }
     /// <summary>
     /// Returns extended details about a book
@@ -49,7 +49,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     [HttpGet]
     [Route("/books/{bookId}/details/all")]
     [ResponseCache(Duration = 60)]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsExtendedDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
     public Task<IActionResult> GetAll(string bookId)
     {
@@ -63,7 +63,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
             return Task.FromResult<IActionResult>(NotFound(ErrorDTO.BookNotFound));
         }
         
-        return Task.FromResult<IActionResult>(Ok(BookDetailsExtendedDTO.From(bookEntity)));
+        return Task.FromResult<IActionResult>(Ok(BookDetailsDTO.From(bookEntity)));
     }
 
     /// <summary>

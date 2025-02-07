@@ -19,7 +19,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
-                Assert.Contains(content, bookDTO => string.Equals(bookDTO.Title, title, StringComparison.OrdinalIgnoreCase) && Math.Abs(bookDTO.Rating - rating) < 0.025);
+                Assert.Contains(content, bookDTO => string.Equals(bookDTO.Title, title, StringComparison.OrdinalIgnoreCase) &&
+                                                    bookDTO.Rating != null && 
+                                                    Math.Abs(bookDTO.Rating.Value - rating) < 0.025);
             });
     }
     
@@ -31,7 +33,7 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
-                Assert.Contains(content, bookDTO => bookDTO.BookId == bookId && Math.Abs(bookDTO.Rating - -1.0) < 0.025);
+                Assert.Contains(content, bookDTO => bookDTO.BookId == bookId && bookDTO.Rating == null);
             });
     }
     
@@ -46,7 +48,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
-                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) && Math.Abs(bookDTO.Rating - rating) < 0.025);
+                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) &&
+                                                    bookDTO.Rating != null &&
+                                                    Math.Abs(bookDTO.Rating.Value - rating) < 0.025);
             });
     }
     
@@ -62,7 +66,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
-                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) && Math.Abs(bookDTO.Rating - rating) < 0.025);
+                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) && 
+                                                    bookDTO.Rating != null &&
+                                                    Math.Abs(bookDTO.Rating.Value - rating) < 0.025);
             });
     }
     
@@ -77,7 +83,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
-                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) && Math.Abs(bookDTO.Rating - rating) < 0.025);
+                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) &&
+                                                    bookDTO.Rating != null &&
+                                                    Math.Abs(bookDTO.Rating.Value - rating) < 0.025);
             });
     }
     
@@ -94,7 +102,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
-                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) && Math.Abs(bookDTO.Rating - newRating) < 0.025);
+                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) && 
+                                                    bookDTO.Rating != null &&
+                                                    Math.Abs(bookDTO.Rating.Value - newRating) < 0.025);
             });
     }
     
@@ -111,7 +121,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
-                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) && Math.Abs(bookDTO.Rating - firstRating) < 0.025);
+                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) &&
+                                                    bookDTO.Rating != null &&
+                                                    Math.Abs(bookDTO.Rating.Value - firstRating) < 0.025);
             });
         
         await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId), new ReviewAddOrUpdateRequestDTO(secondRating), username);
@@ -120,7 +132,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
-                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) && Math.Abs(bookDTO.Rating - secondRating) < 0.025);
+                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) &&
+                                                    bookDTO.Rating != null &&
+                                                    Math.Abs(bookDTO.Rating.Value - secondRating) < 0.025);
             });
     }
     
@@ -138,7 +152,7 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
-                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) && Math.Abs(bookDTO.Rating - -1) < 0.025);
+                Assert.Contains(content, bookDTO => string.Equals(bookDTO.BookId, bookId) && bookDTO.Rating == null);
             });
     }
     

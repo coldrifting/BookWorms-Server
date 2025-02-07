@@ -18,7 +18,7 @@ public class BookDetailsTests(CompositeFixture fixture) : BookwormsIntegrationTe
     [InlineData("OL2191470M", "The Magic School Bus: lost in the solar system", new[] {"Joanna Cole"}, null)]
     public async Task Test_GetBookDetailsBasic(string bookId, string title, string[] authors, double? rating)
     {
-        await CheckResponse<BookDetailsDTO>(async () => await Client.GetAsync(Routes.Books.Details(bookId)),
+        await CheckResponse<BookDTO>(async () => await Client.GetAsync(Routes.Books.Details(bookId)),
             HttpStatusCode.OK,
             content =>
             {
@@ -38,7 +38,7 @@ public class BookDetailsTests(CompositeFixture fixture) : BookwormsIntegrationTe
                                                   string description, string[] subjects, string? isbn10, string? isbn13,
                                                   int publishYear, int? pageCount, int numReviews)
     {
-        await CheckResponse<BookDetailsExtendedDTO>(async () => await Client.GetAsync(Routes.Books.DetailsExtended(bookId)),
+        await CheckResponse<BookDetailsDTO>(async () => await Client.GetAsync(Routes.Books.DetailsExtended(bookId)),
             HttpStatusCode.OK,
             content =>
             {
