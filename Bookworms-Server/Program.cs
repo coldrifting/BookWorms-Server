@@ -17,7 +17,9 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Establish database context ----------------------------------------------------------------------------------
 
-string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+string? connectionString = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production"
+	? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+	: builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<BookwormsDbContext>(opt =>
 {
 	opt.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mySqlOpt =>
