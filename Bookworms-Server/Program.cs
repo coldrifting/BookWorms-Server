@@ -17,7 +17,9 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Establish database context ----------------------------------------------------------------------------------
 
-string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+string? connectionString = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production"
+	? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+	: builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<BookwormsDbContext>(opt =>
 {
 	opt.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mySqlOpt =>
@@ -128,33 +130,30 @@ using (var serviceScope = app.Services.CreateScope()) {
 
 // Configure the HTTP request pipeline -------------------------------------------------------------------------
 
-if (app.Environment.IsDevelopment())
+app.UseStaticFiles();
+app.UseSwagger();
+app.UseSwaggerUI(opt =>
 {
-	app.UseStaticFiles();
-	app.UseSwagger();
-	app.UseSwaggerUI(opt =>
-	{
-		// Use Dark theme
-		opt.InjectStylesheet("/Swagger/Themes/_base.css");
-		opt.InjectStylesheet("/Swagger/Themes/one-dark.css");
-		opt.InjectStylesheet("/Swagger/Themes/one-light.css");
-		
-		// Other style tweaks
-		opt.InjectStylesheet("/Swagger/Themes/_custom.css");
-		opt.InjectJavascript("/Swagger/AuthorizationTweaks.js");
-		opt.InjectJavascript("/Swagger/ResponseTweaks.js");
-        
-		// Use Root URL
-		opt.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-		opt.RoutePrefix = string.Empty;
-        
-		// Minimize Schemas at bottom of page by default
-		opt.DefaultModelsExpandDepth(0);
-        
-		// Enable Try it out mode by default
-		opt.EnableTryItOutByDefault();
-	});
-}
+	// Use Dark theme
+	opt.InjectStylesheet("/Swagger/Themes/_base.css");
+	opt.InjectStylesheet("/Swagger/Themes/one-dark.css");
+	opt.InjectStylesheet("/Swagger/Themes/one-light.css");
+	
+	// Other style tweaks
+	opt.InjectStylesheet("/Swagger/Themes/_custom.css");
+	opt.InjectJavascript("/Swagger/AuthorizationTweaks.js");
+	opt.InjectJavascript("/Swagger/ResponseTweaks.js");
+    
+	// Use Root URL
+	opt.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+	opt.RoutePrefix = string.Empty;
+    
+	// Minimize Schemas at bottom of page by default
+	opt.DefaultModelsExpandDepth(0);
+    
+	// Enable Try it out mode by default
+	opt.EnableTryItOutByDefault();
+});
 
 app.UseHttpsRedirection();
 
@@ -166,7 +165,9 @@ app.MapControllers();
 
 // Persist test data -------------------------------------------------------------------------------------------
 
-using (var serviceScope = app.Services.CreateScope()) {
+if (!app.Environment.IsProduction())
+{
+	using var serviceScope = app.Services.CreateScope();
 	var dbContext = serviceScope.ServiceProvider.GetRequiredService<BookwormsDbContext>();
 	dbContext.SeedTestData();
 }
