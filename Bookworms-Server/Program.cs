@@ -165,7 +165,9 @@ app.MapControllers();
 
 // Persist test data -------------------------------------------------------------------------------------------
 
-using (var serviceScope = app.Services.CreateScope()) {
+if (!app.Environment.IsProduction())
+{
+	using var serviceScope = app.Services.CreateScope();
 	var dbContext = serviceScope.ServiceProvider.GetRequiredService<BookwormsDbContext>();
 	dbContext.SeedTestData();
 }
