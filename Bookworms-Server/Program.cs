@@ -130,33 +130,30 @@ using (var serviceScope = app.Services.CreateScope()) {
 
 // Configure the HTTP request pipeline -------------------------------------------------------------------------
 
-if (app.Environment.IsDevelopment())
+app.UseStaticFiles();
+app.UseSwagger();
+app.UseSwaggerUI(opt =>
 {
-	app.UseStaticFiles();
-	app.UseSwagger();
-	app.UseSwaggerUI(opt =>
-	{
-		// Use Dark theme
-		opt.InjectStylesheet("/Swagger/Themes/_base.css");
-		opt.InjectStylesheet("/Swagger/Themes/one-dark.css");
-		opt.InjectStylesheet("/Swagger/Themes/one-light.css");
-		
-		// Other style tweaks
-		opt.InjectStylesheet("/Swagger/Themes/_custom.css");
-		opt.InjectJavascript("/Swagger/AuthorizationTweaks.js");
-		opt.InjectJavascript("/Swagger/ResponseTweaks.js");
-        
-		// Use Root URL
-		opt.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-		opt.RoutePrefix = string.Empty;
-        
-		// Minimize Schemas at bottom of page by default
-		opt.DefaultModelsExpandDepth(0);
-        
-		// Enable Try it out mode by default
-		opt.EnableTryItOutByDefault();
-	});
-}
+	// Use Dark theme
+	opt.InjectStylesheet("/Swagger/Themes/_base.css");
+	opt.InjectStylesheet("/Swagger/Themes/one-dark.css");
+	opt.InjectStylesheet("/Swagger/Themes/one-light.css");
+	
+	// Other style tweaks
+	opt.InjectStylesheet("/Swagger/Themes/_custom.css");
+	opt.InjectJavascript("/Swagger/AuthorizationTweaks.js");
+	opt.InjectJavascript("/Swagger/ResponseTweaks.js");
+    
+	// Use Root URL
+	opt.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+	opt.RoutePrefix = string.Empty;
+    
+	// Minimize Schemas at bottom of page by default
+	opt.DefaultModelsExpandDepth(0);
+    
+	// Enable Try it out mode by default
+	opt.EnableTryItOutByDefault();
+});
 
 app.UseHttpsRedirection();
 
