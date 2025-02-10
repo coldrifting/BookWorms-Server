@@ -68,17 +68,21 @@ dependency_scanning:
           
 deploy_job:
     stage: deploy
+    image: ubuntu:latest
     only:
         - dev
     before_script:
-        - mkdir -p ~/.ssh
-        # Copy CI ssh private key variable to ~/.ssh/id_rsa, with all carriage returns removed
-        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-        - chmod 600 ~/.ssh/id_rsa
+        # Install open-ssh client
+        - apt-get update -y && apt-get install openssh-client -y
+        # Start ssh-agent
+        - eval $(ssh-agent -s)
+        # Add the private key to ssh-agent
+        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     script:
-        # Connect to EC2 instance over SSH, bypassing the need for the host to be verified
-        # This removes the need for ssh-keygen or ssh-keyscan
-        - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST 'sh deploy.sh'
+        # Connect to the EC2 instance using SSH
+        # The container is ephemeral, so disabling StrictHostKeyChecking isn't really a big deal
+        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sh deploy.sh'
     resource_group: common
     variables:
+        # Don't pull the repository for this job
         GIT_STRATEGY: none
