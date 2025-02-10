@@ -72,11 +72,13 @@ deploy_job:
         - dev
     before_script:
         - mkdir -p ~/.ssh
+        # Copy CI ssh private key variable to ~/.ssh/id_rsa, with all carriage returns removed
         - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
         - chmod 600 ~/.ssh/id_rsa
-        - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
     script:
-        - ssh -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST 'bash -s' < deploy.sh
+        # Connect to EC2 instance over SSH, bypassing the need for the host to be verified
+        # This removes the need for ssh-keygen or ssh-keyscan
+        - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST 'bash -s' < deploy.sh
     resource_group: common
     variables:
         GIT_STRATEGY: none
