@@ -78,7 +78,7 @@ deploy_job:
     script:
         # Connect to EC2 instance over SSH, bypassing the need for the host to be verified
         # This removes the need for ssh-keygen or ssh-keyscan
-        - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST 'bash -s' < deploy.sh
+        - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST 'sh deploy.sh'
     resource_group: common
     variables:
         GIT_STRATEGY: none
