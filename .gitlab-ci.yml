@@ -71,6 +71,7 @@ deploy_job:
     image: ubuntu:latest
     only:
         - dev
+    cache: {}
     before_script:
         # Install open-ssh client
         - apt-get update -y && apt-get install openssh-client -y
