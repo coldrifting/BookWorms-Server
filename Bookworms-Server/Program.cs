@@ -154,10 +154,14 @@ app.UseSwaggerUI(opt =>
 	opt.EnableTryItOutByDefault();
 });
 
-app.UseHttpsRedirection();
-app.UseDefaultFiles();
-app.UseStaticFiles();
-app.UseAuthorization();
+// Don't bother with static files and other web stuff in Staging, which is only used for running tests
+if (!app.Environment.IsStaging())
+{
+	app.UseHttpsRedirection();
+	app.UseDefaultFiles();
+	app.UseStaticFiles();
+	app.UseAuthorization();
+}
 
 // Enable endpoint caching
 app.UseResponseCaching();

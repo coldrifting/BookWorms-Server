@@ -45,7 +45,7 @@ test_job:
         DOCKER_DRIVER: overlay2
     script:
         - echo "Running test suite..."
-        - dotnet test --logger:trx --results-directory TestResults
+        - dotnet test --logger "console;verbosity=normal" --logger "trx"
     artifacts:
         when: always
         reports:
