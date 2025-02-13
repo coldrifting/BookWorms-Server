@@ -79,7 +79,7 @@ publish_job:
     stage: publish
     image: mcr.microsoft.com/dotnet/sdk:$DOTNET_VERSION
     script:
-        - dotnet publish -c Release -o out
+        - dotnet publish Bookworms-Server -c Release -o out
     artifacts:
         paths:
             - out/
@@ -162,5 +162,5 @@ deploy_job:
     variables:
         # Don't pull the repository for this job
         GIT_STRATEGY: none
-        DEPLOYMENT_DIR: /deployment
+        DEPLOYMENT_DIR: ./deployment
     resource_group: common
