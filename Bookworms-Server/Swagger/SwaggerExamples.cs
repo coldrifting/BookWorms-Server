@@ -215,9 +215,9 @@ public static class SwaggerExamples
         {
             return
             [
-                new("Some Books", [new("bookId1", "Title", "Author"), new("bookId2", "Title", "Author"), new("bookId3", "Title", "Author")]),
+                new("Some Books", [new("bookId1", "Title1", ["Author1"]), new("bookId2", "Title2", ["Author2"]), new("bookId3", "Title3", ["Author3", "Author10"])]),
                 new("Not many Books", []),
-                new("Some More Books", [new("bookId1", "Title", "Author")])
+                new("Some More Books", [new("bookId1", "Title", ["Author1"])])
             ];
         }
     }
@@ -228,10 +228,10 @@ public static class SwaggerExamples
         {
             return new("Bookshelf Name",
             [
-                new("bookId1", "Title", "Author"), 
-                new("bookId2", "Title", "Author"), 
-                new("bookId3", "Title", "Author"),
-                new("bookId4", "Title", "Author")
+                new("bookId1", "Title", ["Author1"]), 
+                new("bookId2", "Title", ["Author2"]), 
+                new("bookId3", "Title", ["Author3", "Author10"]),
+                new("bookId4", "Title", ["Author4"])
             ]);
         }
     }

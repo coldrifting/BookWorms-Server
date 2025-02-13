@@ -338,10 +338,10 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
                 {
                     Assert.NotNull(b.BookId);
                     Assert.NotEmpty(b.BookId);
-                    Assert.NotNull(b.Author);
-                    Assert.NotEmpty(b.BookId);
+                    Assert.NotNull(b.Authors);
+                    Assert.NotEmpty(b.Authors);
                     Assert.NotNull(b.Title);
-                    Assert.NotEmpty(b.BookId);
+                    Assert.NotEmpty(b.Title);
                 }
             });
     }
@@ -365,10 +365,10 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
                 {
                     Assert.NotNull(b.BookId);
                     Assert.NotEmpty(b.BookId);
-                    Assert.NotNull(b.Author);
-                    Assert.NotEmpty(b.BookId);
+                    Assert.NotNull(b.Authors);
+                    Assert.NotEmpty(b.Authors);
                     Assert.NotNull(b.Title);
-                    Assert.NotEmpty(b.BookId);
+                    Assert.NotEmpty(b.Title);
                 }
             });
     }

@@ -63,10 +63,10 @@ public class BookshelfPreviewResponseDTO(string name, BookshelfBookPreviewDTO[] 
     }
 }
 
-public record BookshelfBookPreviewDTO(string BookId, string Title, string Author)
+public record BookshelfBookPreviewDTO(string BookId, string Title, List<string> Authors)
 {
     public static BookshelfBookPreviewDTO From(Book book)
     {
-        return new(book.BookId, book.Title, string.Join(" & ", book.Authors));
+        return new(book.BookId, book.Title, book.Authors);
     }
 }
