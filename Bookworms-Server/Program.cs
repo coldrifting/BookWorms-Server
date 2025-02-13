@@ -116,9 +116,11 @@ WebApplication app = builder.Build();
 // Ensure the database is migrated -----------------------------------------------------------------------------
 
 // (This is best done here, after the WebApplication has been created)
-using (var serviceScope = app.Services.CreateScope()) {
+if (!app.Environment.IsProduction())
+{
+	using var serviceScope = app.Services.CreateScope();
 	var dbContext = serviceScope.ServiceProvider.GetRequiredService<BookwormsDbContext>();
-    
+
 	// If running the application or the tests fails here, you need to drop your database and then try again
 	if (dbContext.Database.GetPendingMigrations().Any())
 	{

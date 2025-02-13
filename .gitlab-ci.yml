@@ -1,34 +1,35 @@
-image: mcr.microsoft.com/dotnet/sdk:8.0
-
 stages:
     - build
     - test
     - security
+    - publish
+    - prepare
+    - release
     - deploy
 
 variables:
-    # Specify where to store NuGet packages, for downloading dependencies during build
-    NUGET_PACKAGES: "$CI_PROJECT_DIR/.nuget/packages"
+    DOTNET_VERSION: "8.0"
 
-# Cache downloaded NuGet packages
-cache:
-    paths:
-        - .nuget/packages/
+
+# When Merge Request is opened
 
 build_job:
     stage: build
+    image: mcr.microsoft.com/dotnet/sdk:$DOTNET_VERSION
     script:
         - echo "Building project..."
         - dotnet build
     artifacts: # Preserve build outputs for future use
         paths:
             - bin/
+        expire_in: 1 week
     resource_group: common
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
 
 test_job:
     stage: test
+    image: mcr.microsoft.com/dotnet/sdk:$DOTNET_VERSION
     services:
         # DinD service is required for Testcontainers
         - name: docker:dind
@@ -49,6 +50,7 @@ test_job:
         when: always
         reports:
             junit: TestResults/*.trx
+        expire_in: 1 month
     dependencies:
         - build_job # test_job depends on artifacts produced by build_job (avoids rebuilding the project)
     resource_group: common
@@ -58,32 +60,107 @@ test_job:
 # This doesn't cause the pipeline to fail if a vulnerability is found, but vulnerabilities do get printed
 dependency_scanning:
     stage: security
+    image: mcr.microsoft.com/dotnet/sdk:$DOTNET_VERSION
     script:
-    - echo "Running dependency scanning..."
-    - dotnet restore
-    - dotnet list package --vulnerable
+        - echo "Running dependency scanning..."
+        - dotnet restore
+        - dotnet list package --vulnerable
     resource_group: common
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
-          
-deploy_job:
-    stage: deploy
-    image: ubuntu:latest
+
+
+
+# When a merge is made into dev
+
+publish_job:
     only:
         - dev
-    cache: {}
+    stage: publish
+    image: mcr.microsoft.com/dotnet/sdk:$DOTNET_VERSION
+    script:
+        - dotnet publish -c Release -o out
+    artifacts:
+        paths:
+            - out/
+        expire_in: 1 week
+    resource_group: common
+
+prepare_job:
+    only:
+        - dev
+    stage: prepare
+    image: alpine:latest
+    before_script:
+        - apk add --no-cache git
+    script:
+        |
+        START_DATE="2025-01-09"
+        CURRENT_DATE=$(date +%Y-%m-%d)
+        SECONDS_DIFF=$(( $(date -d "$CURRENT_DATE" +%s) - $(date -d "$START_DATE" +%s) ))
+        WEEK_NUMBER=$(( SECONDS_DIFF / 604800 + 1 ))
+        MARCH_10TH="2025-03-10"
+        MARCH_17TH="2025-03-17"
+        if [ $(date -d "$CURRENT_DATE" +%s) -ge $(date -d "$MARCH_10TH" +%s) ] && [ $(date -d "$CURRENT_DATE" +%s) -lt $(date -d "$MARCH_17TH" +%s) ]; then
+            WEEK_NUMBER="9A"
+        elif [ $(date -d "$CURRENT_DATE" +%s) -ge $(date -d "$MARCH_17TH" +%s) ]; then
+            WEEK_NUMBER=$(( WEEK_NUMBER + 1 ))
+        fi
+        LATEST_TAG=$(git tag -l "v0.$WEEK_NUMBER.*" | sort -V | tail -n 1)
+        if [ -z "$LATEST_TAG" ]; then
+            HOTFIX_NUMBER=0
+        else
+            HOTFIX_NUMBER=$(( ${LATEST_TAG##*.} + 1 ))
+        fi
+        RELEASE_TAG="v0.$WEEK_NUMBER.$HOTFIX_NUMBER"
+        echo "TAG=$RELEASE_TAG" >> variables.env
+    artifacts:
+        reports:
+            dotenv: variables.env
+    resource_group: common
+
+release_job:
+    only:
+        - dev
+    stage: release
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    dependencies:
+        - publish_job
+        - prepare_job
+    script:
+        - echo "Creating GitLab release with tag $TAG"
+    release:
+        name: "Release $TAG"
+        description: "Created using the release CLI"
+        tag_name: "$TAG"
+        ref: "$CI_COMMIT_SHA"
+        assets:
+            links:
+                - name: "projectBuildArtifact"
+                  url: "$(CI_PROJECT_URL)/-/jobs/$(CI_JOB_ID)/artifacts/download"
+    resource_group: common
+
+deploy_job:
+    only:
+        - dev
+    stage: deploy
+    image: alpine:latest
+    dependencies:
+        - publish_job
     before_script:
         # Install open-ssh client
-        - apt-get update -y && apt-get install openssh-client -y
+        - apk add --no-cache openssh-client
         # Start ssh-agent
         - eval $(ssh-agent -s)
         # Add the private key to ssh-agent
-        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -q -
     script:
-        # Connect to the EC2 instance using SSH
-        # The container is ephemeral, so disabling StrictHostKeyChecking isn't really a big deal
-        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sh deploy.sh'
-    resource_group: common
+        # Replace the build artifacts in the EC2 instance, and restart the server
+        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'rm -rf $DEPLOYMENT_DIR'
+        - scp -r -C out/* $EC2_USER@$EC2_HOST:$DEPLOYMENT_DIR
+        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo systemctl restart bookworms-server'
     variables:
         # Don't pull the repository for this job
         GIT_STRATEGY: none
+        DEPLOYMENT_DIR: /deployment
+    resource_group: common
