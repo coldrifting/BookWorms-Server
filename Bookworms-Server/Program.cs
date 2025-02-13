@@ -31,10 +31,17 @@ builder.Services.AddDbContext<BookwormsDbContext>(opt =>
 // Configure Swagger -------------------------------------------------------------------------------------------
 
 // Use lowercase api endpoints
-builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true); 
+builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
+// Return enums in response bodies as strings, not numbers
 builder.Services.AddControllers(opt => 
-	opt.Filters.Add(new ProducesAttribute("application/json")));
+	opt.Filters.Add(new ProducesAttribute("application/json"))).AddJsonOptions(options =>
+{
+	options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+
+	options.JsonSerializerOptions.DefaultIgnoreCondition =
+		JsonIgnoreCondition.WhenWritingNull;
+});
 
 builder.Services.AddResponseCaching();
 
@@ -98,15 +105,6 @@ builder.Services.AddSingleton<IBookApiService, OpenLibraryApiService>();
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 
-// Return enums in response bodies as strings, not numbers
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-	options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-
-	options.JsonSerializerOptions.DefaultIgnoreCondition =
-		JsonIgnoreCondition.WhenWritingNull;
-});
-
 // -------------------------------------------------------------------------------------------------------------
 
 
@@ -132,7 +130,6 @@ if (!app.Environment.IsProduction())
 
 // Configure the HTTP request pipeline -------------------------------------------------------------------------
 
-app.UseStaticFiles();
 app.UseSwagger();
 app.UseSwaggerUI(opt =>
 {
@@ -158,6 +155,9 @@ app.UseSwaggerUI(opt =>
 });
 
 app.UseHttpsRedirection();
+app.UseDefaultFiles();
+app.UseStaticFiles();
+app.UseAuthorization();
 
 // Enable endpoint caching
 app.UseResponseCaching();

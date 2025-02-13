@@ -139,3 +139,6 @@ _NCrunch
 # Ignore JetBrains Rider settings files
 *.sln.DotSettings
 *.sln.DotSettings.user
+
+# Web App Static Files
+Bookworms-Server/wwwroot/PWA
