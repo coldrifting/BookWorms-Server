@@ -134,10 +134,6 @@ release_job:
         description: "Created using the release CLI"
         tag_name: "$TAG"
         ref: "$CI_COMMIT_SHA"
-        assets:
-            links:
-                - name: "projectBuildArtifact"
-                  url: "$CI_PROJECT_URL/-/jobs/$CI_JOB_ID/artifacts/download"
     resource_group: common
 
 deploy_job:
@@ -156,11 +152,11 @@ deploy_job:
         - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -q -
     script:
         # Replace the build artifacts in the EC2 instance, and restart the server
-        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'rm -rf $DEPLOYMENT_DIR'
+        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sh stop.sh'
         - scp -r -C out/* $EC2_USER@$EC2_HOST:$DEPLOYMENT_DIR
-        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo systemctl restart bookworms-server'
+        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sh start.sh'
     variables:
         # Don't pull the repository for this job
         GIT_STRATEGY: none
-        DEPLOYMENT_DIR: ./deployment
+        DEPLOYMENT_DIR: /home/$EC2_USER/deployment
     resource_group: common
