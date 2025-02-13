@@ -23,21 +23,4 @@ public static class Hash
             .Replace('/', '_')
             .Replace("=", "");
     }
-
-    private static string Base64Decode(string base64)
-    {
-        return Encoding.UTF8.GetString(Base64DecodeBytes(base64));
-    }
-
-    private static byte[] Base64DecodeBytes(string base64EncodedData)
-    {
-        string base64 = base64EncodedData.Replace('-', '+')
-                                         .Replace('_', '/');
-        while (base64.Length % 4 != 0)
-        {
-            base64 += '=';
-        }
-        
-        return Convert.FromBase64String(base64);
-    }
 }

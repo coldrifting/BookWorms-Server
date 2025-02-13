@@ -245,5 +245,21 @@
     "coverId": 277175,
     "pageCount": null,
     "publishYear": 2003
+  },
+  {
+    "bookId": "OL2191470M",
+    "title": "The Magic School Bus: lost in the solar system",
+    "authors": [
+      "Joanna Cole"
+    ],
+    "description": "Ms. Frizzle takes her class on a trip to the planetarium, but the magic bus has a better idea and blasts off into space to show the children the real solar system. Reprint. SLJ. H. C. AB.",
+    "subjects": [
+      "Fiction"
+    ],
+    "isbn10": "0590414283",
+    "isbn13": "",
+    "coverId": 383710,
+    "pageCount": 40,
+    "publishYear": 1990
   }
 ]

@@ -2,6 +2,8 @@
 using BookwormsServer.Models.Data;
 using Swashbuckle.AspNetCore.Filters;
 
+using BookwormsServer.Utils;
+
 namespace BookwormsServer.Swagger;
 
 
@@ -16,11 +18,30 @@ public static class SwaggerExamples
 {
     // BookDetailsController
     
+    public class BookResponseExample : IExamplesProvider<BookDTO>
+    {
+        public BookDTO GetExamples()
+        {
+            return new(
+                "OL35966594M",
+                "Giving Day",
+                ["Cori Doerrfeld"],
+                3.5,
+                35
+            );
+        }
+    }
+    
     public class BookDetailsResponseExample : IExamplesProvider<BookDetailsDTO>
     {
         public BookDetailsDTO GetExamples()
         {
             return new(
+                "OL35966594M",
+                "Giving Day",
+                ["Cori Doerrfeld"],
+                3.5,
+                25,
                 "<b>A sweet, fun-filled follow-up to <i>The Welcome Wagon</i> from acclaimed author Cori Doerrfeld!</b><br> <br> Every year, the town of Cubby Hill comes together for the Great Giving Festival, celebrating the spirit of giving and community that makes their town such a great place to live. And this year, Cooper Cub has a very special task: delivering his grandmother’s special honey to everyone in town! But with such a big job, can Cooper find a way to help his friends and sweeten up the Festival?<br> In this sweet follow-up to <i>The Welcome Wagon</i>, Cori Doerrfeld’s adorable animal citizens of Cubby Hill celebrate sharing with your community and offering a helping hand!<br>",
                 [],
                 "1683359046",
@@ -56,7 +77,7 @@ public static class SwaggerExamples
     {
         public ChildEditDTO GetExamples()
         {
-            return new("New_Child_Name", 0, "READA7", "WLF359", DateOnly.Parse("2017-3-4"));
+            return new("New_Child_Name", 0, "ReadA7", "WLF359", DateOnly.Parse("2017-3-4"));
         }
     }
 
@@ -64,7 +85,7 @@ public static class SwaggerExamples
     {
         public ChildResponseDTO GetExamples()
         {
-            return new(Guid.NewGuid(), "Jackson", 1, "A5", "CLS098", DateOnly.Parse("2015-04-15"));
+            return new(Snowflake.Generate(), "Jackson", 1, "A5", "CLS098", DateOnly.Parse("2015-04-15"));
         }
     }
     
@@ -74,9 +95,9 @@ public static class SwaggerExamples
         {
             return
             [
-                new(Guid.NewGuid(),"Ashley", 0,  "A7", "CLS098", DateOnly.Parse("2014-08-23")),
-                new(Guid.NewGuid(),"Miles", 1, "B4", "CLS498", null),
-                new(Guid.NewGuid(),"Joey", 2, null, null, DateOnly.Parse("2015-04-15"))
+                new(Snowflake.Generate(),"Ashley", 0,  "A7", "CLS098", DateOnly.Parse("2014-08-23")),
+                new(Snowflake.Generate(),"Miles", 1, "B4", "CLS498", null),
+                new(Snowflake.Generate(),"Joey", 2, null, null, DateOnly.Parse("2015-04-15"))
             ];
         }
     }
@@ -125,9 +146,9 @@ public static class SwaggerExamples
     
     // SearchController
 
-    public class BooksResponseExample : IExamplesProvider<List<BookDto>>
+    public class BooksResponseExample : IExamplesProvider<List<BookDTO>>
     {
-        public List<BookDto> GetExamples()
+        public List<BookDTO> GetExamples()
         {
             return
             [

@@ -4,33 +4,77 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServer.Models.Entities;
 
-/*
- * By default, EF takes a "Table-Per-Hierarchy" approach to inheritance.
- * That means that one table will be created for BookshelfBook and all its subclasses,
- * with an automatically created Discriminator column to distinguish between entities
- * of different types.
- */
-
-[Table("BookshelfBooks")]
+[Table("CompletedBookshelfBooks")]
 [PrimaryKey(nameof(BookshelfId), nameof(BookId))]
-public class BookshelfBook(Guid bookshelfId, string bookId)
-{
-    [ForeignKey("Bookshelf")]
-    public Guid BookshelfId { get; set; } = bookshelfId;
+public class CompletedBookshelfBook(int bookshelfId, string bookId, double starRating)
+{    
+    public int BookshelfId { get; set; } = bookshelfId;
     
-    [ForeignKey("Book")]
+    [StringLength(20)]
+    public string BookId { get; set; } = bookId;
+    
+    [Range(0, 5, ErrorMessage = "Star rating must be between {0} and {1}.")]
+    public double StarRating { get; set; } = starRating;
+    
+    // Navigation
+    
+    [ForeignKey("BookshelfId")]
+    public CompletedBookshelf? Bookshelf { get; set; }
+    
+    [ForeignKey("BookId")]
+    public Book? Book { get; set; }
+}
+
+[Table("InProgressBookshelfBooks")]
+[PrimaryKey(nameof(BookshelfId), nameof(BookId))]
+public class InProgressBookshelfBook(int bookshelfId, string bookId)
+{
+    public int BookshelfId { get; set; } = bookshelfId;
+    
     [StringLength(20)]
     public string BookId { get; set; } = bookId;
     
     // Navigation
     
-    public Bookshelf? Bookshelf { get; set; }
+    [ForeignKey("BookshelfId")]
+    public InProgressBookshelf? Bookshelf { get; set; }
+    
+    [ForeignKey("BookId")]
     public Book? Book { get; set; }
 }
 
-public class CompletedBookshelfBook(Guid bookshelfId, string bookId, double starRating)
-    : BookshelfBook(bookshelfId, bookId)
+[Table("ChildBookshelfBooks")]
+[PrimaryKey(nameof(BookshelfId), nameof(BookId))]
+public class ChildBookshelfBook(int bookshelfId, string bookId)
 {
-    [Range(0, 5, ErrorMessage = "Star rating must be between {0} and {1}.")]
-    public double StarRating { get; set; } = starRating;
+    public int BookshelfId { get; set; } = bookshelfId;
+    
+    [StringLength(20)]
+    public string BookId { get; set; } = bookId;
+    
+    // Navigation
+    
+    [ForeignKey("BookshelfId")]
+    public ChildBookshelf? Bookshelf { get; set; }
+    
+    [ForeignKey("BookId")]
+    public Book? Book { get; set; }
+}
+
+[Table("ClassroomBookshelfBooks")]
+[PrimaryKey(nameof(BookshelfId), nameof(BookId))]
+public class ClassroomBookshelfBook(int bookshelfId, string bookId)
+{
+    public int BookshelfId { get; set; } = bookshelfId;
+    
+    [StringLength(20)]
+    public string BookId { get; set; } = bookId;
+    
+    // Navigation
+    
+    [ForeignKey("BookshelfId")]
+    public ClassroomBookshelf? Bookshelf { get; set; }
+    
+    [ForeignKey("BookId")]
+    public Book? Book { get; set; }
 }

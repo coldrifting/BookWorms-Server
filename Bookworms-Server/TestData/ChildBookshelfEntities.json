@@ -1,32 +1,32 @@
 ﻿[
   {
-    "childId": "ab198b2c-e08b-4f3d-a372-6af43c80e229",
-    "bookshelfId": "470ec5e1-c3df-43ab-af36-ffa666f3e656",
+    "childId": "2bc5ae6239c988",
+    "bookshelfId": 1,
     "name": "Evelyn's bookshelf (Parent1)"
   },
   {
-    "childId": "08dd3c4b-f197-4657-8556-58c76701802b",
-    "bookshelfId": "de0f92a9-01b7-4473-a4b8-a7b18319ee06",
+    "childId": "2bc5b121b46b4a",
+    "bookshelfId": 2,
     "name": "Evelyn's bookshelf (Parent2)"
   },
   {
-    "childId": "2a23200c-8fe0-4c8d-9233-3cf095569c01",
-    "bookshelfId": "88bf5fb8-4cd6-4044-9217-455f0907f518",
+    "childId": "2bc5b325697a55",
+    "bookshelfId":  3,
     "name": "Eric's books"
   },
   {
-    "childId": "61a1be57-69a3-46d5-95cd-8e257d4a553c",
-    "bookshelfId": "9ee22dbc-7bb2-41a0-a02a-40a2c0a51af6",
+    "childId": "2bc5b4544b34e7",
+    "bookshelfId": 4,
     "name": "Madison's collection"
   },
   {
-    "childId": "3eda09c6-53ee-44a4-b784-fbd90d5b7b1f",
-    "bookshelfId": "2e51c934-1ea8-4846-8229-ccb135cd6348",
+    "childId": "2bc5b3b701b2ee",
+    "bookshelfId": 5,
     "name": "Costanza's curation"
   },
   {
-    "childId": "94706c0e-2be9-45b5-ab3d-b42d61ae6c47",
-    "bookshelfId": "59a613c9-2494-4ef0-8a41-abd5d667d315",
+    "childId": "2bc5b4ec4f452c",
+    "bookshelfId": 6,
     "name": "Ryn's Empty Bookshelf"
   }
 ]

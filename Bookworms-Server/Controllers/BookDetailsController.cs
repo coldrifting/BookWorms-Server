@@ -14,18 +14,18 @@ namespace BookwormsServer.Controllers;
 public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService bookApiService) : ControllerBase
 {
     /// <summary>
-    /// Returns details about a book
+    /// Returns basic details about a book
     /// </summary>
-    /// <param name="bookId">The Google Books ID of the book to target</param>
+    /// <param name="bookId">The Book ID of the book to target</param>
     /// <returns>A BookDetailsDTO object</returns>
     /// <response code="200">Success</response>
     /// <response code="404">The book is not found</response>
     [HttpGet]
     [Route("/books/{bookId}/details")]
     [ResponseCache(Duration = 60)]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public Task<IActionResult> Get(string bookId)
+    public Task<IActionResult> GetBasic(string bookId)
     {
         Book? bookEntity = dbContext.Books
             .Include(b => b.Reviews)
@@ -37,14 +37,39 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
             return Task.FromResult<IActionResult>(NotFound(ErrorDTO.BookNotFound));
         }
         
-        var details = BookDetailsDTO.From(bookEntity);
-        return Task.FromResult<IActionResult>(Ok(details));
+        return Task.FromResult<IActionResult>(Ok(BookDTO.From(bookEntity)));
+    }
+    /// <summary>
+    /// Returns extended details about a book
+    /// </summary>
+    /// <param name="bookId">The Book ID of the book to target</param>
+    /// <returns>A BookDetailsExtendedDTO object</returns>
+    /// <response code="200">Success</response>
+    /// <response code="404">The book is not found</response>
+    [HttpGet]
+    [Route("/books/{bookId}/details/all")]
+    [ResponseCache(Duration = 60)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookDetailsDTO))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    public Task<IActionResult> GetAll(string bookId)
+    {
+        Book? bookEntity = dbContext.Books
+            .Include(b => b.Reviews)
+            .ThenInclude(r => r.Reviewer)
+            .SingleOrDefault(b => b.BookId == bookId);
+
+        if (bookEntity == null)
+        {
+            return Task.FromResult<IActionResult>(NotFound(ErrorDTO.BookNotFound));
+        }
+        
+        return Task.FromResult<IActionResult>(Ok(BookDetailsDTO.From(bookEntity)));
     }
 
     /// <summary>
     /// Gets the cover image for a book
     /// </summary>
-    /// <param name="bookId">The Google Books ID of the book to target</param>
+    /// <param name="bookId">The Book ID of the book to target</param>
     /// <returns>A JPEG file</returns>
     /// <response code="200">Success</response>
     /// <response code="404">The book is not found</response>
@@ -77,7 +102,7 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     /// <summary>
     /// Gets the cover images for a list of books
     /// </summary>
-    /// <param name="bookIds">The Google Books IDs of the books to target</param>
+    /// <param name="bookIds">The Book IDs of the books to target</param>
     /// <returns>A zip archive of book cover images</returns>
     /// <response code="200">Success</response>
     [HttpPost]
