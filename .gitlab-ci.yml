@@ -137,7 +137,7 @@ release_job:
         assets:
             links:
                 - name: "projectBuildArtifact"
-                  url: "$(CI_PROJECT_URL)/-/jobs/$(CI_JOB_ID)/artifacts/download"
+                  url: "$CI_PROJECT_URL/-/jobs/$CI_JOB_ID/artifacts/download"
     resource_group: common
 
 deploy_job:
