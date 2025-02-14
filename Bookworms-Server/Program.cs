@@ -15,6 +15,9 @@ using Swashbuckle.AspNetCore.Filters;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+// Enable Systemd support
+builder.Services.AddSystemd();
+
 // Establish database context ----------------------------------------------------------------------------------
 
 string? connectionString = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production"
