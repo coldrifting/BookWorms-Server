@@ -1,17 +1,13 @@
-﻿using System.Security.Claims;
-using BookwormsServer.Models.Data;
+﻿using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using BookwormsServer.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookwormsServer.Controllers;
 
-[ApiController]
-[Authorize]
-[Tags("Users")]
+[Tags("Users - Management")]
 [Route("user/[action]")]
-public class UserDetailsController(BookwormsDbContext dbContext) : ControllerBase
+public class UserDetailsController(BookwormsDbContext context) : AuthControllerBase(context)
 {
     /// <summary>
     /// Returns all the registered users
@@ -26,8 +22,8 @@ public class UserDetailsController(BookwormsDbContext dbContext) : ControllerBas
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     public IActionResult All()
     {
-        return dbContext.Users.CurrentUser(User) is Admin
-            ? Ok(dbContext.Users.Select(user => user.ToResponse()).ToList())
+        return CurrentUser is Admin
+            ? Ok(DbContext.Users.Select(user => user.ToResponse()).ToList())
             : StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotAdmin);
     }
 
@@ -43,7 +39,7 @@ public class UserDetailsController(BookwormsDbContext dbContext) : ControllerBas
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     public IActionResult Details()
     {
-        return Ok(dbContext.Users.CurrentUser(User).ToResponse());
+        return Ok(CurrentUser.ToResponse());
     }
 
     /// <summary>
@@ -58,21 +54,19 @@ public class UserDetailsController(BookwormsDbContext dbContext) : ControllerBas
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     public IActionResult Edit(UserDetailsEditRequest payload)
     {
-        User user = dbContext.Users.CurrentUser(User);
-
         // EF will only update DB state if a value has changed different
-        user.FirstName = payload.FirstName ?? user.FirstName;
-        user.LastName = payload.LastName ?? user.LastName;
-        user.UserIcon = payload.Icon ?? user.UserIcon;
+        CurrentUser.FirstName = payload.FirstName ?? CurrentUser.FirstName;
+        CurrentUser.LastName = payload.LastName ?? CurrentUser.LastName;
+        CurrentUser.UserIcon = payload.Icon ?? CurrentUser.UserIcon;
 
         if (payload.Password is not null)
         {
-            UserService.UpdatePassword(user, payload.Password);
+            UserService.UpdatePassword(CurrentUser, payload.Password);
         }
 
-        dbContext.SaveChanges();
+        DbContext.SaveChanges();
         
-        return Ok(user.ToResponse());
+        return Ok(CurrentUser.ToResponse());
     }
 
     /// <summary>
@@ -90,30 +84,28 @@ public class UserDetailsController(BookwormsDbContext dbContext) : ControllerBas
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Delete([FromQuery] string? username = null)
     {
-        User user = dbContext.Users.CurrentUser(User);
-            
         // self account deletion
         if (username is null)
         {
-            dbContext.Users.Remove(user);
-            dbContext.SaveChanges();
+            DbContext.Users.Remove(CurrentUser);
+            DbContext.SaveChanges();
             return NoContent();
         }
         
         // Delete other accounts
-        if (user is not Admin)
+        if (CurrentUser is not Admin)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotAdmin);
         }
         
-        User? userToDelete = dbContext.Users.Find(username);
+        User? userToDelete = DbContext.Users.Find(username);
         if (userToDelete is null)
         {
             return UnprocessableEntity(ErrorResponse.UserNotFound);
         }
         
-        dbContext.Users.Remove(userToDelete);
-        dbContext.SaveChanges();
+        DbContext.Users.Remove(userToDelete);
+        DbContext.SaveChanges();
         return NoContent();
     }
 }

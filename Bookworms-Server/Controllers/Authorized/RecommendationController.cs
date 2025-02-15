@@ -1,18 +1,13 @@
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookwormsServer.Controllers;
 
-[ApiController]
-[Authorize]
 [Tags("Recommend")]
 [Route("/Recommend/[action]")]
-public class RecommendationController(BookwormsDbContext dbContext, HttpClient httpClient): ControllerBase
+public class RecommendationController(BookwormsDbContext context, HttpClient httpClient): AuthControllerBase(context)
 {
-    private readonly HttpClient _client = httpClient;
-
     /// <summary>
     /// Gets a list of books by the same authors the user has left positive reviews for
     /// </summary>
@@ -53,16 +48,16 @@ public class RecommendationController(BookwormsDbContext dbContext, HttpClient h
 
     private async Task<IActionResult> GetRecommendedBooks(string endpoint, string? childId)
     {
-        User user = dbContext.Users.CurrentUser(User);
+        User user = CurrentUser;
         string url = $"{endpoint}?username={user.Username}";
         if (!string.IsNullOrEmpty(childId))
         {
-            if (dbContext.Users.CurrentUser(User) is not Parent parent)
+            if (CurrentUser is not Parent)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
             }
 
-            if (dbContext.Children.FindChild(parent, childId) is not { } child)
+            if (CurrentUserChild(childId) is not { })
             {
                 return NotFound(ErrorResponse.ChildNotFound);
             }
@@ -70,12 +65,12 @@ public class RecommendationController(BookwormsDbContext dbContext, HttpClient h
             url += $"&childID={childId}";   
         }
 
-        HttpResponseMessage response = await _client.GetAsync(url);
+        HttpResponseMessage response = await httpClient.GetAsync(url);
 
         if (response.IsSuccessStatusCode)
         {
             List<string> bookIds = await response.Content.ReadFromJsonAsync<List<string>>() ?? [];
-            List<Book> books = dbContext.Books.Where(b => bookIds.Contains(b.BookId)).ToList();
+            List<Book> books = DbContext.Books.Where(b => bookIds.Contains(b.BookId)).ToList();
             List<BookResponse> output = books.Select(book => book.ToResponse()).ToList();
             return Ok(output);
         }

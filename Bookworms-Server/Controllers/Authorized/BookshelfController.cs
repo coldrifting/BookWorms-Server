@@ -1,16 +1,12 @@
-using System.Security.Claims;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServer.Controllers;
 
-[ApiController]
-[Authorize]
 [Tags("Children - Bookshelves")]
-public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
+public class BookshelfController(BookwormsDbContext context) : AuthControllerBase(context)
 {
     /// <summary>
     /// Returns all bookshelves for the selected child under the logged in parent.
@@ -31,18 +27,15 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult All(string childId)
     {
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        Parent? parent = dbContext.Parents.Find(parentUsername);
-        if (parent is null)
+        if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = dbContext.Children
+        Child? child = DbContext.Children
             .Include(child => child.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.Books)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
+            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
         if (child is null)
         {
             return NotFound(ErrorResponse.ChildNotFound);
@@ -71,18 +64,15 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Details(string childId, string bookshelfName)
     {
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        Parent? parent = dbContext.Parents.Find(parentUsername);
-        if (parent is null)
+        if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = dbContext.Children
+        Child? child = DbContext.Children
             .Include(child => child.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.Books)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
+            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
         if (child is null)
         {
             return NotFound(ErrorResponse.ChildNotFound);
@@ -117,17 +107,14 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     public IActionResult Add(string childId, string bookshelfName)
     {
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        Parent? parent = dbContext.Parents.Find(parentUsername);
-        if (parent is null)
+        if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = dbContext.Children
+        Child? child = DbContext.Children
             .Include(child => child.Bookshelves)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
+            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
         if (child is null)
         {
             return NotFound(ErrorResponse.ChildNotFound);
@@ -139,8 +126,8 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             return UnprocessableEntity(ErrorResponse.BookshelfAlreadyExists);
         }
         
-        dbContext.ChildBookshelves.Add(new(bookshelfName, child.ChildId));
-        dbContext.SaveChanges();
+        DbContext.ChildBookshelves.Add(new(bookshelfName, child.ChildId));
+        DbContext.SaveChanges();
         
         return All(childId);
     }
@@ -166,17 +153,14 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     public IActionResult Rename(string childId, string bookshelfName, [FromQuery] string newName)
     {
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        Parent? parent = dbContext.Parents.Find(parentUsername);
-        if (parent is null)
+        if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = dbContext.Children
+        Child? child = DbContext.Children
             .Include(child => child.Bookshelves)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
+            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
         if (child is null)
         {
             return NotFound(ErrorResponse.ChildNotFound);
@@ -195,8 +179,8 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         }
 
         childBookshelf.Name = newName;
-        dbContext.ChildBookshelves.Update(childBookshelf);
-        dbContext.SaveChanges();
+        DbContext.ChildBookshelves.Update(childBookshelf);
+        DbContext.SaveChanges();
         
         return All(childId);
     }
@@ -222,18 +206,15 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     public IActionResult Insert(string childId, string bookshelfName, [FromQuery] string bookId)
     {
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        Parent? parent = dbContext.Parents.Find(parentUsername);
-        if (parent is null)
+        if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = dbContext.Children
+        Child? child = DbContext.Children
             .Include(child => child.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
+            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
         if (child is null)
         {
             return NotFound(ErrorResponse.ChildNotFound);
@@ -247,14 +228,14 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         
         if (childBookshelf.BookshelfBooks.All(b => b.BookId != bookId))
         {
-            Book? book = dbContext.Books.Find(bookId);
+            Book? book = DbContext.Books.Find(bookId);
             if (book is null)
             {
                 return UnprocessableEntity(ErrorResponse.BookIdInvalid);
             }
             
             childBookshelf.BookshelfBooks.Add(new(childBookshelf.BookshelfId, book.BookId));
-            dbContext.SaveChanges();
+            DbContext.SaveChanges();
         }
         
         return Details(childId, bookshelfName);
@@ -279,18 +260,15 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Remove(string childId, string bookshelfName, [FromQuery] string bookId)
     {
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        Parent? parent = dbContext.Parents.Find(parentUsername);
-        if (parent is null)
+        if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = dbContext.Children
+        Child? child = DbContext.Children
             .Include(child => child.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
+            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
         if (child is null)
         {
             return NotFound(ErrorResponse.ChildNotFound);
@@ -308,8 +286,8 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             return NotFound(ErrorResponse.BookshelfBookNotFound);
         }
 
-        dbContext.ChildBookshelfBooks.Remove(bookshelfBook);
-        dbContext.SaveChanges();
+        DbContext.ChildBookshelfBooks.Remove(bookshelfBook);
+        DbContext.SaveChanges();
         
         return Details(childId, bookshelfName);
     }
@@ -331,18 +309,15 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Clear(string childId, string bookshelfName)
     {
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        Parent? parent = dbContext.Parents.Find(parentUsername);
-        if (parent is null)
+        if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = dbContext.Children
+        Child? child = DbContext.Children
             .Include(child => child.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
+            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
         if (child is null)
         {
             return NotFound(ErrorResponse.ChildNotFound);
@@ -355,7 +330,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         }
 
         childBookshelf.BookshelfBooks.Clear();
-        dbContext.SaveChanges();
+        DbContext.SaveChanges();
 
         return NoContent();
     }
@@ -378,17 +353,14 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Delete(string childId, string bookshelfName)
     {
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        Parent? parent = dbContext.Parents.Find(parentUsername);
-        if (parent is null)
+        if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = dbContext.Children
+        Child? child = DbContext.Children
             .Include(child => child.Bookshelves)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
+            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
         
         if (child is null)
         {
@@ -401,8 +373,8 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             return NotFound(ErrorResponse.BookshelfNotFound);
         }
 
-        dbContext.ChildBookshelves.Remove(childBookshelf);
-        dbContext.SaveChanges();
+        DbContext.ChildBookshelves.Remove(childBookshelf);
+        DbContext.SaveChanges();
 
         return All(childId);
     }

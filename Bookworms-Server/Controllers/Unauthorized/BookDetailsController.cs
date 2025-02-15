@@ -21,11 +21,11 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     /// <response code="200">Success</response>
     /// <response code="404">The book is not found</response>
     [HttpGet]
-    [Route("/books/{bookId}/details")]
     [ResponseCache(Duration = 60)]
+    [Route("/books/{bookId}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
-    public IActionResult GetBasic(string bookId)
+    public IActionResult Details(string bookId)
     {
         Book? bookEntity = dbContext.Books
             .Include(b => b.Reviews)
@@ -44,11 +44,11 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     /// <response code="200">Success</response>
     /// <response code="404">The book is not found</response>
     [HttpGet]
-    [Route("/books/{bookId}/details/all")]
     [ResponseCache(Duration = 60)]
+    [Route("/books/{bookId}/details/all")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookResponseExtended))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
-    public IActionResult GetAll(string bookId)
+    public IActionResult All(string bookId)
     {
         Book? bookEntity = dbContext.Books
             .Include(b => b.Reviews)
@@ -68,10 +68,10 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     /// <response code="200">Success</response>
     /// <response code="404">The book is not found</response>
     [HttpGet]
-    [Route("/books/{bookId}/cover")]
+    [Route("/books/{bookId}/[action]")]
     [ProducesResponseType(typeof(Task<IActionResult>), StatusCodes.Status200OK, "image/jpeg", Type = typeof(File))]
     [ProducesResponseType(typeof(Task<IActionResult>), StatusCodes.Status404NotFound, "application/json", Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> Image(string bookId)
+    public async Task<IActionResult> Cover(string bookId)
     {
         string? coverId = dbContext.Books
             .SingleOrDefault(b => b.BookId == bookId)
@@ -100,10 +100,10 @@ public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService
     /// <returns>A zip archive of book cover images</returns>
     /// <response code="200">Success</response>
     [HttpPost]
-    [Route("/books/covers")]
+    [Route("/books/[action]")]
     [ProducesResponseType(typeof(Task<IActionResult>), StatusCodes.Status200OK, "application/zip", Type = typeof(File))]
     [SwaggerRequestExample(typeof(List<string>), typeof(SwaggerExamples.ImagesRequestBodyExample))]
-    public async Task<IActionResult> Images([FromBody] List<string> bookIds)
+    public async Task<IActionResult> Covers([FromBody] List<string> bookIds)
     {
         List<Book> books = dbContext.Books
             .Where(b => bookIds.Contains(b.BookId))

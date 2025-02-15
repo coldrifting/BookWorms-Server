@@ -8,7 +8,7 @@ namespace BookwormsServer.Controllers;
 
 [ApiController]
 [AllowAnonymous]
-[Tags("Users")]
+[Tags("Users - Login")]
 [Route("user/[action]")]
 public class UserLoginController(BookwormsDbContext dbContext) : ControllerBase
 {

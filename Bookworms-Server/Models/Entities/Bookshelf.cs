@@ -38,7 +38,6 @@ public class InProgressBookshelf(string childId)
     public string ChildId { get; set; } = childId;
 
     // Navigation
-    
     [ForeignKey(nameof(ChildId))] 
     public Child? Child { get; set; }
     
