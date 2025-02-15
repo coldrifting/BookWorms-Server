@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BookWormsServer.Migrations
+namespace BookwormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
-    [Migration("20250205064554_Initial")]
+    [Migration("20250215043149_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -366,10 +366,6 @@ namespace BookWormsServer.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
 
-                    b.Property<string>("Roles")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<byte[]>("Salt")
                         .IsRequired()
                         .HasColumnType("longblob");
@@ -384,6 +380,15 @@ namespace BookWormsServer.Migrations
                     b.HasDiscriminator().HasValue("User");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.Admin", b =>
+                {
+                    b.HasBaseType("BookwormsServer.Models.Entities.User");
+
+                    b.ToTable("Users");
+
+                    b.HasDiscriminator().HasValue("Admin");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.Parent", b =>

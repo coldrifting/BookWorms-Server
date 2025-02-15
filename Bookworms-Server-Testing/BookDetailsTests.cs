@@ -18,7 +18,7 @@ public class BookDetailsTests(CompositeFixture fixture) : BookwormsIntegrationTe
     [InlineData("OL2191470M", "The Magic School Bus: lost in the solar system", new[] {"Joanna Cole"}, null)]
     public async Task Test_GetBookDetailsBasic(string bookId, string title, string[] authors, double? rating)
     {
-        await CheckResponse<BookDTO>(async () => await Client.GetAsync(Routes.Books.Details(bookId)),
+        await CheckResponse<BookResponse>(async () => await Client.GetAsync(Routes.Books.Details(bookId)),
             HttpStatusCode.OK,
             content =>
             {
@@ -38,7 +38,7 @@ public class BookDetailsTests(CompositeFixture fixture) : BookwormsIntegrationTe
                                                   string description, string[] subjects, string? isbn10, string? isbn13,
                                                   int publishYear, int? pageCount, int numReviews)
     {
-        await CheckResponse<BookDetailsDTO>(async () => await Client.GetAsync(Routes.Books.DetailsExtended(bookId)),
+        await CheckResponse<BookResponseExtended>(async () => await Client.GetAsync(Routes.Books.DetailsExtended(bookId)),
             HttpStatusCode.OK,
             content =>
             {
@@ -64,11 +64,11 @@ public class BookDetailsTests(CompositeFixture fixture) : BookwormsIntegrationTe
     {
         await CheckForError(() => Client.GetAsync(Routes.Books.Details(bookId)), 
             HttpStatusCode.NotFound, 
-            ErrorDTO.BookNotFound);
+            ErrorResponse.BookNotFound);
         
         await CheckForError(() => Client.GetAsync(Routes.Books.DetailsExtended(bookId)), 
             HttpStatusCode.NotFound, 
-            ErrorDTO.BookNotFound);
+            ErrorResponse.BookNotFound);
     }
     
     [Theory]

@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BookwormsServer.Models.Entities;
 
 namespace BookwormsServer.Models.Data;
 
-public record ChildEditDTO(
+public record ChildEditRequest(
     [StringLength(256, MinimumLength = 2, ErrorMessage = "Child name must be between {2} and {1} characters long.")]
     string? NewName = null,
 
@@ -19,10 +18,10 @@ public record ChildEditDTO(
         ErrorMessage = "Child date of birth must fall between {1} and {2}.")]
     DateOnly? DateOfBirth = null);
 
-public record ChildResponseDTO(string ChildId, string Name, int? ChildIcon, string? ReadingLevel, string? ClassroomCode, DateOnly? DateOfBirth)
-{
-    public static ChildResponseDTO From(Child child)
-    {
-        return new(child.ChildId, child.Name, child.ChildIcon, child.ReadingLevel, child.ClassroomCode, child.DateOfBirth);
-    }
-}
+public record ChildResponse(
+    string ChildId, 
+    string Name, 
+    int? ChildIcon, 
+    string? ReadingLevel, 
+    string? ClassroomCode, 
+    DateOnly? DateOfBirth);

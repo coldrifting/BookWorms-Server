@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BookwormsServer.Models.Data;
 
 namespace BookwormsServer.Models.Entities;
 
@@ -68,4 +69,50 @@ public class Book(string bookId, string title, List<string> authors, string desc
             ? Math.Round(Reviews.Average(r => r.StarRating), numDecPlaces) 
             : null;
     }
+    
+    public BookResponsePreview ToResponsePreview()
+    {
+        return new(
+            BookId,
+            Title,
+            Authors
+        );
+    }
+    
+    public BookResponse ToResponse()
+    {
+        return new(
+            BookId,
+            Title,
+            Authors,
+            StarRating,
+            Level
+        );
+    }
+    
+    public BookResponseExtended ToResponseExtended()
+    {
+        return new(
+            BookId,
+            Title,
+            Authors,
+            StarRating,
+            Level,
+            Description,
+            Subjects,
+            Isbn10 == "" ? null : Isbn10,
+            Isbn13 == "" ? null : Isbn13,
+            PublishYear,
+            PageCount,
+            Reviews.Select(review => review.ToResponse()).ToList()
+        );
+    }
+}
+
+public static class BookExtensions
+{
+	public static List<BookResponse> ToResponse(this IEnumerable<Book> books)
+	{
+		return books.Select(book => book.ToResponse()).ToList();
+	}
 }

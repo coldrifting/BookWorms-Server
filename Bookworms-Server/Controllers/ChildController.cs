@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using BookwormsServer.Models.Data;
+﻿using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BookwormsServer.Controllers;
 
 [ApiController]
+[Authorize]
 [Tags("Children")]
 [Route("/children/[action]")]
 public class ChildController(BookwormsDbContext dbContext) : ControllerBase
@@ -20,16 +20,14 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="403">The user is not a parent</response>
     [HttpGet]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ChildResponseDTO>))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ChildResponse>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     public IActionResult All()
     {
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        return dbContext.Parents.Any(p => p.Username == parentUsername) 
-            ? Ok(GetAllChildren(parentUsername)) 
-            : StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+        return dbContext.Users.CurrentUser(User) is not Parent parent 
+            ? StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent) 
+            : Ok(GetAllChildren(parent.Username));
     }
     
     
@@ -43,26 +41,22 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a parent</response>
     [HttpPost]
-    [Authorize]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(List<ChildResponseDTO>))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(List<ChildResponse>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     public IActionResult Add(string childName)
     {
-        // This should never be null thanks to the authorize attribute above
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        if (!dbContext.Parents.Any(p => p.Username == parentUsername))
+        if (dbContext.Users.CurrentUser(User) is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child child = new(childName, parentUsername);
+        Child child = new(childName, parent.Username);
         dbContext.Children.Add(child);
         
         dbContext.SaveChanges();
 
-        return Created($"/children/{child.ChildId}", GetAllChildren(parentUsername));
+        return Created($"/children/{child.ChildId}", GetAllChildren(parent.Username));
     }
 
     
@@ -73,36 +67,33 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="200">Info about the child</response>
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a parent</response>
-    /// <response code="404">The child ID is invalid, or is not managed by the logged in parent</response>
+    /// <response code="404">The child's ID is invalid, or is not managed by the logged in parent</response>
     /// <response code="422">The classroom code is invalid, or an invalid icon is specified</response>
     [HttpPut]
     [Authorize]
     [Route("/children/{childId}/[action]")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ChildResponseDTO))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
-    public IActionResult Edit([FromRoute] string childId, [FromBody] ChildEditDTO payload)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ChildResponse))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
+    public IActionResult Edit([FromRoute] string childId, [FromBody] ChildEditRequest payload)
     {
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        if (!dbContext.Parents.Any(p => p.Username == parentUsername))
+        if (dbContext.Users.CurrentUser(User) is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = dbContext.Children.Find(childId);
-        if (child is null || child.ParentUsername != parentUsername)
+        if (dbContext.Children.FindChild(parent, childId) is not { } child)
         {
-            return NotFound(ErrorDTO.ChildNotFound);
+            return NotFound(ErrorResponse.ChildNotFound);
         }
 
         if (payload.ClassroomCode is not null)
         {
             if (!dbContext.Classrooms.Any(c => c.ClassroomCode == payload.ClassroomCode))
             {
-                return UnprocessableEntity(ErrorDTO.ClassroomNotFound);
+                return UnprocessableEntity(ErrorResponse.ClassroomNotFound);
             }
             
             child.ClassroomCode = payload.ClassroomCode;
@@ -129,7 +120,7 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
         }
 
         dbContext.SaveChanges();
-        return Ok(ChildResponseDTO.From(child));
+        return Ok(child.ToResponse());
     }
 
     
@@ -140,27 +131,24 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="200">Info about all remaining children under the logged in parent</response>
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a parent</response>
-    /// <response code="404">The child ID is invalid, or is not managed by the logged in parent</response>
+    /// <response code="404">The child's ID is invalid, or is not managed by the logged in parent</response>
     [HttpDelete]
     [Authorize]
     [Route("/children/{childId}/[action]")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ChildResponseDTO>))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ChildResponse>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Remove(string childId)
     {
-        string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        if (!dbContext.Parents.Any(p => p.Username == parentUsername))
+        if (dbContext.Users.CurrentUser(User) is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = dbContext.Children.Find(childId);
-        if (child is null || child.ParentUsername != parentUsername)
+        if (dbContext.Children.FindChild(parent, childId) is not { } child)
         {
-            return NotFound(ErrorDTO.ChildNotFound);
+            return NotFound(ErrorResponse.ChildNotFound);
         }
         
         dbContext.Remove(child);
@@ -170,12 +158,11 @@ public class ChildController(BookwormsDbContext dbContext) : ControllerBase
     }
 
     
-    private List<ChildResponseDTO> GetAllChildren(string parentUsername)
+    private List<ChildResponse> GetAllChildren(string parentUsername)
     {
         return dbContext.Children
             .Where(c => c.ParentUsername == parentUsername)
-            .AsEnumerable()
-            .Select(ChildResponseDTO.From)
+            .Select(child => child.ToResponse())
             .ToList();
     }
 }

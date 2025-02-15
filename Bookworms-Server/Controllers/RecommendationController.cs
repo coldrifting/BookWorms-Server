@@ -1,13 +1,14 @@
-using System.Security.Claims;
-using BookwormsServer;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
+
+namespace BookwormsServer.Controllers;
 
 [ApiController]
+[Authorize]
 [Tags("Recommend")]
+[Route("/Recommend/[action]")]
 public class RecommendationController(BookwormsDbContext dbContext, HttpClient httpClient): ControllerBase
 {
     private readonly HttpClient _client = httpClient;
@@ -19,17 +20,15 @@ public class RecommendationController(BookwormsDbContext dbContext, HttpClient h
     /// <response code="200">Returns a list of books by the same authors the user has left positive reviews for</response>
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a parent</response>
-    /// <response code="404">The child ID is invalid, or is not managed by the logged in user</response>
+    /// <response code="404">The child ID is invalid, or is not managed by the logged-in user</response>
     [HttpGet]
-    [Authorize]
-    [Route("/Recommend/SameAuthors")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookDTO>))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public async Task<IActionResult> RecommendSameAuthors(string? childId = null)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookResponse>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    public async Task<IActionResult> SameAuthors(string? childId = null)
     {
-        string endpoint = "http://localhost:8000/recommend/same-authors";
+        const string endpoint = "http://localhost:8000/recommend/same-authors";
         return await GetRecommendedBooks(endpoint, childId);
     }
 
@@ -40,52 +39,47 @@ public class RecommendationController(BookwormsDbContext dbContext, HttpClient h
     /// <response code="200">Returns a list ofbooks with similar descriptions to other books the user has left positive reviews for</response>
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a parent</response>
-    /// <response code="404">The child ID is invalid, or is not managed by the logged in user</response>
+    /// <response code="404">The child ID is invalid, or is not managed by the logged-in user</response>
     [HttpGet]
-    [Authorize]
-    [Route("/Recommend/SimilarDescriptions")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookDTO>))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public async Task<IActionResult> RecommendSimilarDescriptions(string? childId = null)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookResponse>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    public async Task<IActionResult> SimilarDescriptions(string? childId = null)
     {
-        string endpoint = "http://localhost:8000/recommend/similar-descriptions";
+        const string endpoint = "http://localhost:8000/recommend/similar-descriptions";
         return await GetRecommendedBooks(endpoint, childId);
     }
 
     private async Task<IActionResult> GetRecommendedBooks(string endpoint, string? childId)
     {
-        string loggedInUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        string url = $"{endpoint}?username={loggedInUsername}";
+        User user = dbContext.Users.CurrentUser(User);
+        string url = $"{endpoint}?username={user.Username}";
         if (!string.IsNullOrEmpty(childId))
         {
-            if (!dbContext.Parents.Any(p => p.Username == loggedInUsername))
+            if (dbContext.Users.CurrentUser(User) is not Parent parent)
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
             }
-            Child? child = dbContext.Children.Find(childId);
-            if (child is null || child.ParentUsername != loggedInUsername)
+
+            if (dbContext.Children.FindChild(parent, childId) is not { } child)
             {
-                return NotFound(ErrorDTO.ChildNotFound);
+                return NotFound(ErrorResponse.ChildNotFound);
             }
+            
             url += $"&childID={childId}";   
         }
 
-        var response = await _client.GetAsync(url);
+        HttpResponseMessage response = await _client.GetAsync(url);
 
         if (response.IsSuccessStatusCode)
         {
-            string content = await response.Content.ReadAsStringAsync();
-            JArray jsonArray = JArray.Parse(content);
-            List<string> bookIds = jsonArray?.ToObject<List<string>>() ?? [];
+            List<string> bookIds = await response.Content.ReadFromJsonAsync<List<string>>() ?? [];
             List<Book> books = dbContext.Books.Where(b => bookIds.Contains(b.BookId)).ToList();
-            List<BookDTO> output = books.Select(BookDTO.From).ToList();
+            List<BookResponse> output = books.Select(book => book.ToResponse()).ToList();
             return Ok(output);
         }
-        else
-        {
-            return Ok(new List<BookDTO>());
-        }
+
+        return Ok(new List<BookResponse>());
     }
 }

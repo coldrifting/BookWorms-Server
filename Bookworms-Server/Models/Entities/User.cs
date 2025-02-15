@@ -1,17 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BookwormsServer.Models.Data;
 
 namespace BookwormsServer.Models.Entities;
 
 /*
  * By default, EF takes  "Table-Per-Hierarchy" approach to inheritance.
- * That means that one table will be created for BookShelf and all its subclasses,
+ * That means that one table will be created for User and all its subclasses,
  * with an automatically created Discriminator column to distinguish between entities
  * of different types.
  */
 
 [Table("Users")]
-public class User(string username, byte[] hash, byte[] salt, string firstName, string lastName, int userIcon)
+public abstract class User(string username, byte[] hash, byte[] salt, string firstName, string lastName, int userIcon)
 {
     [Key, StringLength(64, MinimumLength = 5, ErrorMessage = "User username must be between {2} and {1} characters long.")]
     public string Username { get; set; } = username;
@@ -29,15 +30,17 @@ public class User(string username, byte[] hash, byte[] salt, string firstName, s
     
     public byte[] Salt { get; set; } = salt;
 
-    public string[] Roles { get; set; } = [];
-
     // Navigation
-
     public ICollection<Review> Reviews { get; set; } = null!;
-
-    public bool IsAdmin()
+    
+    public UserDetailsResponse ToResponse()
     {
-        return Roles.Contains("Admin");
+        return new(
+            Username, 
+            FirstName, 
+            LastName, 
+        GetType().Name,
+            UserIcon);
     }
 }
 
@@ -55,7 +58,9 @@ public class Teacher(string username, byte[] hash, byte[] salt, string firstName
     public string? ClassroomCode { get; set; }
     
     // Navigation
-    
     [ForeignKey(nameof(ClassroomCode))]
     public Classroom? Classroom { get; set; }
 }
+
+public class Admin(string username, byte[] hash, byte[] salt, string firstName, string lastName, int userIcon)
+    : User(username, hash, salt, firstName, lastName, userIcon);

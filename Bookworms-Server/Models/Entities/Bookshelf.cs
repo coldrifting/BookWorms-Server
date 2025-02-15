@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BookwormsServer.Models.Data;
 
 namespace BookwormsServer.Models.Entities;
 
@@ -64,6 +65,13 @@ public class ChildBookshelf(string name, string childId)
     
     public ICollection<ChildBookshelfBook> BookshelfBooks { get; set; } = null!;
     public ICollection<Book> Books { get; set; } = null!; // Skip-navigation (many-to-many)
+
+    public BookshelfResponse ToResponse(int numBooks = int.MaxValue)
+    {
+        return new(
+            Name,
+            Books.Select(book => book.ToResponsePreview()).Take(numBooks).ToList());
+    }
 }
 
 [Table("ClassroomBookshelves")]

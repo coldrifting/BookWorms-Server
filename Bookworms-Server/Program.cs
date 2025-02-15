@@ -86,13 +86,13 @@ builder.Services
 	{
 		opt.RequireHttpsMetadata = false;
 		opt.SaveToken = true;
-		opt.TokenValidationParameters = new TokenValidationParameters
+		opt.TokenValidationParameters = new()
 		{
 			IssuerSigningKey = new SymmetricSecurityKey(AuthService.SecretBytes),
 			ValidateIssuer = false,
 			ValidateAudience = false
 		};
-		// Make authorization failure (401 & 403) responses consistent with other bad requests
+		// 401 & 403 use custom error model, and check user is not deleted
 		opt.Events = AuthService.BearerEvents();
 	});
 builder.Services.AddAuthorization();
@@ -171,6 +171,7 @@ if (!app.Environment.IsStaging())
 	app.UseHttpsRedirection();
 	app.UseDefaultFiles();
 	app.UseStaticFiles();
+	app.UseAuthentication();
 	app.UseAuthorization();
 }
 

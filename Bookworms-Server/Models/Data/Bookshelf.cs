@@ -1,20 +1,18 @@
-using BookwormsServer.Models.Entities;
-
 namespace BookwormsServer.Models.Data;
 
-public class BookshelfPreviewResponseDTO(string name, BookshelfBookPreviewDTO[] books)
+public class BookshelfResponse(string name, List<BookResponsePreview> books)
 {
     public string Name { get; } = name;
-    public BookshelfBookPreviewDTO[] Books { get; } = books;
+    public List<BookResponsePreview> Books { get; } = books;
 
     public override bool Equals(object? other)
     {
-        if (other is not BookshelfPreviewResponseDTO otherBookshelfPreview)
+        if (other is not BookshelfResponse otherBookshelfPreview)
         {
             return false;
         }
         
-        if (Books.Length != otherBookshelfPreview.Books.Length)
+        if (Books.Count != otherBookshelfPreview.Books.Count)
         {
             return false;
         }
@@ -24,7 +22,7 @@ public class BookshelfPreviewResponseDTO(string name, BookshelfBookPreviewDTO[] 
             return false;
         }
 
-        for (int i = 0; i < Books.Length; i++)
+        for (int i = 0; i < Books.Count; i++)
         {
             if (Books[i] != otherBookshelfPreview.Books[i])
             {
@@ -38,35 +36,5 @@ public class BookshelfPreviewResponseDTO(string name, BookshelfBookPreviewDTO[] 
     public override int GetHashCode()
     {
         return HashCode.Combine(Name, Books);
-    }
-
-    public static BookshelfPreviewResponseDTO From(string name, IEnumerable<ChildBookshelfBook> books)
-    {
-        List<BookshelfBookPreviewDTO> bookPreviews = [];
-        foreach (var bookshelfBook in books)
-        {
-            if (bookshelfBook.Book != null)
-            {
-                bookPreviews.Add(BookshelfBookPreviewDTO.From(bookshelfBook.Book));
-            }
-        }
-
-        return new(name, bookPreviews.ToArray());
-    }
-
-    public static BookshelfPreviewResponseDTO From(string name, IEnumerable<Book> books)
-    {
-        List<BookshelfBookPreviewDTO> bookPreviews = [];
-        bookPreviews.AddRange(books.Select(BookshelfBookPreviewDTO.From));
-
-        return new(name, bookPreviews.ToArray());
-    }
-}
-
-public record BookshelfBookPreviewDTO(string BookId, string Title, List<string> Authors)
-{
-    public static BookshelfBookPreviewDTO From(Book book)
-    {
-        return new(book.BookId, book.Title, book.Authors);
     }
 }

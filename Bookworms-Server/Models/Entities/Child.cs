@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BookwormsServer.Models.Data;
 using BookwormsServer.Utils;
 
 namespace BookwormsServer.Models.Entities;
@@ -43,4 +44,15 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
     public CompletedBookshelf? Completed { get; set; }
     public InProgressBookshelf? InProgress { get; set; }
     public ICollection<ChildBookshelf> Bookshelves { get; set; } = null!;
+
+    public ChildResponse ToResponse()
+    {
+        return new(
+            ChildId,
+            Name,
+            ChildIcon,
+            ReadingLevel,
+            ClassroomCode,
+            DateOfBirth);
+    }
 }

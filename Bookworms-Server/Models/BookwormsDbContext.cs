@@ -1,5 +1,7 @@
-﻿using System.Text.Json;
+﻿using System.Security.Claims;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +10,7 @@ namespace BookwormsServer;
 public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : DbContext(options)
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<Admin> Admins { get; set; }
     public DbSet<Parent> Parents { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
     
@@ -60,7 +63,7 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     {
 	    Clear();
 
-	    Seed<User>();
+	    Seed<Admin>();
 	    Seed<Parent>();
 	    Seed<Teacher>();
 	    
@@ -116,4 +119,29 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 		Set<T>().AddRange(objects);
 		SaveChanges();
     }
+}
+
+public static class BookwormsDbContextExtensions
+{
+	/// <summary>
+	/// Gets the current loged in user from the database.<para />
+	/// Must be called from a controller class or method with the Authorize attribute
+	/// </summary>
+	/// <param name="users">The DB Set of Users</param>
+	/// <param name="principal">The User Claim Priniciple from the validated token</param>
+	/// <returns>The logged-in User Entity</returns>
+	public static User CurrentUser(this DbSet<User> users, ClaimsPrincipal principal)
+	{
+		// Will not be null as long as this method is called from an authorized route
+		string loggedInUsername = principal.FindFirstValue(ClaimTypes.NameIdentifier)!;
+		return users.Find(loggedInUsername)!;
+	}
+
+	public static Child? FindChild(this DbSet<Child> children, Parent parent, string childId)
+	{
+		Child? child = children.Find(childId);
+		return child?.ParentUsername == parent.Username 
+			? child 
+			: null;
+	}
 }

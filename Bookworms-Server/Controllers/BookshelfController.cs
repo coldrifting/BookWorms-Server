@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BookwormsServer.Controllers;
 
 [ApiController]
+[Authorize]
 [Tags("Children - Bookshelves")]
 public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
 {
@@ -23,12 +24,11 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="403">The user is not a parent</response>
     /// <response code="404">The child does not exist</response>
     [HttpGet]
-    [Authorize]
     [Route("/children/{childId}/shelves")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfPreviewResponseDTO>))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfResponse>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult All(string childId)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -36,7 +36,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
         Child? child = dbContext.Children
@@ -45,13 +45,11 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
-            return NotFound(ErrorDTO.ChildNotFound);
+            return NotFound(ErrorResponse.ChildNotFound);
         }
-        
-        List<BookshelfPreviewResponseDTO> bookshelves = [];
-        bookshelves.AddRange(child.Bookshelves.Select(cb =>
-            BookshelfPreviewResponseDTO.From(cb.Name, cb.Books.Take(3))));
-        return Ok(bookshelves);
+
+        List<BookshelfResponse> shelves = child.Bookshelves.Select(cb => cb.ToResponse(3)).ToList();
+        return Ok(shelves);
     }
     
     /// <summary>
@@ -66,12 +64,11 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="403">The user is not a parent</response>
     /// <response code="404">The child or bookshelf does not exist</response>
     [HttpGet]
-    [Authorize]
     [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookshelfPreviewResponseDTO))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookshelfResponse))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Details(string childId, string bookshelfName)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -79,7 +76,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
         Child? child = dbContext.Children
@@ -88,16 +85,16 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
-            return NotFound(ErrorDTO.ChildNotFound);
+            return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        var childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
+        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
         if (childBookshelf is null)
         {
-            return NotFound(ErrorDTO.BookshelfNotFound);
+            return NotFound(ErrorResponse.BookshelfNotFound);
         }
-        
-        return Ok(BookshelfPreviewResponseDTO.From(childBookshelf.Name, childBookshelf.Books));
+
+        return Ok(childBookshelf.ToResponse());
     }
 
     /// <summary>
@@ -112,13 +109,12 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="404">The child or bookshelf does not exist</response>
     /// <response code="422">A bookshelf with the same name already exists for the selected child</response>
     [HttpPost]
-    [Authorize]
     [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfPreviewResponseDTO>))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfResponse>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     public IActionResult Add(string childId, string bookshelfName)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -126,7 +122,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
         Child? child = dbContext.Children
@@ -134,13 +130,13 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
-            return NotFound(ErrorDTO.ChildNotFound);
+            return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        var childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
+        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
         if (childBookshelf is not null)
         {
-            return UnprocessableEntity(ErrorDTO.BookshelfAlreadyExists);
+            return UnprocessableEntity(ErrorResponse.BookshelfAlreadyExists);
         }
         
         dbContext.ChildBookshelves.Add(new(bookshelfName, child.ChildId));
@@ -162,13 +158,12 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="404">The child or bookshelf does not exist</response>
     /// <response code="422">A bookshelf with the new name already exists for this child</response>
     [HttpPost]
-    [Authorize]
     [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfPreviewResponseDTO>))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfResponse>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     public IActionResult Rename(string childId, string bookshelfName, [FromQuery] string newName)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -176,7 +171,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
         Child? child = dbContext.Children
@@ -184,19 +179,19 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
-            return NotFound(ErrorDTO.ChildNotFound);
+            return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        var childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
+        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
         if (childBookshelf is null)
         {
-            return NotFound(ErrorDTO.BookshelfNotFound);
+            return NotFound(ErrorResponse.BookshelfNotFound);
         }
         
-        var childBookshelf2 = child.Bookshelves.FirstOrDefault(cb => cb.Name == newName);
+        ChildBookshelf? childBookshelf2 = child.Bookshelves.FirstOrDefault(cb => cb.Name == newName);
         if (childBookshelf2 is not null)
         {
-            return UnprocessableEntity(ErrorDTO.BookshelfAlreadyExists);
+            return UnprocessableEntity(ErrorResponse.BookshelfAlreadyExists);
         }
 
         childBookshelf.Name = newName;
@@ -219,13 +214,12 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="404">The child, bookshelf, or book does not exist</response>
     /// <response code="422">The book id is invalid</response>
     [HttpPut]
-    [Authorize]
     [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookshelfPreviewResponseDTO))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookshelfResponse))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     public IActionResult Insert(string childId, string bookshelfName, [FromQuery] string bookId)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -233,7 +227,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
         Child? child = dbContext.Children
@@ -242,13 +236,13 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
-            return NotFound(ErrorDTO.ChildNotFound);
+            return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        var childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
+        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
         if (childBookshelf is null)
         {
-            return NotFound(ErrorDTO.BookshelfNotFound);
+            return NotFound(ErrorResponse.BookshelfNotFound);
         }
         
         if (childBookshelf.BookshelfBooks.All(b => b.BookId != bookId))
@@ -256,7 +250,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             Book? book = dbContext.Books.Find(bookId);
             if (book is null)
             {
-                return UnprocessableEntity(ErrorDTO.BookIdInvalid);
+                return UnprocessableEntity(ErrorResponse.BookIdInvalid);
             }
             
             childBookshelf.BookshelfBooks.Add(new(childBookshelf.BookshelfId, book.BookId));
@@ -278,12 +272,11 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="403">The user is not a parent</response>
     /// <response code="404">The child or bookshelf does not exist, or the book id was not found in the bookshelf</response>
     [HttpDelete]
-    [Authorize]
     [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookshelfPreviewResponseDTO))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookshelfResponse))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Remove(string childId, string bookshelfName, [FromQuery] string bookId)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -291,7 +284,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
         Child? child = dbContext.Children
@@ -300,19 +293,19 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
-            return NotFound(ErrorDTO.ChildNotFound);
+            return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        var childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
+        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
         if (childBookshelf is null)
         {
-            return NotFound(ErrorDTO.BookshelfNotFound);
+            return NotFound(ErrorResponse.BookshelfNotFound);
         }
 
         ChildBookshelfBook? bookshelfBook = childBookshelf.BookshelfBooks.FirstOrDefault(b => b.BookId == bookId);
         if (bookshelfBook is null)
         {
-            return NotFound(ErrorDTO.BookshelfBookNotFound);
+            return NotFound(ErrorResponse.BookshelfBookNotFound);
         }
 
         dbContext.ChildBookshelfBooks.Remove(bookshelfBook);
@@ -331,12 +324,11 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="403">The user is not a parent</response>
     /// <response code="404">The child or bookshelf does not exist</response>
     [HttpDelete]
-    [Authorize]
     [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Clear(string childId, string bookshelfName)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -344,7 +336,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
         Child? child = dbContext.Children
@@ -353,13 +345,13 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parentUsername);
         if (child is null)
         {
-            return NotFound(ErrorDTO.ChildNotFound);
+            return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        var childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
+        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
         if (childBookshelf is null)
         {
-            return NotFound(ErrorDTO.BookshelfNotFound);
+            return NotFound(ErrorResponse.BookshelfNotFound);
         }
 
         childBookshelf.BookshelfBooks.Clear();
@@ -379,12 +371,11 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="403">The user is not a parent</response>
     /// <response code="404">The child or bookshelf does not exist</response>
     [HttpDelete]
-    [Authorize]
     [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfPreviewResponseDTO>))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookshelfResponse>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Delete(string childId, string bookshelfName)
     {
         string parentUsername = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -392,7 +383,7 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         Parent? parent = dbContext.Parents.Find(parentUsername);
         if (parent is null)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorDTO.UserNotParent);
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
         Child? child = dbContext.Children
@@ -401,13 +392,13 @@ public class BookshelfController(BookwormsDbContext dbContext) : ControllerBase
         
         if (child is null)
         {
-            return NotFound(ErrorDTO.ChildNotFound);
+            return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        var childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
+        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
         if (childBookshelf is null)
         {
-            return NotFound(ErrorDTO.BookshelfNotFound);
+            return NotFound(ErrorResponse.BookshelfNotFound);
         }
 
         dbContext.ChildBookshelves.Remove(childBookshelf);

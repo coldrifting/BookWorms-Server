@@ -22,8 +22,8 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="404">The book is not found</response>
     [HttpGet]
     [Route("/books/{bookId}/reviews")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ReviewDTO>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ReviewResponse>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Get(string bookId, int start, int max)
     {
         Book? book = dbContext.Books
@@ -32,7 +32,7 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
 
         if (book is null)
         {
-            return NotFound(ErrorDTO.BookNotFound);
+            return NotFound(ErrorResponse.BookNotFound);
         }
 
         IQueryable<Review> q = dbContext.Reviews
@@ -44,7 +44,7 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
         if (max > 0)
             q = q.Take(max);
 
-        List<ReviewDTO> output = q.AsEnumerable().Select(ReviewDTO.From).ToList();
+        List<ReviewResponse> output = q.AsEnumerable().Select(review => review.ToResponse()).ToList();
             
         return Ok(output);
     }
@@ -53,7 +53,7 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     /// Adds/updates the review for the specified book and user
     /// </summary>
     /// <param name="bookId">The Google Books ID of the book to target</param>
-    /// <param name="reviewDto">The data with which to populate the new/updated review</param>
+    /// <param name="payload">The data with which to populate the new/updated review</param>
     /// <returns>The newly created or updated review</returns>
     /// <response code="200">Success. Review was Updated</response>
     /// <response code="201">Success. Review was Created</response>
@@ -62,11 +62,11 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     [HttpPut]
     [Authorize]
     [Route("/books/{bookId}/review")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReviewDTO))]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ReviewDTO))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
-    public IActionResult AddOrUpdate(string bookId, [FromBody] ReviewAddOrUpdateRequestDTO reviewDto)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReviewResponse))]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ReviewResponse))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    public IActionResult AddOrUpdate(string bookId, [FromBody] ReviewEditRequest payload)
     {
         Book? book = dbContext.Books
             .Include(b => b.Reviews)
@@ -74,7 +74,7 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
             .FirstOrDefault(b => b.BookId == bookId);
         if (book is null)
         {
-            return NotFound(ErrorDTO.BookNotFound);
+            return NotFound(ErrorResponse.BookNotFound);
         }
 
         // Will not be null thanks to Authorize attribute
@@ -85,13 +85,13 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
         int statusCode;
         if (review is not null)
         {
-            review.StarRating = reviewDto.StarRating;
-            review.ReviewText = reviewDto.ReviewText;
+            review.StarRating = payload.StarRating;
+            review.ReviewText = payload.ReviewText;
             statusCode = StatusCodes.Status200OK;
         }
         else
         {
-            review = new(bookId, username, reviewDto.StarRating, reviewDto.ReviewText, DateTime.Now);
+            review = new(bookId, username, payload.StarRating, payload.ReviewText, DateTime.Now);
             statusCode = StatusCodes.Status201Created;
         }
         
@@ -105,7 +105,7 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
             .Include(r => r.Reviewer)
             .First(r => r.Username == username && r.BookId == bookId);
 
-        return StatusCode(statusCode, ReviewDTO.From(reviewOutput));
+        return StatusCode(statusCode, reviewOutput.ToResponse());
     }
     
     /// <summary>
@@ -119,8 +119,8 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
     [Authorize]
     [Route("/books/{bookId}/review")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDTO))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Delete(string bookId)
     {
         Book? book = dbContext.Books
@@ -129,7 +129,7 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
             .FirstOrDefault(b => b.BookId == bookId);
         if (book is null)
         {
-            return NotFound(ErrorDTO.BookNotFound);
+            return NotFound(ErrorResponse.BookNotFound);
         }
 
         // Will not be null thanks to Authorize attribute
@@ -139,7 +139,7 @@ public class ReviewsController(BookwormsDbContext dbContext) : ControllerBase
 
         if (review is null)
         {
-            return NotFound(ErrorDTO.ReviewNotFound);
+            return NotFound(ErrorResponse.ReviewNotFound);
         }
         
         dbContext.Remove(review);

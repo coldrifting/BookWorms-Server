@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BookWormsServer.Migrations
+namespace BookwormsServer.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -97,8 +97,6 @@ namespace BookWormsServer.Migrations
                     UserIcon = table.Column<int>(type: "int", nullable: false),
                     Hash = table.Column<byte[]>(type: "longblob", nullable: false),
                     Salt = table.Column<byte[]>(type: "longblob", nullable: false),
-                    Roles = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Discriminator = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
