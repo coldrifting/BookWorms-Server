@@ -160,6 +160,14 @@ app.UseSwaggerUI(opt =>
 // Don't bother with static files and other web stuff in Staging, which is only used for running tests
 if (!app.Environment.IsStaging())
 {
+	app.UseCors(o => o.WithOrigins(
+		"https://www.bookworms.app",
+		"https://bookworms.app")
+		.WithExposedHeaders("*")
+		.AllowAnyMethod()
+		.AllowAnyHeader()
+		.AllowCredentials());
+	
 	app.UseHttpsRedirection();
 	app.UseDefaultFiles();
 	app.UseStaticFiles();

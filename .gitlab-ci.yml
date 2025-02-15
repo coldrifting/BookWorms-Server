@@ -152,11 +152,12 @@ deploy_job:
         - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -q -
     script:
         # Replace the build artifacts in the EC2 instance, and restart the server
-        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sh stop.sh'
+        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'systemctl stop bookworms.service'
+        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'rm -rf $DEPLOYMENT_DIR/*'
         - scp -r -C out/* $EC2_USER@$EC2_HOST:$DEPLOYMENT_DIR
-        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sh start.sh'
+        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'systemctl start bookworms.service'
     variables:
         # Don't pull the repository for this job
         GIT_STRATEGY: none
-        DEPLOYMENT_DIR: /home/$EC2_USER/deployment
+        DEPLOYMENT_DIR: /var/www/api/
     resource_group: common
