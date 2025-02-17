@@ -14,6 +14,7 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     
     public DbSet<Book> Books { get; set; }
     public DbSet<Review> Reviews { get; set; }
+    public DbSet<DifficultyRating> DifficultyRatings { get; set; }
     
     public DbSet<Child> Children { get; set; }
     public DbSet<ChildBookshelf> ChildBookshelves { get; set; }

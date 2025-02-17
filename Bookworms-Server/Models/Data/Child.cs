@@ -9,7 +9,8 @@ public record ChildEditRequest(
     [Range(0, int.MaxValue, ErrorMessage = "{0} must be a positive integer.")]
     int? ChildIcon = null,
 
-    [StringLength(6)] string? ReadingLevel = null,
+    [Range(0, 100, ErrorMessage = "Child reading level must be between {1} and {2}.")]
+    int? ReadingLevel = null,
 
     [StringLength(6, MinimumLength = 6, ErrorMessage = "Child classroom code must be exactly {1} characters long.")]
     string? ClassroomCode = null,
@@ -22,6 +23,6 @@ public record ChildResponse(
     string ChildId, 
     string Name, 
     int? ChildIcon, 
-    string? ReadingLevel, 
+    int? ReadingLevel, 
     string? ClassroomCode, 
     DateOnly? DateOfBirth);

@@ -115,6 +115,9 @@ public static class Routes
             $"/books/{bookId}/review";
     }
 
+    public static string RateDifficulty(string bookId) =>
+        $"/books/{bookId}/rate-difficulty";
+    
     public static class User
     {
         public static string All =>

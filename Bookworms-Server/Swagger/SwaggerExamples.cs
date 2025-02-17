@@ -77,7 +77,7 @@ public static class SwaggerExamples
     {
         public ChildEditRequest GetExamples()
         {
-            return new("New_Child_Name", 0, "ReadA7", "WLF359", DateOnly.Parse("2017-3-4"));
+            return new("New_Child_Name", 0, 42, "WLF359", DateOnly.Parse("2017-3-4"));
         }
     }
 
@@ -85,7 +85,7 @@ public static class SwaggerExamples
     {
         public ChildResponse GetExamples()
         {
-            return new(Snowflake.Generate(), "Jackson", 1, "A5", "CLS098", DateOnly.Parse("2015-04-15"));
+            return new(Snowflake.Generate(), "Jackson", 1, 52, "CLS098", DateOnly.Parse("2015-04-15"));
         }
     }
     
@@ -95,8 +95,8 @@ public static class SwaggerExamples
         {
             return
             [
-                new(Snowflake.Generate(),"Ashley", 0,  "A7", "CLS098", DateOnly.Parse("2014-08-23")),
-                new(Snowflake.Generate(),"Miles", 1, "B4", "CLS498", null),
+                new(Snowflake.Generate(),"Ashley", 0,  59, "CLS098", DateOnly.Parse("2014-08-23")),
+                new(Snowflake.Generate(),"Miles", 1, null, "CLS498", null),
                 new(Snowflake.Generate(),"Joey", 2, null, null, DateOnly.Parse("2015-04-15"))
             ];
         }

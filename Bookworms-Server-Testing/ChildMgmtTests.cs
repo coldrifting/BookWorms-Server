@@ -93,7 +93,7 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
     {
         await CheckForError(
             () => Client.PutPayloadAsync(Routes.Children.Edit(childId),
-                new ChildEditRequest(ClassroomCode: classroomCode, ReadingLevel: "A5"), username),
+                new ChildEditRequest(ClassroomCode: classroomCode, ReadingLevel: 35), username),
             HttpStatusCode.UnprocessableEntity,
             ErrorResponse.ClassroomNotFound);
         
@@ -297,8 +297,8 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
     }
 
     [Theory]
-    [InlineData("parent1", Constants.Parent1Child1Id, "A4")]
-    public async Task Test_EditChild_ChangeReadingLevel_Basic(string username, string childId, string readingLevel)
+    [InlineData("parent1", Constants.Parent1Child1Id, 31)]
+    public async Task Test_EditChild_ChangeReadingLevel_Basic(string username, string childId, int readingLevel)
     {
         await CheckResponse<ChildResponse>(
             async () => await Client.PutPayloadAsync(Routes.Children.Edit(childId),

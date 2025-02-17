@@ -40,6 +40,8 @@ public class Book(string bookId, string title, List<string> authors, string desc
     [Range(0, 100, ErrorMessage = "Level must be in [0, 100]")]
     public int? Level { get; set; }
 
+    public bool LevelIsLocked { get; set; }
+
     [Range(0.0, 5.0, ErrorMessage = "Star rating must be between {0} and {1}.")]
     public double? StarRating { get; set; }
     
@@ -50,13 +52,14 @@ public class Book(string bookId, string title, List<string> authors, string desc
     // Navigation
     
     public ICollection<Review> Reviews { get; set; } = null!;
+    public ICollection<DifficultyRating> DifficultyRatings { get; set; } = null!;
     
     public ICollection<CompletedBookshelfBook> CompletedBookshelfBooks { get; set; } = null!;
     public ICollection<InProgressBookshelfBook> InProgressBookshelfBooks { get; set; } = null!;
     public ICollection<ChildBookshelfBook> ChildBookshelfBooks { get; set; } = null!;
     public ICollection<ClassroomBookshelfBook> ClassroomBookshelfBooks { get; set; } = null!;
     
-    // Skip-navigations (many-to-many) -- NotMapped, because we're mapping the M2M relationship ourselves
+    // Skip-navigations (many-to-many)
     [InverseProperty("Books")] public ICollection<CompletedBookshelf> CompletedBookshelves { get; set; } = null!;
     [InverseProperty("Books")] public ICollection<InProgressBookshelf> InProgressBookshelves { get; set; } = null!;
     [InverseProperty("Books")] public ICollection<ChildBookshelf> ChildBookshelves { get; set; } = null!;
@@ -106,6 +109,43 @@ public class Book(string bookId, string title, List<string> authors, string desc
             PageCount,
             Reviews.Select(review => review.ToResponse()).ToList()
         );
+    }
+
+    public UpdatedLevelResponse ToUpdatedLevelResponse(int? oldLevel)
+    {
+        return new(
+            "book",
+            BookId,
+            oldLevel,
+            Level
+        );
+    }
+
+    public void UpdateLevel(BookwormsDbContext dbContext)
+    {
+        if (LevelIsLocked)
+        {
+            return;
+        }
+
+        if (DifficultyRatings.Count > 0)
+        {
+            int newLevel = (int)Math.Round(DifficultyRatings.Average(
+                r => 3 * (r.Rating - 3) + r.ReadingLevelAtRatingTime));
+            newLevel = int.Max(newLevel, 0);
+            newLevel = int.Min(newLevel, 100);
+            Level = newLevel;
+        }
+        else
+        {
+            Level = null;
+        }
+        
+        if (DifficultyRatings.Count >= 200)
+        {
+            LevelIsLocked = true;
+            dbContext.RemoveRange(DifficultyRatings.Take(200).ToList());
+        }
     }
 }
 

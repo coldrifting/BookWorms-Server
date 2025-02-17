@@ -54,6 +54,7 @@ namespace BookwormsServer.Migrations
                     PageCount = table.Column<int>(type: "int", nullable: true),
                     PublishYear = table.Column<int>(type: "int", nullable: false),
                     Level = table.Column<int>(type: "int", nullable: true),
+                    LevelIsLocked = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     StarRating = table.Column<double>(type: "double", nullable: true),
                     TimeAdded = table.Column<DateTime>(type: "datetime(0)", nullable: true),
                     ClassroomCode = table.Column<string>(type: "varchar(6)", nullable: true)
@@ -158,8 +159,7 @@ namespace BookwormsServer.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ChildIcon = table.Column<int>(type: "int", nullable: false),
                     DateOfBirth = table.Column<DateOnly>(type: "date", nullable: true),
-                    ReadingLevel = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ReadingLevel = table.Column<int>(type: "int", nullable: true),
                     ParentUsername = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
@@ -253,6 +253,35 @@ namespace BookwormsServer.Migrations
                     table.PrimaryKey("PK_CompletedBookshelves", x => x.BookshelfId);
                     table.ForeignKey(
                         name: "FK_CompletedBookshelves_Children_ChildId",
+                        column: x => x.ChildId,
+                        principalTable: "Children",
+                        principalColumn: "ChildId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "DifficultyRatings",
+                columns: table => new
+                {
+                    BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ChildId = table.Column<string>(type: "char(22)", maxLength: 22, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ReadingLevelAtRatingTime = table.Column<int>(type: "int", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DifficultyRatings", x => new { x.BookId, x.ChildId });
+                    table.ForeignKey(
+                        name: "FK_DifficultyRatings_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "BookId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DifficultyRatings_Children_ChildId",
                         column: x => x.ChildId,
                         principalTable: "Children",
                         principalColumn: "ChildId",
@@ -409,6 +438,11 @@ namespace BookwormsServer.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_DifficultyRatings_ChildId",
+                table: "DifficultyRatings",
+                column: "ChildId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InProgressBookshelfBooks_BookId",
                 table: "InProgressBookshelfBooks",
                 column: "BookId");
@@ -448,6 +482,9 @@ namespace BookwormsServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "CompletedBookshelfBooks");
+
+            migrationBuilder.DropTable(
+                name: "DifficultyRatings");
 
             migrationBuilder.DropTable(
                 name: "InProgressBookshelfBooks");

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BookwormsServer.Migrations
+namespace BookWormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
     partial class BookwormsDbContextModelSnapshot : ModelSnapshot
@@ -54,6 +54,9 @@ namespace BookwormsServer.Migrations
 
                     b.Property<int?>("Level")
                         .HasColumnType("int");
+
+                    b.Property<bool>("LevelIsLocked")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int?>("PageCount")
                         .HasColumnType("int");
@@ -109,9 +112,8 @@ namespace BookwormsServer.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)");
 
-                    b.Property<string>("ReadingLevel")
-                        .HasMaxLength(6)
-                        .HasColumnType("varchar(6)");
+                    b.Property<int?>("ReadingLevel")
+                        .HasColumnType("int");
 
                     b.HasKey("ChildId");
 
@@ -268,6 +270,29 @@ namespace BookwormsServer.Migrations
                     b.HasIndex("BookId");
 
                     b.ToTable("CompletedBookshelfBooks");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.DifficultyRating", b =>
+                {
+                    b.Property<string>("BookId")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("ChildId")
+                        .HasMaxLength(22)
+                        .HasColumnType("char(22)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReadingLevelAtRatingTime")
+                        .HasColumnType("int");
+
+                    b.HasKey("BookId", "ChildId");
+
+                    b.HasIndex("ChildId");
+
+                    b.ToTable("DifficultyRatings");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.InProgressBookshelf", b =>
@@ -537,6 +562,25 @@ namespace BookwormsServer.Migrations
                     b.Navigation("Bookshelf");
                 });
 
+            modelBuilder.Entity("BookwormsServer.Models.Entities.DifficultyRating", b =>
+                {
+                    b.HasOne("BookwormsServer.Models.Entities.Book", "Book")
+                        .WithMany("DifficultyRatings")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookwormsServer.Models.Entities.Child", "Child")
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Child");
+                });
+
             modelBuilder.Entity("BookwormsServer.Models.Entities.InProgressBookshelf", b =>
                 {
                     b.HasOne("BookwormsServer.Models.Entities.Child", "Child")
@@ -603,6 +647,8 @@ namespace BookwormsServer.Migrations
 
                     b.Navigation("CompletedBookshelfBooks");
 
+                    b.Navigation("DifficultyRatings");
+
                     b.Navigation("InProgressBookshelfBooks");
 
                     b.Navigation("Reviews");
@@ -630,7 +676,8 @@ namespace BookwormsServer.Migrations
 
                     b.Navigation("ClassroomBookshelves");
 
-                    b.Navigation("Teacher");
+                    b.Navigation("Teacher")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomBookshelf", b =>

@@ -27,33 +27,36 @@ public record ErrorResponse(string Error, string Description)
     public static ErrorResponse BookCoverNotFound => new("Book Cover Not Found",
         "Unable to find the requested book cover on external API server");
 
-   public static ErrorResponse ChildNotFound => new("Child Not Found",
+    public static ErrorResponse DuplicateDifficultyRating => new("Difficulty rating already exists",
+        "A child can only rate a book's difficulty once");
+
+    public static ErrorResponse ChildNotFound => new("Child Not Found",
        "Unable to find a child with the given name under the logged in parent");
-   
-   public static ErrorResponse UserNotFound => new("User Not Found",
+
+    public static ErrorResponse UserNotFound => new("User Not Found",
        "Unable to find a user matching the given username");
-   
-   public static ErrorResponse UserNotAdmin => new("User is not an Administrator",
+
+    public static ErrorResponse UserNotAdmin => new("User is not an Administrator",
        "User must be an administrator to access this route");
-   
-   public static ErrorResponse UserNotParent => new("User is not a Parent",
+
+    public static ErrorResponse UserNotParent => new("User is not a Parent",
        "User must be a parent to access this route");
-   
-   public static ErrorResponse UserNotTeacher => new("User is not a Teacher",
+
+    public static ErrorResponse UserNotTeacher => new("User is not a Teacher",
        "User must be a teacher to access this route");
 
-   public static ErrorResponse BookshelfNotFound => new("Bookshelf Not Found",
+    public static ErrorResponse BookshelfNotFound => new("Bookshelf Not Found",
        "Unable to find a bookshelf with the given name for the currently selected child");
 
-   public static ErrorResponse BookshelfAlreadyExists => new("Bookshelf Already Exists",
+    public static ErrorResponse BookshelfAlreadyExists => new("Bookshelf Already Exists",
        "Unable to add a bookshelf with the given name as one already exists under the selected child");
 
-   public static ErrorResponse BookshelfBookNotFound => new("Bookshelf Book Not Found",
+    public static ErrorResponse BookshelfBookNotFound => new("Bookshelf Book Not Found",
        "Unable to find a book with the given id in this bookshelf");
-   
-   public static ErrorResponse ClassroomNotFound => new("Classroom Not Found", 
+
+    public static ErrorResponse ClassroomNotFound => new("Classroom Not Found", 
        "Unable to find a class with the given classroom code");
 
-   public static ErrorResponse InvalidIconIndex => new("Invalid Icon Index", 
+    public static ErrorResponse InvalidIconIndex => new("Invalid Icon Index", 
        "The requested icon index is not valid");
 }
