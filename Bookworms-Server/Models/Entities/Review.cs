@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BookwormsServer.Models.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServer.Models.Entities;
@@ -26,10 +27,22 @@ public class Review(string bookId, string username, double starRating, string? r
     public DateTime ReviewDate { get; set; } = reviewDate;
 
     // Navigation
-    
+
     [ForeignKey(nameof(BookId))] 
-    public Book? Book { get; set; }
+    public Book Book { get; set; } = null!;
 
     [ForeignKey(nameof(Username))] 
-    public User? Reviewer { get; set; }
+    public User Reviewer { get; set; } = null!;
+    
+    public ReviewResponse ToResponse()
+    {
+        return new(
+            Reviewer!.FirstName,
+            Reviewer.LastName,
+            Reviewer is Parent ? "Parent" : "Teacher",
+            Reviewer.UserIcon,
+            ReviewDate,
+            StarRating, 
+            ReviewText ?? "");
+    }
 }

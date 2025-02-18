@@ -6,16 +6,27 @@ namespace BookwormsServer.Models.Entities;
 
 [Table("CompletedBookshelfBooks")]
 [PrimaryKey(nameof(BookshelfId), nameof(BookId))]
-public class CompletedBookshelfBook(int bookshelfId, string bookId, double starRating)
-{    
-    public int BookshelfId { get; set; } = bookshelfId;
+public class CompletedBookshelfBook
+{
+    public CompletedBookshelfBook()
+    {
+    }
+
+    public CompletedBookshelfBook(int bookshelfId, string bookId, double starRating)
+    {
+        BookshelfId = bookshelfId;
+        BookId = bookId;
+        StarRating = starRating;
+    }
+    
+    public int BookshelfId { get; set; }
     
     [StringLength(20)]
-    public string BookId { get; set; } = bookId;
-    
+    public required string BookId { get; set; }
+
     [Range(0, 5, ErrorMessage = "Star rating must be between {0} and {1}.")]
-    public double StarRating { get; set; } = starRating;
-    
+    public double StarRating { get; set; }
+
     // Navigation
     
     [ForeignKey("BookshelfId")]
@@ -27,12 +38,22 @@ public class CompletedBookshelfBook(int bookshelfId, string bookId, double starR
 
 [Table("InProgressBookshelfBooks")]
 [PrimaryKey(nameof(BookshelfId), nameof(BookId))]
-public class InProgressBookshelfBook(int bookshelfId, string bookId)
+public class InProgressBookshelfBook
 {
-    public int BookshelfId { get; set; } = bookshelfId;
+    public InProgressBookshelfBook()
+    {
+    }
+
+    public InProgressBookshelfBook(int bookshelfId, string bookId)
+    {
+        BookshelfId = bookshelfId;
+        BookId = bookId;
+    }
+    
+    public int BookshelfId { get; set; }
     
     [StringLength(20)]
-    public string BookId { get; set; } = bookId;
+    public required string BookId { get; set; }
     
     // Navigation
     
@@ -45,12 +66,22 @@ public class InProgressBookshelfBook(int bookshelfId, string bookId)
 
 [Table("ChildBookshelfBooks")]
 [PrimaryKey(nameof(BookshelfId), nameof(BookId))]
-public class ChildBookshelfBook(int bookshelfId, string bookId)
+public class ChildBookshelfBook
 {
-    public int BookshelfId { get; set; } = bookshelfId;
+    public ChildBookshelfBook()
+    {
+    }
+
+    public ChildBookshelfBook(int bookshelfId, string bookId)
+    {
+        BookshelfId = bookshelfId;
+        BookId = bookId;
+    }
+
+    public int BookshelfId { get; set; }
     
     [StringLength(20)]
-    public string BookId { get; set; } = bookId;
+    public required string BookId { get; set; }
     
     // Navigation
     
@@ -63,12 +94,22 @@ public class ChildBookshelfBook(int bookshelfId, string bookId)
 
 [Table("ClassroomBookshelfBooks")]
 [PrimaryKey(nameof(BookshelfId), nameof(BookId))]
-public class ClassroomBookshelfBook(int bookshelfId, string bookId)
+public class ClassroomBookshelfBook
 {
-    public int BookshelfId { get; set; } = bookshelfId;
+    public ClassroomBookshelfBook()
+    {
+    }
+
+    public ClassroomBookshelfBook(int bookshelfId, string bookId)
+    {
+        BookshelfId = bookshelfId;
+        BookId = bookId;
+    }
+    
+    public int BookshelfId { get; set; }
     
     [StringLength(20)]
-    public string BookId { get; set; } = bookId;
+    public required string BookId { get; set; }
     
     // Navigation
     

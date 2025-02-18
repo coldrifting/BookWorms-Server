@@ -18,9 +18,9 @@ public static class SwaggerExamples
 {
     // BookDetailsController
     
-    public class BookResponseExample : IExamplesProvider<BookDTO>
+    public class BookResponseExample : IExamplesProvider<BookResponse>
     {
-        public BookDTO GetExamples()
+        public BookResponse GetExamples()
         {
             return new(
                 "OL35966594M",
@@ -32,9 +32,9 @@ public static class SwaggerExamples
         }
     }
     
-    public class BookDetailsResponseExample : IExamplesProvider<BookDetailsDTO>
+    public class BookResponseExtendedExample : IExamplesProvider<BookResponseExtended>
     {
-        public BookDetailsDTO GetExamples()
+        public BookResponseExtended GetExamples()
         {
             return new(
                 "OL35966594M",
@@ -73,31 +73,31 @@ public static class SwaggerExamples
 
     // ChildController
     
-    public class ChildEditBodyExample : IExamplesProvider<ChildEditDTO>
+    public class ChildEditBodyExample : IExamplesProvider<ChildEditRequest>
     {
-        public ChildEditDTO GetExamples()
+        public ChildEditRequest GetExamples()
         {
-            return new("New_Child_Name", 0, "ReadA7", "WLF359", DateOnly.Parse("2017-3-4"));
+            return new("New_Child_Name", 0, 42, DateOnly.Parse("2017-3-4"));
         }
     }
 
-    public class ChildResponseExample : IExamplesProvider<ChildResponseDTO>
+    public class ChildResponseExample : IExamplesProvider<ChildResponse>
     {
-        public ChildResponseDTO GetExamples()
+        public ChildResponse GetExamples()
         {
-            return new(Snowflake.Generate(), "Jackson", 1, "A5", "CLS098", DateOnly.Parse("2015-04-15"));
+            return new(Snowflake.Generate(), "Jackson", 1, 52, DateOnly.Parse("2015-04-15"));
         }
     }
     
-    public class ChildListResponseExample : IExamplesProvider<List<ChildResponseDTO>>
+    public class ChildListResponseExample : IExamplesProvider<List<ChildResponse>>
     {
-        public List<ChildResponseDTO> GetExamples()
+        public List<ChildResponse> GetExamples()
         {
             return
             [
-                new(Snowflake.Generate(),"Ashley", 0,  "A7", "CLS098", DateOnly.Parse("2014-08-23")),
-                new(Snowflake.Generate(),"Miles", 1, "B4", "CLS498", null),
-                new(Snowflake.Generate(),"Joey", 2, null, null, DateOnly.Parse("2015-04-15"))
+                new(Snowflake.Generate(),"Ashley", 0,  59, DateOnly.Parse("2014-08-23")),
+                new(Snowflake.Generate(),"Miles", 1, null, null),
+                new(Snowflake.Generate(),"Joey", 2, null, DateOnly.Parse("2015-04-15"))
             ];
         }
     }
@@ -105,9 +105,9 @@ public static class SwaggerExamples
     
     // ReviewsController
 
-    public class ReviewResponseExample : IExamplesProvider<ReviewDTO>
+    public class ReviewResponseExample : IExamplesProvider<ReviewResponse>
     {
-        public ReviewDTO GetExamples()
+        public ReviewResponse GetExamples()
         {
             return new(
                 "Emma",
@@ -120,9 +120,9 @@ public static class SwaggerExamples
         }
     }
 
-    public class ReviewsResponseExample : IExamplesProvider<List<ReviewDTO>>
+    public class ReviewListResponseExample : IExamplesProvider<List<ReviewResponse>>
     {
-        public List<ReviewDTO> GetExamples()
+        public List<ReviewResponse> GetExamples()
         {
             return
             [
@@ -135,9 +135,9 @@ public static class SwaggerExamples
         }
     }
 
-    public class ReviewAddOrUpdateRequestBodyExample : IExamplesProvider<ReviewAddOrUpdateRequestDTO>
+    public class ReviewEditRequestExample : IExamplesProvider<ReviewEditRequest>
     {
-        public ReviewAddOrUpdateRequestDTO GetExamples()
+        public ReviewEditRequest GetExamples()
         {
             return new(4.5, "We loved the colorful pictures and silly characters");
         }
@@ -146,9 +146,9 @@ public static class SwaggerExamples
     
     // SearchController
 
-    public class BooksResponseExample : IExamplesProvider<List<BookDTO>>
+    public class BooksResponseExample : IExamplesProvider<List<BookResponse>>
     {
-        public List<BookDTO> GetExamples()
+        public List<BookResponse> GetExamples()
         {
             return
             [
@@ -163,42 +163,42 @@ public static class SwaggerExamples
     
     // UserController
     
-    public class UserLoginRequestBodyExample : IExamplesProvider<UserLoginDTO>
+    public class UserLoginRequestExample : IExamplesProvider<UserLoginRequest>
     {
-        public UserLoginDTO GetExamples()
+        public UserLoginRequest GetExamples()
         {
             return new("_username_", "_password_");
         }
     }
 
-    public class UserLoginSuccessResponseExample : IExamplesProvider<UserLoginSuccessDTO>
+    public class UserLoginSuccessResponseExample : IExamplesProvider<UserLoginSuccessResponse>
     {
-        public UserLoginSuccessDTO GetExamples()
+        public UserLoginSuccessResponse GetExamples()
         {
             return new(
                 "_jwt_token_string_");
         }
     }
 
-    public class UserRegisterRequestBodyExample : IExamplesProvider<UserRegisterDTO>
+    public class UserRegisterRequestExample : IExamplesProvider<UserRegisterRequest>
     {
-        public UserRegisterDTO GetExamples()
+        public UserRegisterRequest GetExamples()
         {
             return new("_username_", "_password_", "Person Doe", "email@example.com", true);
         }
     }
 
-    public class UserDetailsSuccessResponseExample : IExamplesProvider<UserDetailsDTO>
+    public class UserDetailsResponseResponseExample : IExamplesProvider<UserDetailsResponse>
     {
-        public UserDetailsDTO GetExamples()
+        public UserDetailsResponse GetExamples()
         {
             return new("_username_", "_password_", "John Jackson", "Teacher", 0);
         }
     }
 
-    public class UserDetailsListSuccessResponseExample : IExamplesProvider<List<UserDetailsDTO>>
+    public class UserDetailsListResponseExample : IExamplesProvider<List<UserDetailsResponse>>
     {
-        public List<UserDetailsDTO> GetExamples()
+        public List<UserDetailsResponse> GetExamples()
         {
             return
             [
@@ -209,29 +209,100 @@ public static class SwaggerExamples
         }
     }
 
-    public class BookshelfListResponseExample : IExamplesProvider<List<BookshelfPreviewResponseDTO>>
+    public class BookshelfListResponseExample : IExamplesProvider<List<BookshelfResponse>>
     {
-        public List<BookshelfPreviewResponseDTO> GetExamples()
+        public List<BookshelfResponse> GetExamples()
         {
             return
             [
-                new("Some Books", [new("bookId1", "Title", "Author"), new("bookId2", "Title", "Author"), new("bookId3", "Title", "Author")]),
+                new("Some Books", [new("bookId1", "Title1", ["Author1"]), new("bookId2", "Title2", ["Author2"]), new("bookId3", "Title3", ["Author3", "Author10"])]),
                 new("Not many Books", []),
-                new("Some More Books", [new("bookId1", "Title", "Author")])
+                new("Some More Books", [new("bookId1", "Title", ["Author1"])])
             ];
         }
     }
 
-    public class BookshelfResponseExample : IExamplesProvider<BookshelfPreviewResponseDTO>
+    public class BookshelfResponseExample : IExamplesProvider<BookshelfResponse>
     {
-        public BookshelfPreviewResponseDTO GetExamples()
+        public BookshelfResponse GetExamples()
         {
             return new("Bookshelf Name",
             [
-                new("bookId1", "Title", "Author"), 
-                new("bookId2", "Title", "Author"), 
-                new("bookId3", "Title", "Author"),
-                new("bookId4", "Title", "Author")
+                new("bookId1", "Title", ["Author1"]), 
+                new("bookId2", "Title", ["Author2"]), 
+                new("bookId3", "Title", ["Author3", "Author10"]),
+                new("bookId4", "Title", ["Author4"])
+            ]);
+        }
+    }
+    
+    // Classrooms
+    
+    public class ClassroomChildResponseExample : IExamplesProvider<ClassroomChildResponse>
+    {
+        public ClassroomChildResponse GetExamples()
+        {
+            return new("ABC123", "Ava's Class", "Mrs. Ava", [
+                new("Reading List", 
+                [
+                    new("bookId1", "Title", ["Author1"])
+                ]),
+                new("Advanced Reading",
+                [
+                    new("bookId2", "Title", ["Author2"]), 
+                    new("bookId3", "Title", ["Author3", "Author10"])
+                ])
+            ]);
+        }
+    }
+    
+    public class ClassroomChildResponseListExample : IExamplesProvider<List<ClassroomChildResponse>>
+    {
+        public List<ClassroomChildResponse> GetExamples()
+        {
+            return
+            [
+                new("ABC123", "Ava's Class", "Mrs. Ava", [
+                    new("Reading List",
+                    [
+                        new("bookId1", "Title", ["Author1"])
+                    ]),
+                    new("Advanced Reading",
+                    [
+                        new("bookId2", "Title", ["Author2"]),
+                        new("bookId3", "Title", ["Author3", "Author10"])
+                    ])
+                ]),
+                new("ALP234", "Mustard's Class", "Mr. Mustard", [
+                    new("Rad Reading List",
+                    [
+                        new("bookId1", "Title", ["Author1"])
+                    ])
+                ]),
+            ];
+        }
+    }
+
+    public class ClassroomResponseExample : IExamplesProvider<ClassroomTeacherResponse>
+    {
+        public ClassroomTeacherResponse GetExamples()
+        {
+            return new("ABC123", "Ava's Class", 
+                [
+                    new("childId1", "Jack", 0, 3, new(2017, 02, 15)),
+                    new("childId2", "Wyatt", 1, 45, new(2019, 08, 17)),
+                    new("childId3", "Sadie", 2, 72, new(2018, 05, 28))
+                ], 
+                [
+                new("Reading List", 
+                [
+                    new("bookId1", "Title", ["Author1"])
+                ]),
+                new("Advanced Reading",
+                [
+                    new("bookId2", "Title", ["Author2"]), 
+                    new("bookId3", "Title", ["Author3", "Author10"])
+                ])
             ]);
         }
     }

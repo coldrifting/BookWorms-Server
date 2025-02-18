@@ -1,0 +1,32 @@
+[
+  {
+    "bookshelfId": 1,
+    "classroomCode": "BBB222",
+    "name": "Class Books"
+  },
+  {
+    "bookshelfId": 2,
+    "classroomCode": "ABC123",
+    "name": "Books 1"
+  },
+  {
+    "bookshelfId": 3,
+    "classroomCode": "ABC123",
+    "name": "Books A"
+  },
+  {
+    "bookshelfId": 4,
+    "classroomCode": "ZETA28",
+    "name": "History Readings"
+  },
+  {
+    "bookshelfId": 5,
+    "classroomCode": "ZETA28",
+    "name": "Empty Readings"
+  },
+  {
+    "bookshelfId": 6,
+    "classroomCode": "UTA801",
+    "name": "Some Utah History"
+  }
+]

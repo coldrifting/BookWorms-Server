@@ -15,6 +15,9 @@ using Swashbuckle.AspNetCore.Filters;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+// Enable Systemd support
+builder.Services.AddSystemd();
+
 // Establish database context ----------------------------------------------------------------------------------
 
 string? connectionString = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production"
@@ -83,13 +86,13 @@ builder.Services
 	{
 		opt.RequireHttpsMetadata = false;
 		opt.SaveToken = true;
-		opt.TokenValidationParameters = new TokenValidationParameters
+		opt.TokenValidationParameters = new()
 		{
 			IssuerSigningKey = new SymmetricSecurityKey(AuthService.SecretBytes),
 			ValidateIssuer = false,
 			ValidateAudience = false
 		};
-		// Make authorization failure (401 & 403) responses consistent with other bad requests
+		// 401 & 403 use custom error model, and check user is not deleted
 		opt.Events = AuthService.BearerEvents();
 	});
 builder.Services.AddAuthorization();
@@ -154,10 +157,23 @@ app.UseSwaggerUI(opt =>
 	opt.EnableTryItOutByDefault();
 });
 
-app.UseHttpsRedirection();
-app.UseDefaultFiles();
-app.UseStaticFiles();
-app.UseAuthorization();
+// Don't bother with static files and other web stuff in Staging, which is only used for running tests
+if (!app.Environment.IsStaging())
+{
+	app.UseCors(o => o.WithOrigins(
+		"https://www.bookworms.app",
+		"https://bookworms.app")
+		.WithExposedHeaders("*")
+		.AllowAnyMethod()
+		.AllowAnyHeader()
+		.AllowCredentials());
+	
+	app.UseHttpsRedirection();
+	app.UseDefaultFiles();
+	app.UseStaticFiles();
+	app.UseAuthentication();
+	app.UseAuthorization();
+}
 
 // Enable endpoint caching
 app.UseResponseCaching();

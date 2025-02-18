@@ -10,7 +10,7 @@
     "name": "Evelyn",
     "childIcon": 0,
     "dateOfBirth": "2017-04-13",
-    "readingLevel": "A7",
+    "readingLevel": 21,
     "parentUsername": "parent2"
   },
   {
@@ -29,7 +29,7 @@
     "childId": "2bc5b325697a55",
     "name": "Eric",
     "childIcon": 2,
-    "readingLevel": "B4",
+    "readingLevel": 45,
     "parentUsername": "parent3"
   },
   {

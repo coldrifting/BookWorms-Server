@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BookwormsServer.Models.Data;
 using BookwormsServer.Utils;
 
 namespace BookwormsServer.Models.Entities;
 
-public class Child(string name, string parentUsername, DateOnly? dateOfBirth = null, string? readingLevel = null)
+public class Child(string name, string parentUsername, DateOnly? dateOfBirth = null, int? readingLevel = null)
 {
     [Key]
     [StringLength(14)]
@@ -21,26 +22,98 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
         ErrorMessage = "Child date of birth must fall between {1} and {2}.")]
     public DateOnly? DateOfBirth { get; set; } = dateOfBirth;
     
-    [StringLength(6)]
-    public string? ReadingLevel { get; set; } = readingLevel;
+    [Range(0, 100, ErrorMessage = "Child reading level must be between {1} and {2}.")]
+    public int? ReadingLevel { get; set; } = readingLevel ?? CalculateBaseReadingLevel(dateOfBirth);
 
     [StringLength(64)]
     public string ParentUsername { get; set; } = parentUsername;
-        
-    [StringLength(6, MinimumLength = 6, ErrorMessage = "Child classroom code must be exactly {1} characters long.")]
-    public string? ClassroomCode { get; set; }
 
     // Navigation
+
+    [ForeignKey(nameof(ParentUsername))] 
+    public Parent Parent { get; set; } = null!;
     
-    // Inverse property needed for extra selected child property in parent to work
-    [InverseProperty(nameof(Parent.Children))]
-    [ForeignKey(nameof(ParentUsername))]
-    public Parent? Parent { get; set; }
-    
-    [ForeignKey(nameof(ClassroomCode))]
-    public Classroom? Classroom { get; set; }
-    
+    // Skip-navigation (many-to-many)
+    [InverseProperty("Children")] public ICollection<Classroom> Classrooms { get; set; } = null!;
+
     public CompletedBookshelf? Completed { get; set; }
     public InProgressBookshelf? InProgress { get; set; }
     public ICollection<ChildBookshelf> Bookshelves { get; set; } = null!;
+
+    public ChildResponse ToResponse()
+    {
+        return new(
+            ChildId,
+            Name,
+            ChildIcon,
+            ReadingLevel,
+            DateOfBirth);
+    }
+    
+    public UpdatedLevelResponse ToUpdatedLevelResponse(int? oldLevel)
+    {
+        return new(
+            "child",
+            ChildId,
+            oldLevel,
+            ReadingLevel
+        );
+    }
+
+
+    public void AdjustReadingLevel(Book book, int difficultyRating)
+    {
+        // The controller that calls this method guarantees that both of these are non-null
+        int diff = book.Level!.Value - ReadingLevel!.Value;
+        int adjustmentOffset = 1 - difficultyRating;
+
+        int newLevel = ReadingLevel.Value;
+        switch (diff)
+        {
+            case < -10: // should be way too easy
+                newLevel += adjustmentOffset;
+                break;
+            case < -5: // should be a bit too easy
+                newLevel += 1 + adjustmentOffset;
+                break;
+            case < 5: // should be just right
+                newLevel += 2 + adjustmentOffset;
+                break;
+            case < 10: // should be a bit too hard
+                newLevel += 3 + adjustmentOffset;
+                break;
+            case < 100: // should be way too hard
+                newLevel += 4 + adjustmentOffset;
+                break;
+        }
+        newLevel = int.Max(newLevel, 0);
+        newLevel = int.Min(newLevel, 100);
+        
+        ReadingLevel = newLevel;
+    }
+
+    private static int? CalculateBaseReadingLevel(DateOnly? dateOfBirth)
+    {
+        if (dateOfBirth == null)
+        {
+            return null;
+        }
+
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        DateOnly childBirthDate = dateOfBirth.Value;
+        
+        DateOnly thirdBirthday = childBirthDate.AddYears(3);
+        DateOnly eighteenthBirthday = childBirthDate.AddYears(18);
+        
+        if (thirdBirthday.CompareTo(today) > 0)
+            return 0;
+        if (eighteenthBirthday.CompareTo(today) < 0)
+            return 100;
+        
+        double fifteenYears = eighteenthBirthday.DayNumber - thirdBirthday.DayNumber;
+        double daysPastThree = today.DayNumber - thirdBirthday.DayNumber;
+        
+        // Percentage of the way between 3 yrs old and 18 yrs old
+        return (int?)Math.Round(daysPastThree / fifteenYears);
+    }
 }

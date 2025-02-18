@@ -25,11 +25,11 @@ public static class Common
     
     private static async Task<string> GetUserToken(HttpClient client, string username, string password)
     {
-        HttpResponseMessage response = await client.PostAsJsonAsync(Routes.User.Login, new UserLoginDTO(username, password));
+        HttpResponseMessage response = await client.PostAsJsonAsync(Routes.User.Login, new UserLoginRequest(username, password));
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            UserLoginSuccessDTO? dto = await response.Content.ReadFromJsonAsync<UserLoginSuccessDTO>();
+            UserLoginSuccessResponse? dto = await response.Content.ReadFromJsonAsync<UserLoginSuccessResponse>();
             if (dto is not null)
             {
                 return dto.Token;
@@ -108,12 +108,12 @@ public static class Common
     }
     
     // Test helpers
-    public static async Task CheckForError(Func<Task<HttpResponseMessage>> requestFunc, HttpStatusCode statusCode, ErrorDTO errorType)
+    public static async Task CheckForError(Func<Task<HttpResponseMessage>> requestFunc, HttpStatusCode statusCode, ErrorResponse errorType)
     {
         HttpResponseMessage response = await requestFunc.Invoke();
         Assert.Equal(statusCode, response.StatusCode);
         
-        ErrorDTO? content = await response.Content.ReadFromJsonAsync<ErrorDTO>();
+        ErrorResponse? content = await response.Content.ReadFromJsonAsync<ErrorResponse>();
         Assert.NotNull(content);
         Assert.Equal(errorType, content);
     }

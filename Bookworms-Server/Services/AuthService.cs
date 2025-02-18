@@ -1,9 +1,12 @@
-﻿using System.Security.Cryptography;
+﻿using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BookwormsServer.Services;
 
@@ -21,16 +24,22 @@ public static class AuthService
     public static string GenerateToken(User user)
     {
         long expTimestamp = DateTime.UtcNow.AddMinutes(ExpireTime).ToFileTimeUtc();
-        TokenHeaderDTO headerDTO = new();
-        TokenPayloadDTO payloadDTO = new("server", user.Username, expTimestamp, user.Roles);
+        TokenHeaderResponse headerResponse = new();
+        
+        TokenPayloadResponse payloadResponse = new(
+	        "server", 
+	        user.Username,
+	        expTimestamp, 
+	        user.GetType().Name);
 
         JsonSerializerOptions serializeOptions = new()
         {
+	        Converters = { new JsonStringEnumConverter() },
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
         
-        string header = JsonSerializer.Serialize(headerDTO, serializeOptions);
-        string payload = JsonSerializer.Serialize(payloadDTO, serializeOptions);
+        string header = JsonSerializer.Serialize(headerResponse, serializeOptions);
+        string payload = JsonSerializer.Serialize(payloadResponse, serializeOptions);
         string signature = GenerateJWTSignature(header, payload);
 
         return Utils.Hash.Base64Encode(header) + '.' + 
@@ -62,14 +71,23 @@ public static class AuthService
 	            context.Response.ContentType = "application/json";
 	            context.Response.StatusCode = 401;
 
-	            return context.Response.WriteAsJsonAsync(ErrorDTO.Unauthorized);
+	            return context.Response.WriteAsJsonAsync(ErrorResponse.Unauthorized);
 		    },
 		    OnForbidden = context =>
 		    {
 	            context.Response.ContentType = "application/json";
 	            context.Response.StatusCode = 403;
 
-	            return context.Response.WriteAsJsonAsync(ErrorDTO.Forbidden);
+	            return context.Response.WriteAsJsonAsync(ErrorResponse.Forbidden);
+		    },
+		    OnAuthenticationFailed = context =>
+		    {
+			    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+			    {
+					context.Response.Headers.Append("Token-Expired", "true");
+			    }
+			    
+			    return Task.CompletedTask;
 		    },
 		    OnTokenValidated = context =>
 		    {
@@ -77,8 +95,7 @@ public static class AuthService
 
 			    if (context.Principal?.Claims is {} claims)
 			    {
-				    const string usernameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
-				    string? username = claims.FirstOrDefault(x => x.Type == usernameClaimType)?.Value;
+				    string? username = claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
 				    if (dbContext.Users.Any(u => u.Username == username))
 				    {
 					    return Task.CompletedTask;

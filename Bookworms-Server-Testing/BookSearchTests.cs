@@ -15,7 +15,7 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("Giving", "The Giving Tree", 2.9)]
     public async Task Test_GetSearchResults(string searchString, string title, double rating)
     {
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
@@ -29,7 +29,7 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("Magic", "OL2191470M")]
     public async Task Test_GetSearchResultsNoReviews(string searchString, string bookId)
     {
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
@@ -42,9 +42,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("teacher1", "Giving", "OL3368288W", 1.5, 2.67)]
     public async Task Test_GetSearchResultsAfterLeavingNewReviewRating(string username, string searchString, string bookId, double newRating, double rating)
     {
-        await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId), new ReviewAddOrUpdateRequestDTO(newRating), username);
+        await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId), new ReviewEditRequest(newRating), username);
         
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
@@ -60,9 +60,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("teacher2", "Giving", "OL3368288W", 0, 2.8)]
     public async Task Test_GetSearchResultsAfterUpdatingReviewRating(string username, string searchString, string bookId, double newRating, double rating)
     {
-        await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId), new ReviewAddOrUpdateRequestDTO(newRating), username);
+        await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId), new ReviewEditRequest(newRating), username);
         
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
@@ -79,7 +79,7 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     {
         await Client.DeleteAsync(Routes.Reviews.Remove(bookId), username);
         
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
@@ -96,9 +96,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("teacher2", "Magic", "OL2191470M", 2.16)]
     public async Task Test_GetSearchResultsAfterLeavingFirstNewReviewRating(string username, string searchString, string bookId, double newRating)
     {
-        await Client.PutPayloadAsync(Routes.Reviews.Remove(bookId), new ReviewAddOrUpdateRequestDTO(newRating), username);
+        await Client.PutPayloadAsync(Routes.Reviews.Remove(bookId), new ReviewEditRequest(newRating), username);
         
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
@@ -115,9 +115,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("teacher2", "Magic", "OL2191470M", 2.16, 4.25)]
     public async Task Test_GetSearchResultsAfterUpdatingOnlyReviewRating(string username, string searchString, string bookId, double firstRating, double secondRating)
     {
-        await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId), new ReviewAddOrUpdateRequestDTO(firstRating), username);
+        await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId), new ReviewEditRequest(firstRating), username);
         
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
@@ -126,9 +126,9 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
                                                     Math.Abs(bookDTO.Rating.Value - firstRating) < 0.025);
             });
         
-        await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId), new ReviewAddOrUpdateRequestDTO(secondRating), username);
+        await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId), new ReviewEditRequest(secondRating), username);
         
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
@@ -145,10 +145,10 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("teacher2", "Magic", "OL2191470M", 2.16)]
     public async Task Test_GetSearchResultsAfterRemovingOnlyReviewRating(string username, string searchString, string bookId, double newRating)
     {
-        await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId), new ReviewAddOrUpdateRequestDTO(newRating), username);
+        await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId), new ReviewEditRequest(newRating), username);
         await Client.DeleteAsync(Routes.Reviews.Remove(bookId), username);
         
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(title: searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
@@ -165,7 +165,7 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("isa rog", "OL14912086W", 1)]
     public async Task Test_SearchAuthorBasic(string searchString, string bookId, int numResults)
     {
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(author: searchString)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(author: searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
@@ -178,7 +178,7 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("shel", "OL3368286W", 4)]
     public async Task Test_SearchQueryBasic(string searchString, string bookId, int numResults)
     {
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(query: searchString)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(query: searchString)),
             HttpStatusCode.OK,
             content => {
                 Assert.NotEmpty(content);
@@ -195,7 +195,7 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData(4.5, "", 0)]
     public async Task Test_SearchReviewRatingMinBasic(double minReview, string bookId, int numResults)
     {
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(ratingMin: minReview)),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(ratingMin: minReview)),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(numResults, content.Count);
@@ -214,7 +214,7 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData(new [] {"American", "animal"}, "OL26571192W", 4)]
     public async Task Test_SearchSubjectsBasic(string[] subjects, string bookId, int numResults)
     {
-        await CheckResponse<List<BookDTO>>(async () => await Client.GetAsync(Routes.Search(subjects: subjects.ToList())),
+        await CheckResponse<List<BookResponse>>(async () => await Client.GetAsync(Routes.Search(subjects: subjects.ToList())),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(numResults, content.Count);

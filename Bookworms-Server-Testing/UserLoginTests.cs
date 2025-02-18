@@ -16,8 +16,8 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     [InlineData("parent2", "parent2")]
     public async Task Test_Login_Basics(string username, string password)
     {
-        await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync(Routes.User.Login,
-                new UserLoginDTO(username, password)),
+        await CheckResponse<UserLoginSuccessResponse>(async () => await Client.PostPayloadAsync(Routes.User.Login,
+                new UserLoginRequest(username, password)),
             HttpStatusCode.OK,
             content =>
                 Assert.NotNull(content.Token)
@@ -31,9 +31,9 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     public async Task Test_LoginBadUsernameAndOrPassword(string username, string password)
     {
         await CheckForError(() => Client.PostPayloadAsync(Routes.User.Login,
-                new UserLoginDTO(username, password)),
+                new UserLoginRequest(username, password)),
             HttpStatusCode.BadRequest,
-            ErrorDTO.LoginFailure);
+            ErrorResponse.LoginFailure);
     }
 
     [Theory]
@@ -41,15 +41,15 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     public async Task Test_CreateUserUsernameAlreadyExists(string username, string password)
     {
         await CheckForError(() => Client.PostPayloadAsync(Routes.User.Register,
-                new UserRegisterDTO(username, password, username, username, false)),
+                new UserRegisterRequest(username, password, username, username, false)),
             HttpStatusCode.UnprocessableContent,
-            ErrorDTO.UsernameAlreadyExists);
+            ErrorResponse.UsernameAlreadyExists);
     }
 
     [Fact]
     public async Task Test_ShowUsersAsAdminShouldOk()
     {
-        await CheckResponse<List<UserDetailsDTO>>(async () => await Client.GetAsync(Routes.User.All, "admin"),
+        await CheckResponse<List<UserDetailsResponse>>(async () => await Client.GetAsync(Routes.User.All, "admin"),
             HttpStatusCode.OK,
             content =>
             {
@@ -67,7 +67,7 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     {
         await CheckForError(() => Client.GetAsync(Routes.User.All, username),
             HttpStatusCode.Forbidden,
-            ErrorDTO.UserNotAdmin);
+            ErrorResponse.UserNotAdmin);
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     {
         await CheckForError(() => Client.GetAsync(Routes.User.All),
             HttpStatusCode.Unauthorized,
-            ErrorDTO.Unauthorized);
+            ErrorResponse.Unauthorized);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     {
         await CheckForError(() => Client.GetAsync(Routes.User.Details),
             HttpStatusCode.Unauthorized,
-            ErrorDTO.Unauthorized);
+            ErrorResponse.Unauthorized);
     }
 
     [Theory]
@@ -93,7 +93,7 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     public async Task Test_UserDetails_Basic(string username, string firstName, string lastName, string role,
         int icon)
     {
-        await CheckResponse<UserDetailsDTO>(async () => await Client.GetAsync(Routes.User.Details, username),
+        await CheckResponse<UserDetailsResponse>(async () => await Client.GetAsync(Routes.User.Details, username),
             HttpStatusCode.OK,
             content =>
             {
@@ -110,7 +110,7 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     {
         await CheckForError(() => Client.PutAsync(Routes.User.Details),
             HttpStatusCode.Unauthorized,
-            ErrorDTO.Unauthorized);
+            ErrorResponse.Unauthorized);
     }
 
     [Theory]
@@ -122,7 +122,7 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
         await CheckForError(
             async () => await Client.DeleteAsync(Routes.User.DeleteParam(usernameToDelete), username),
             HttpStatusCode.UnprocessableEntity,
-            ErrorDTO.UserNotFound);
+            ErrorResponse.UserNotFound);
 
         Assert.Equal(numUsers, Context.Users.Count());
     }
@@ -135,7 +135,7 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
         await CheckForError(
             async () => await Client.DeleteAsync(Routes.User.DeleteParam(usernameToDelete), username),
             HttpStatusCode.Forbidden,
-            ErrorDTO.UserNotAdmin);
+            ErrorResponse.UserNotAdmin);
 
         Assert.Contains(Context.ChildBookshelves, cb => cb.ChildId == childId);
     }
@@ -145,8 +145,8 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     [InlineData("testTeacher", "testName", false)]
     public async Task Test_CreateNewUser_Basic(string username, string name, bool isParent)
     {
-        await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync(Routes.User.Register,
-                new UserRegisterDTO(username, username, name, name, isParent)),
+        await CheckResponse<UserLoginSuccessResponse>(async () => await Client.PostPayloadAsync(Routes.User.Register,
+                new UserRegisterRequest(username, username, name, name, isParent)),
             HttpStatusCode.OK,
             content =>
                 Assert.NotNull(content.Token)
@@ -158,15 +158,15 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     [InlineData("testTeacher", "testName", false)]
     public async Task Test_CreateNewUser_ThenLogin(string username, string name, bool isParent)
     {
-        await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync(Routes.User.Register,
-                new UserRegisterDTO(username, username, name, name, isParent)),
+        await CheckResponse<UserLoginSuccessResponse>(async () => await Client.PostPayloadAsync(Routes.User.Register,
+                new UserRegisterRequest(username, username, name, name, isParent)),
             HttpStatusCode.OK,
             content =>
                 Assert.NotNull(content.Token)
         );
 
-        await CheckResponse<UserLoginSuccessDTO>(async () => await Client.PostPayloadAsync(Routes.User.Login,
-                new UserLoginDTO(username, username)),
+        await CheckResponse<UserLoginSuccessResponse>(async () => await Client.PostPayloadAsync(Routes.User.Login,
+                new UserLoginRequest(username, username)),
             HttpStatusCode.OK,
             content =>
                 Assert.NotNull(content.Token)
@@ -179,8 +179,8 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     [InlineData("admin", "Name")]
     public async Task Test_UserEdit_FirstNameOnly(string username, string newFirstName)
     {
-        await CheckResponse<UserDetailsDTO>(async () => await Client.PutPayloadAsync(Routes.User.Details,
-                new UserDetailsEditDTO(FirstName: newFirstName), username),
+        await CheckResponse<UserDetailsResponse>(async () => await Client.PutPayloadAsync(Routes.User.Details,
+                new UserDetailsEditRequest(FirstName: newFirstName), username),
             HttpStatusCode.OK,
             content =>
             {
@@ -199,8 +199,8 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     [InlineData("admin", "Name")]
     public async Task Test_UserEdit_LastNameOnly(string username, string newLastName)
     {
-        await CheckResponse<UserDetailsDTO>(async () => await Client.PutPayloadAsync(Routes.User.Details,
-                new UserDetailsEditDTO(LastName: newLastName), username),
+        await CheckResponse<UserDetailsResponse>(async () => await Client.PutPayloadAsync(Routes.User.Details,
+                new UserDetailsEditRequest(LastName: newLastName), username),
             HttpStatusCode.OK,
             content =>
             {
@@ -219,8 +219,8 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     [InlineData("admin", 1)]
     public async Task Test_UserEdit_IconOnly(string username, int newIcon)
     {
-        await CheckResponse<UserDetailsDTO>(async () => await Client.PutPayloadAsync(Routes.User.Details,
-                new UserDetailsEditDTO(Icon: newIcon), username),
+        await CheckResponse<UserDetailsResponse>(async () => await Client.PutPayloadAsync(Routes.User.Details,
+                new UserDetailsEditRequest(Icon: newIcon), username),
             HttpStatusCode.OK,
             content =>
             {
@@ -239,15 +239,15 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     [InlineData("admin", "NewPassWord")]
     public async Task Test_UserEdit_PasswordOnly(string username, string newPassword)
     {
-        await CheckResponse<UserDetailsDTO>(async () => await Client.PutPayloadAsync(Routes.User.Details,
-                new UserDetailsEditDTO(Password: newPassword), username),
+        await CheckResponse<UserDetailsResponse>(async () => await Client.PutPayloadAsync(Routes.User.Details,
+                new UserDetailsEditRequest(Password: newPassword), username),
             HttpStatusCode.OK,
             content => { Assert.Equal(username, content.Username); });
 
         // Clear token to force re-login with new password
         Client.DefaultRequestHeaders.Authorization = null;
 
-        await CheckResponse<UserDetailsDTO>(
+        await CheckResponse<UserDetailsResponse>(
             async () => await Client.GetAsync(Routes.User.Details, username, newPassword),
             HttpStatusCode.OK,
             content => { Assert.Equal(username, content.Username); });
@@ -260,9 +260,9 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
     public async Task Test_UserEdit_AllValid(string username, string newFirstName, string newLastName,
         int newIcon, string newPassword)
     {
-        await CheckResponse<UserDetailsDTO>(
+        await CheckResponse<UserDetailsResponse>(
             async () => await Client.PutPayloadAsync(Routes.User.Details,
-                new UserDetailsEditDTO(newFirstName, newLastName, newIcon, newPassword), username),
+                new UserDetailsEditRequest(newFirstName, newLastName, newIcon, newPassword), username),
             HttpStatusCode.OK,
             content =>
             {
@@ -294,17 +294,17 @@ public class UserLoginTests(CompositeFixture fixture) : BookwormsIntegrationTest
         await CheckForError(
             async () => await Client.DeleteAsync(Routes.User.Delete, username),
             HttpStatusCode.Unauthorized,
-            ErrorDTO.Unauthorized);
+            ErrorResponse.Unauthorized);
 
         await CheckForError(
-            async () => await Client.PostPayloadAsync(Routes.User.Login, new UserLoginDTO(username, username)), 
+            async () => await Client.PostPayloadAsync(Routes.User.Login, new UserLoginRequest(username, username)), 
             HttpStatusCode.BadRequest,
-            ErrorDTO.LoginFailure);
+            ErrorResponse.LoginFailure);
 
         await CheckForError(
             async () => await Client.GetAsync(Routes.User.Details), 
             HttpStatusCode.Unauthorized,
-            ErrorDTO.Unauthorized);
+            ErrorResponse.Unauthorized);
     }
 
     [Theory]

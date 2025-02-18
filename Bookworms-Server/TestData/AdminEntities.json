@@ -6,9 +6,6 @@
     "firstName": "Admin",
     "lastName": "Admin",
     "email": "admin@site.com",
-    "userIcon": 2,
-    "roles": [
-      "Admin"
-    ]
+    "userIcon": 2
   }
 ]

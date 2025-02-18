@@ -24,7 +24,7 @@ public class SearchController(BookwormsDbContext dbContext) : ControllerBase
     /// <response code="200">Success</response>
     [HttpGet]
     [Route("/search")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<BookResponse>))]
     public Task<IActionResult> ByName(
         [FromQuery] string? query,
         [FromQuery] string? title,
@@ -81,10 +81,10 @@ public class SearchController(BookwormsDbContext dbContext) : ControllerBase
 
         List<Book> books = q.ToList();
         
-        List<BookDTO> bookDTOList = books.Select(BookDTO.From)
+        List<BookResponse> bookResponseList = books.Select(book => book.ToResponse())
             .Take(maxBooksToReturn)
             .ToList();
         
-        return Task.FromResult<IActionResult>(Ok(bookDTOList));
+        return Task.FromResult<IActionResult>(Ok(bookResponseList));
     }
 }

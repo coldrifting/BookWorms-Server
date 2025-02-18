@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BookwormsServer.Models.Entities;
 
 namespace BookwormsServer.Models.Data;
 
@@ -11,7 +10,7 @@ namespace BookwormsServer.Models.Data;
 /// <param name="FirstName"></param>
 /// <param name="LastName"></param>
 /// <param name="IsParent"></param>
-public record UserRegisterDTO(
+public record UserRegisterRequest(
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     string Username,
 
@@ -31,7 +30,7 @@ public record UserRegisterDTO(
 /// </summary>
 /// <param name="Username"></param>
 /// <param name="Password"></param>
-public record UserLoginDTO(
+public record UserLoginRequest(
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     string Username,
     
@@ -43,35 +42,26 @@ public record UserLoginDTO(
 /// 
 /// </summary>
 /// <param name="Token"></param>
-public record UserLoginSuccessDTO(string Token);
+public record UserLoginSuccessResponse(string Token);
 
-public record UserDetailsDTO(string Username, string FirstName, string LastName, string Role, int Icon)
-{
-    public static UserDetailsDTO From(User userLogin)
-    {
-        Role role;
-        if (userLogin.Roles.Length > 0 && userLogin.Roles[0] == "Admin")
-        {
-            role = Data.Role.Admin;
-        }
-        else if (userLogin is Parent)
-        {
-            role = Data.Role.Parent;
-        }
-        else
-        {
-            role = Data.Role.Teacher;
-        }
-        return new(
-            userLogin.Username, 
-            userLogin.FirstName, 
-            userLogin.LastName, 
-            role.ToString(),
-            userLogin.UserIcon);
-    }
-}
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Username"></param>
+/// <param name="FirstName"></param>
+/// <param name="LastName"></param>
+/// <param name="Role"></param>
+/// <param name="Icon"></param>
+public record UserDetailsResponse(string Username, string FirstName, string LastName, string Role, int Icon);
 
-public record UserDetailsEditDTO(
+/// <summary>
+/// 
+/// </summary>
+/// <param name="FirstName"></param>
+/// <param name="LastName"></param>
+/// <param name="Icon"></param>
+/// <param name="Password"></param>
+public record UserDetailsEditRequest(
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 2)] 
     string? FirstName = null, 
     
@@ -83,10 +73,3 @@ public record UserDetailsEditDTO(
     
     [StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
     string? Password = null);
-
-public enum Role
-{
-    Parent,
-    Teacher,
-    Admin
-}

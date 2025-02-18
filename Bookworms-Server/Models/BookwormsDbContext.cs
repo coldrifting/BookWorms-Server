@@ -8,11 +8,13 @@ namespace BookwormsServer;
 public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : DbContext(options)
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<Admin> Admins { get; set; }
     public DbSet<Parent> Parents { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
     
     public DbSet<Book> Books { get; set; }
     public DbSet<Review> Reviews { get; set; }
+    public DbSet<DifficultyRating> DifficultyRatings { get; set; }
     
     public DbSet<Child> Children { get; set; }
     public DbSet<ChildBookshelf> ChildBookshelves { get; set; }
@@ -23,30 +25,36 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     public DbSet<InProgressBookshelfBook> InProgressBookshelfBooks { get; set; }
     
     public DbSet<Classroom> Classrooms { get; set; }
+    public DbSet<ClassroomChild> ClassroomChildren { get; set; }
     public DbSet<ClassroomBookshelf> ClassroomBookshelves { get; set; }
     public DbSet<ClassroomBookshelfBook> ClassroomBookshelfBooks { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 	    modelBuilder.Entity<CompletedBookshelf>()
-		    .HasMany(cbb => cbb.Books)
-		    .WithMany(b => b.CompletedBookshelves)
+		    .HasMany(completedBookshelf => completedBookshelf.Books)
+		    .WithMany(book => book.CompletedBookshelves)
 		    .UsingEntity<CompletedBookshelfBook>();
 	    
 	    modelBuilder.Entity<InProgressBookshelf>()
-		    .HasMany(cbb => cbb.Books)
-		    .WithMany(b => b.InProgressBookshelves)
+		    .HasMany(inProgressBookshelf => inProgressBookshelf.Books)
+		    .WithMany(book => book.InProgressBookshelves)
 		    .UsingEntity<InProgressBookshelfBook>();
 	    
 	    modelBuilder.Entity<ChildBookshelf>()
-		    .HasMany(cbb => cbb.Books)
-		    .WithMany(b => b.ChildBookshelves)
+		    .HasMany(childBookshelf => childBookshelf.Books)
+		    .WithMany(book => book.ChildBookshelves)
 		    .UsingEntity<ChildBookshelfBook>();
 	    
 	    modelBuilder.Entity<ClassroomBookshelf>()
-		    .HasMany(cbb => cbb.Books)
-		    .WithMany(b => b.ClassroomBookshelves)
+		    .HasMany(classroomBookshelf => classroomBookshelf.Books)
+		    .WithMany(book => book.ClassroomBookshelves)
 		    .UsingEntity<ClassroomBookshelfBook>();
+	    
+	    modelBuilder.Entity<Child>()
+		    .HasMany(child => child.Classrooms)
+		    .WithMany(classroom => classroom.Children)
+		    .UsingEntity<ClassroomChild>();
     }
     
     private readonly JsonSerializerOptions _jso = new()
@@ -60,7 +68,7 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     {
 	    Clear();
 
-	    Seed<User>();
+	    Seed<Admin>();
 	    Seed<Parent>();
 	    Seed<Teacher>();
 	    
@@ -70,6 +78,11 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	    Seed<Child>();
 	    Seed<ChildBookshelf>();
 	    Seed<ChildBookshelfBook>();
+
+	    Seed<Classroom>();
+	    Seed<ClassroomChild>();
+	    Seed<ClassroomBookshelf>();
+	    Seed<ClassroomBookshelfBook>();
 	    
 	    // Fix any inconsistencies that result from inserting directly into DB
 	    foreach (Book book in Books.Include(b => b.Reviews))
@@ -91,6 +104,7 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	                           DELETE FROM Children;
 	                           DELETE FROM ClassroomBookshelfBooks;
 	                           DELETE FROM ClassroomBookshelves;
+	                           DELETE FROM ClassroomChildren;
 	                           DELETE FROM Classrooms;
 	                           DELETE FROM CompletedBookshelfBooks;
 	                           DELETE FROM CompletedBookshelves;

@@ -1,20 +1,14 @@
-﻿using BookwormsServer.Models.Entities;
+﻿namespace BookwormsServer.Models.Data;
 
-namespace BookwormsServer.Models.Data;
+public record ReviewResponse(
+    string ReviewerFirstName,
+    string ReviewerLastName,
+    string ReviewerRole,
+    int ReviewerIcon,
+    DateTime ReviewDate,
+    double StarRating,
+    string ReviewText);
 
-public record ReviewDTO(string ReviewerFirstName, string ReviewerLastName, string ReviewerRole, int ReviewerIcon, DateTime ReviewDate, double StarRating, string ReviewText)
-{
-    public static ReviewDTO From(Review r)
-    {
-        return new(
-            r.Reviewer!.FirstName,
-            r.Reviewer.LastName,
-            r.Reviewer is Parent ? "Parent" : "Teacher",
-            r.Reviewer.UserIcon,
-            r.ReviewDate,
-            r.StarRating, 
-            r.ReviewText ?? "");
-    }
-}
-
-public record ReviewAddOrUpdateRequestDTO(double StarRating, string? ReviewText = null);
+public record ReviewEditRequest(
+    double StarRating, 
+    string? ReviewText = null);

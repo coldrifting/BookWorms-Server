@@ -18,7 +18,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.GetAsync(Routes.Bookshelves.All(childId)),
             HttpStatusCode.Unauthorized,
-            ErrorDTO.Unauthorized);
+            ErrorResponse.Unauthorized);
     }
 
     [Theory]
@@ -28,7 +28,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.GetAsync(Routes.Bookshelves.All(childId), username),
             HttpStatusCode.Forbidden,
-            ErrorDTO.UserNotParent);
+            ErrorResponse.UserNotParent);
     }
 
     [Theory]
@@ -38,7 +38,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.GetAsync(Routes.Bookshelves.All(childId), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.ChildNotFound);
+            ErrorResponse.ChildNotFound);
     }
 
     [Theory]
@@ -48,7 +48,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName)),
             HttpStatusCode.Unauthorized,
-            ErrorDTO.Unauthorized);
+            ErrorResponse.Unauthorized);
     }
 
     [Theory]
@@ -58,7 +58,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
             HttpStatusCode.Forbidden,
-            ErrorDTO.UserNotParent);
+            ErrorResponse.UserNotParent);
     }
 
     [Theory]
@@ -68,7 +68,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.ChildNotFound);
+            ErrorResponse.ChildNotFound);
     }
 
     [Theory]
@@ -78,7 +78,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.BookshelfNotFound);
+            ErrorResponse.BookshelfNotFound);
     }
 
     [Theory]
@@ -88,7 +88,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName)),
             HttpStatusCode.Unauthorized,
-            ErrorDTO.Unauthorized);
+            ErrorResponse.Unauthorized);
     }
 
     [Theory]
@@ -98,7 +98,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName), username),
             HttpStatusCode.Forbidden,
-            ErrorDTO.UserNotParent);
+            ErrorResponse.UserNotParent);
     }
 
     [Theory]
@@ -108,7 +108,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.ChildNotFound);
+            ErrorResponse.ChildNotFound);
     }
 
     [Theory]
@@ -118,7 +118,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName), username),
             HttpStatusCode.UnprocessableEntity,
-            ErrorDTO.BookshelfAlreadyExists);
+            ErrorResponse.BookshelfAlreadyExists);
     }
 
     [Theory]
@@ -128,7 +128,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName)),
             HttpStatusCode.Unauthorized,
-            ErrorDTO.Unauthorized);
+            ErrorResponse.Unauthorized);
     }
 
     [Theory]
@@ -138,7 +138,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
             HttpStatusCode.Forbidden,
-            ErrorDTO.UserNotParent);
+            ErrorResponse.UserNotParent);
     }
 
     [Theory]
@@ -148,7 +148,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.ChildNotFound);
+            ErrorResponse.ChildNotFound);
     }
 
     [Theory]
@@ -158,7 +158,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Rename(childId, bookshelfName, newBookshelfName)),
             HttpStatusCode.Unauthorized,
-            ErrorDTO.Unauthorized);
+            ErrorResponse.Unauthorized);
     }
 
     [Theory]
@@ -168,7 +168,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Rename(childId, bookshelfName, newBookshelfName), username),
             HttpStatusCode.Forbidden,
-            ErrorDTO.UserNotParent);
+            ErrorResponse.UserNotParent);
     }
 
     [Theory]
@@ -178,7 +178,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Rename(childId, bookshelfName, newBookshelfName), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.ChildNotFound);
+            ErrorResponse.ChildNotFound);
     }
 
     [Theory]
@@ -188,7 +188,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Rename(childId, bookshelfName, newBookshelfName), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.BookshelfNotFound);
+            ErrorResponse.BookshelfNotFound);
     }
 
     [Theory]
@@ -198,7 +198,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
             HttpStatusCode.Forbidden,
-            ErrorDTO.UserNotParent);
+            ErrorResponse.UserNotParent);
     }
 
     [Theory]
@@ -208,7 +208,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.ChildNotFound);
+            ErrorResponse.ChildNotFound);
     }
 
     [Theory]
@@ -218,7 +218,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.BookshelfNotFound);
+            ErrorResponse.BookshelfNotFound);
     }
 
     [Theory]
@@ -228,7 +228,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
             HttpStatusCode.UnprocessableEntity,
-            ErrorDTO.BookIdInvalid);
+            ErrorResponse.BookIdInvalid);
     }
 
     [Theory]
@@ -238,7 +238,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, bookId), username),
             HttpStatusCode.Forbidden,
-            ErrorDTO.UserNotParent);
+            ErrorResponse.UserNotParent);
     }
 
     [Theory]
@@ -249,7 +249,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, bookId), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.ChildNotFound);
+            ErrorResponse.ChildNotFound);
     }
 
     [Theory]
@@ -259,7 +259,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.BookshelfNotFound);
+            ErrorResponse.BookshelfNotFound);
     }
 
     [Theory]
@@ -269,7 +269,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, bookId), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.BookshelfNotFound);
+            ErrorResponse.BookshelfNotFound);
     }
 
     [Theory]
@@ -279,7 +279,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, bookId), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.BookshelfBookNotFound);
+            ErrorResponse.BookshelfBookNotFound);
     }
 
     [Theory]
@@ -289,7 +289,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, invalidBookId), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.BookshelfBookNotFound);
+            ErrorResponse.BookshelfBookNotFound);
     }
 
     [Theory]
@@ -299,7 +299,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Clear(childId, bookshelfName), username),
             HttpStatusCode.Forbidden,
-            ErrorDTO.UserNotParent);
+            ErrorResponse.UserNotParent);
     }
 
     [Theory]
@@ -309,7 +309,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Clear(childId, bookshelfName), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.ChildNotFound);
+            ErrorResponse.ChildNotFound);
     }
 
     [Theory]
@@ -319,7 +319,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.DeleteAsync(Routes.Bookshelves.Clear(childId, bookshelfName), username),
             HttpStatusCode.NotFound,
-            ErrorDTO.BookshelfNotFound);
+            ErrorResponse.BookshelfNotFound);
     }
     
     [Theory]
@@ -328,20 +328,20 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     [InlineData("parent2", Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent2)", 3)]
     public async Task Test_GetBookshelfDetails_Basic(string username, string childId, string bookshelfName, int expectedBooks)
     {
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Equal(expectedBooks, content.Books.Length);
+                Assert.Equal(expectedBooks, content.Books.Count);
                 foreach (var b in content.Books)
                 {
                     Assert.NotNull(b.BookId);
                     Assert.NotEmpty(b.BookId);
-                    Assert.NotNull(b.Author);
-                    Assert.NotEmpty(b.BookId);
+                    Assert.NotNull(b.Authors);
+                    Assert.NotEmpty(b.Authors);
                     Assert.NotNull(b.Title);
-                    Assert.NotEmpty(b.BookId);
+                    Assert.NotEmpty(b.Title);
                 }
             });
     }
@@ -352,23 +352,23 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     [InlineData("parent2", Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent2)", 3)]
     public async Task Test_GetAllBookshelves_Basic(string username, string childId, string bookshelfName, int expectedBooks)
     {
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.GetAsync(Routes.Bookshelves.All(childId), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Single(content);
                 Assert.NotNull(content[0]);
                 Assert.Equal(bookshelfName, content[0].Name);
-                Assert.Equal(expectedBooks, content[0].Books.Length);
-                Assert.True(content[0].Books.Length <= 3, "Expected num of books per list to be less than 3");
+                Assert.Equal(expectedBooks, content[0].Books.Count);
+                Assert.True(content[0].Books.Count <= 3, "Expected num of books per list to be less than 3");
                 foreach (var b in content[0].Books)
                 {
                     Assert.NotNull(b.BookId);
                     Assert.NotEmpty(b.BookId);
-                    Assert.NotNull(b.Author);
-                    Assert.NotEmpty(b.BookId);
+                    Assert.NotNull(b.Authors);
+                    Assert.NotEmpty(b.Authors);
                     Assert.NotNull(b.Title);
-                    Assert.NotEmpty(b.BookId);
+                    Assert.NotEmpty(b.Title);
                 }
             });
     }
@@ -380,12 +380,12 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         Context.ChildBookshelves.Add(new("New", childId));
         await Context.SaveChangesAsync();
         
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.GetAsync(Routes.Bookshelves.All(childId), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(2, content.Count);
-                Assert.Contains(content, c => c.Name == bookshelfName && c.Books.Length == expectedBooks);
+                Assert.Contains(content, c => c.Name == bookshelfName && c.Books.Count == expectedBooks);
             });
     }
     
@@ -400,7 +400,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Rename(childId, bookshelfName1, bookshelfName2), username),
             HttpStatusCode.UnprocessableEntity,
-            ErrorDTO.BookshelfAlreadyExists);
+            ErrorResponse.BookshelfAlreadyExists);
     }
 
     [Theory]
@@ -408,7 +408,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     public async Task Test_AddBookshelf_Basic_ChildWithNoBookshelves(string username, string childId,
         string bookshelfName)
     {
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName), username),
             HttpStatusCode.OK,
             content => {
@@ -438,7 +438,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         string bookshelfName1, string bookshelfName2,
         string bookId)
     {
-        string child1Id = await CheckResponse<List<ChildResponseDTO>, string>(
+        string child1Id = await CheckResponse<List<ChildResponse>, string>(
             async () => await Client.PostAsync(Routes.Children.Add(childName1), username1),
             HttpStatusCode.Created,
             (_, headers) => {
@@ -447,7 +447,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
                 return childId;
             });
         
-        string child2Id = await CheckResponse<List<ChildResponseDTO>, string>(
+        string child2Id = await CheckResponse<List<ChildResponse>, string>(
             async () => await Client.PostAsync(Routes.Children.Add(childName2), username2),
             HttpStatusCode.Created,
             (_, headers) => {
@@ -456,7 +456,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
                 return childId;
             });
         
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.PostAsync(Routes.Bookshelves.Add(child1Id, bookshelfName1), username1),
             HttpStatusCode.OK,
             content => {
@@ -469,7 +469,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         // Insert a book to distinguish the two 
         await Client.PutAsync(Routes.Bookshelves.Insert(child1Id, bookshelfName1, bookId), username1);
         
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.PostAsync(Routes.Bookshelves.Add(child2Id, bookshelfName2), username2),
             HttpStatusCode.OK,
             content => {
@@ -479,7 +479,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
                 Assert.Empty(content[0].Books);
             });
         
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.GetAsync(Routes.Bookshelves.All(child1Id), username1),
             HttpStatusCode.OK,
             content => {
@@ -490,7 +490,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
                 Assert.Contains(content[0].Books, c => c.BookId == bookId);
             });
         
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.GetAsync(Routes.Bookshelves.All(child2Id), username2),
             HttpStatusCode.OK,
             content => {
@@ -505,7 +505,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     [InlineData("parent3", Constants.Parent3Child3Id, "Costanza's curation")]
     public async Task Test_DeleteBookshelf_BasicWithoutBooks(string username, string childId, string bookshelfName)
     {
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
             HttpStatusCode.OK,
             Assert.Empty);
@@ -515,7 +515,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)")]
     public async Task Test_DeleteBookshelf_BasicWithBooks(string username, string childId, string bookshelfName)
     {
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
             HttpStatusCode.OK,
             Assert.Empty);
@@ -528,7 +528,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         Context.ChildBookshelves.Add(new(newBookshelf, childId));
         await this.Context.SaveChangesAsync();
 
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(childId, existingBookshelf), username),
             HttpStatusCode.OK,
             content => {
@@ -543,14 +543,14 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "NEW books")]
     public async Task Test_RenameBookshelf_Basic(string username, string childId, string oldBookshelfName, string newBookshelfName)
     {
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.PostAsync(Routes.Bookshelves.Rename(childId, oldBookshelfName, newBookshelfName), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Single(content);
                 Assert.NotNull(content[0]);
                 Assert.Equal(content[0].Name, newBookshelfName);
-                Assert.Equal(3, content[0].Books.Length);
+                Assert.Equal(3, content[0].Books.Count);
             });
         
         List<ChildBookshelf> shelves = Context.ChildBookshelves
@@ -572,7 +572,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Rename(childId, oldBookshelfName, newBookshelfName), username),
             HttpStatusCode.UnprocessableEntity,
-            ErrorDTO.BookshelfAlreadyExists);
+            ErrorResponse.BookshelfAlreadyExists);
         
         List<ChildBookshelf> shelves = Context.ChildBookshelves
             .Where(c => c.ChildId == childId)
@@ -588,7 +588,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         string username1, string child1Id, string child2Id,
         string bookshelfName1, string bookshelfName2)
     {
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.PostAsync(Routes.Bookshelves.Rename(child1Id, bookshelfName1, bookshelfName2), username1),
             HttpStatusCode.OK,
             content => {
@@ -616,7 +616,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         string child1Id, string child2Id,
         string bookshelfName1, string bookshelfName2)
     {
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(child1Id, bookshelfName1), username1),
             HttpStatusCode.OK,
             Assert.Empty);
@@ -637,7 +637,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         Context.ChildBookshelves.Add(new(bookshelfName, child2Id));
         await Context.SaveChangesAsync();
         
-        await CheckResponse<List<BookshelfPreviewResponseDTO>>(
+        await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(child2Id, bookshelfName), username),
             HttpStatusCode.OK,
             Assert.Empty);
@@ -653,7 +653,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     [InlineData("parent5", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", "OL3368273W")]
     public async Task Test_BookshelfInsert_EmptyBookshelf(string username, string childId, string bookshelfName, string bookId)
     {
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
             HttpStatusCode.OK,
             content => {
@@ -667,7 +667,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", "OL3368273W", "OL48763W")]
     public async Task Test_BookshelfInsert_NonEmptyBookshelf_BookNotAlreadyInBookshelf(string username, string childId, string bookshelfName, string bookId, string existingBookId)
     {
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
             HttpStatusCode.OK,
             content => {
@@ -681,7 +681,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", "OL48763W")]
     public async Task Test_BookshelfInsert_NonEmptyBookshelf_BookAlreadyInBookshelf(string username, string childId, string bookshelfName, string bookId)
     {
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
             HttpStatusCode.OK,
             content => {
@@ -696,21 +696,21 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     public async Task Test_BookshelfInsert_Multiple_NeitherAlreadyExists(string username, string childId,
         string bookshelfName, string bookId1, string bookId2)
     {
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId1), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Equal(3, content.Books.Length);
+                Assert.Equal(3, content.Books.Count);
                 Assert.Contains(content.Books, b => b.BookId == bookId1);
             });
         
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId2), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Equal(4, content.Books.Length);
+                Assert.Equal(4, content.Books.Count);
                 Assert.Contains(content.Books, b => b.BookId == bookId1);
                 Assert.Contains(content.Books, b => b.BookId == bookId2);
             });
@@ -722,21 +722,21 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     public async Task Test_BookshelfInsert_Multiple_OneAlreadyExists(string username, string childId,
         string bookshelfName, string bookId1, string bookId2, int expectedFirst, int expectedSecond)
     {
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId1), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Equal(expectedFirst, content.Books.Length);
+                Assert.Equal(expectedFirst, content.Books.Count);
                 Assert.Contains(content.Books, b => b.BookId == bookId1);
             });
         
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId2), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Equal(expectedSecond, content.Books.Length);
+                Assert.Equal(expectedSecond, content.Books.Count);
                 Assert.Contains(content.Books, b => b.BookId == bookId1);
                 Assert.Contains(content.Books, b => b.BookId == bookId2);
             });
@@ -747,22 +747,22 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     public async Task Test_BookshelfInsert_Multiple_BothAlreadyExists(string username, string childId,
         string bookshelfName, string bookId1, string bookId2)
     {
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId1), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Equal(2, content.Books.Length);
+                Assert.Equal(2, content.Books.Count);
                 Assert.Contains(content.Books, b => b.BookId == bookId1);
                 Assert.Contains(content.Books, b => b.BookId == bookId2);
             });
         
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId2), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Equal(2, content.Books.Length);
+                Assert.Equal(2, content.Books.Count);
                 Assert.Contains(content.Books, b => b.BookId == bookId1);
                 Assert.Contains(content.Books, b => b.BookId == bookId2);
             });
@@ -773,7 +773,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     public async Task Test_RemoveBookshelfItem_SingleItemInBookshelf(string username, string childId, string bookshelfName,
         string bookId)
     {
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, bookId), username),
             HttpStatusCode.OK,
             content => {
@@ -790,11 +790,11 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     public async Task Test_RemoveBookshelfItem_MultipleItemsInBookshelf(string username, string childId, string bookshelfName,
         string bookId)
     {
-        await CheckResponse<BookshelfPreviewResponseDTO>(
+        await CheckResponse<BookshelfResponse>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, bookId), username),
             HttpStatusCode.OK,
             content => {
-                Assert.Equal(3, content.Books.Length);
+                Assert.Equal(3, content.Books.Count);
                 Assert.DoesNotContain(content.Books, c => c.BookId == bookId);
             });
     }
