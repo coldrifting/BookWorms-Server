@@ -27,12 +27,12 @@ public class Review(string bookId, string username, double starRating, string? r
     public DateTime ReviewDate { get; set; } = reviewDate;
 
     // Navigation
-    
+
     [ForeignKey(nameof(BookId))] 
-    public Book? Book { get; set; }
+    public Book Book { get; set; } = null!;
 
     [ForeignKey(nameof(Username))] 
-    public User? Reviewer { get; set; }
+    public User Reviewer { get; set; } = null!;
     
     public ReviewResponse ToResponse()
     {

@@ -54,11 +54,6 @@ public class Book(string bookId, string title, List<string> authors, string desc
     public ICollection<Review> Reviews { get; set; } = null!;
     public ICollection<DifficultyRating> DifficultyRatings { get; set; } = null!;
     
-    public ICollection<CompletedBookshelfBook> CompletedBookshelfBooks { get; set; } = null!;
-    public ICollection<InProgressBookshelfBook> InProgressBookshelfBooks { get; set; } = null!;
-    public ICollection<ChildBookshelfBook> ChildBookshelfBooks { get; set; } = null!;
-    public ICollection<ClassroomBookshelfBook> ClassroomBookshelfBooks { get; set; } = null!;
-    
     // Skip-navigations (many-to-many)
     [InverseProperty("Books")] public ICollection<CompletedBookshelf> CompletedBookshelves { get; set; } = null!;
     [InverseProperty("Books")] public ICollection<InProgressBookshelf> InProgressBookshelves { get; set; } = null!;

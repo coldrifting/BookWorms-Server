@@ -27,20 +27,15 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
 
     [StringLength(64)]
     public string ParentUsername { get; set; } = parentUsername;
-        
-    [StringLength(6, MinimumLength = 6, ErrorMessage = "Child classroom code must be exactly {1} characters long.")]
-    public string? ClassroomCode { get; set; }
 
     // Navigation
+
+    [ForeignKey(nameof(ParentUsername))] 
+    public Parent Parent { get; set; } = null!;
     
-    // Inverse property needed for extra selected child property in parent to work
-    [InverseProperty(nameof(Parent.Children))]
-    [ForeignKey(nameof(ParentUsername))]
-    public Parent? Parent { get; set; }
-    
-    [ForeignKey(nameof(ClassroomCode))]
-    public Classroom? Classroom { get; set; }
-    
+    // Skip-navigation (many-to-many)
+    [InverseProperty("Children")] public ICollection<Classroom> Classrooms { get; set; } = null!;
+
     public CompletedBookshelf? Completed { get; set; }
     public InProgressBookshelf? InProgress { get; set; }
     public ICollection<ChildBookshelf> Bookshelves { get; set; } = null!;
@@ -52,7 +47,6 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
             Name,
             ChildIcon,
             ReadingLevel,
-            ClassroomCode,
             DateOfBirth);
     }
     

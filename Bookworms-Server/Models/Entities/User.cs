@@ -54,11 +54,7 @@ public class Parent(string username, byte[] hash, byte[] salt, string firstName,
 public class Teacher(string username, byte[] hash, byte[] salt, string firstName, string lastName, int userIcon)
     : User(username, hash, salt, firstName, lastName, userIcon)
 {
-    [StringLength(6, MinimumLength = 6, ErrorMessage = "Teacher classroom code must be exactly {0} characters long.")]
-    public string? ClassroomCode { get; set; }
-    
     // Navigation
-    [ForeignKey(nameof(ClassroomCode))]
     public Classroom? Classroom { get; set; }
 }
 

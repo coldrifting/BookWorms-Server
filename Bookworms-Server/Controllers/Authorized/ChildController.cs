@@ -29,9 +29,11 @@ public class ChildDetailsController(BookwormsDbContext context) : AuthController
 
     /// <summary>
     /// Adds a child under the logged-in parent with the specified name.
+    /// </summary>
+    /// <remarks>
     /// If no other children exist under this parent, the new child will
     /// be selected automatically.
-    /// </summary>
+    /// </remarks>
     /// <returns>A list of all children under the parent and their info</returns>
     /// <response code="201">Success. Child ID Included in Location header</response>
     /// <response code="401">The user is not logged in</response>
@@ -88,16 +90,6 @@ public class ChildEditController(BookwormsDbContext context) : AuthControllerBas
         if (CurrentUserChild(childId) is not { } child)
         {
             return NotFound(ErrorResponse.ChildNotFound);
-        }
-
-        if (payload.ClassroomCode is not null)
-        {
-            if (!DbContext.Classrooms.Any(c => c.ClassroomCode == payload.ClassroomCode))
-            {
-                return UnprocessableEntity(ErrorResponse.ClassroomNotFound);
-            }
-            
-            child.ClassroomCode = payload.ClassroomCode;
         }
 
         if (payload.NewName is not null)

@@ -17,11 +17,10 @@ public class CompletedBookshelf(string childId)
     public string ChildId { get; set; } = childId;
 
     // Navigation
-    
+
     [ForeignKey(nameof(ChildId))] 
-    public Child? Child { get; set; }
+    public Child Child { get; set; } = null!;
     
-    public ICollection<CompletedBookshelfBook> BookshelfBooks { get; set; } = null!;
     public ICollection<Book> Books { get; set; } = null!; // Skip-navigation (many-to-many)
 }
 
@@ -38,10 +37,10 @@ public class InProgressBookshelf(string childId)
     public string ChildId { get; set; } = childId;
 
     // Navigation
-    [ForeignKey(nameof(ChildId))] 
-    public Child? Child { get; set; }
     
-    public ICollection<InProgressBookshelfBook> BookshelfBooks { get; set; } = null!;
+    [ForeignKey(nameof(ChildId))] 
+    public Child Child { get; set; } = null!;
+    
     public ICollection<Book> Books { get; set; } = null!; // Skip-navigation (many-to-many)
 }
 
@@ -58,11 +57,10 @@ public class ChildBookshelf(string name, string childId)
     public string ChildId { get; set; } = childId;
 
     // Navigation
-    
+
     [ForeignKey(nameof(ChildId))] 
-    public Child? Child { get; set; }
+    public Child Child { get; set; } = null!;
     
-    public ICollection<ChildBookshelfBook> BookshelfBooks { get; set; } = null!;
     public ICollection<Book> Books { get; set; } = null!; // Skip-navigation (many-to-many)
 
     public BookshelfResponse ToResponse(int numBooks = int.MaxValue)
@@ -87,10 +85,16 @@ public class ClassroomBookshelf(string name, string classroomCode)
     public string ClassroomCode { get; set; } = classroomCode;
 
     // Navigation
-    
+
     [ForeignKey(nameof(ClassroomCode))] 
-    public Classroom? Classroom { get; set; }
+    public Classroom Classroom { get; set; } = null!;
     
-    public ICollection<ClassroomBookshelfBook> BookshelfBooks { get; set; } = null!;
     public ICollection<Book> Books { get; set; } = null!; // Skip-navigation (many-to-many)
+
+    public BookshelfResponse ToResponse(int numBooks = int.MaxValue)
+    {
+        return new(
+            Name,
+            Books.Select(book => book.ToResponsePreview()).Take(numBooks).ToList());
+    }
 }

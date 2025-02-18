@@ -77,7 +77,7 @@ public static class SwaggerExamples
     {
         public ChildEditRequest GetExamples()
         {
-            return new("New_Child_Name", 0, 42, "WLF359", DateOnly.Parse("2017-3-4"));
+            return new("New_Child_Name", 0, 42, DateOnly.Parse("2017-3-4"));
         }
     }
 
@@ -85,7 +85,7 @@ public static class SwaggerExamples
     {
         public ChildResponse GetExamples()
         {
-            return new(Snowflake.Generate(), "Jackson", 1, 52, "CLS098", DateOnly.Parse("2015-04-15"));
+            return new(Snowflake.Generate(), "Jackson", 1, 52, DateOnly.Parse("2015-04-15"));
         }
     }
     
@@ -95,9 +95,9 @@ public static class SwaggerExamples
         {
             return
             [
-                new(Snowflake.Generate(),"Ashley", 0,  59, "CLS098", DateOnly.Parse("2014-08-23")),
-                new(Snowflake.Generate(),"Miles", 1, null, "CLS498", null),
-                new(Snowflake.Generate(),"Joey", 2, null, null, DateOnly.Parse("2015-04-15"))
+                new(Snowflake.Generate(),"Ashley", 0,  59, DateOnly.Parse("2014-08-23")),
+                new(Snowflake.Generate(),"Miles", 1, null, null),
+                new(Snowflake.Generate(),"Joey", 2, null, DateOnly.Parse("2015-04-15"))
             ];
         }
     }
@@ -232,6 +232,77 @@ public static class SwaggerExamples
                 new("bookId2", "Title", ["Author2"]), 
                 new("bookId3", "Title", ["Author3", "Author10"]),
                 new("bookId4", "Title", ["Author4"])
+            ]);
+        }
+    }
+    
+    // Classrooms
+    
+    public class ClassroomChildResponseExample : IExamplesProvider<ClassroomChildResponse>
+    {
+        public ClassroomChildResponse GetExamples()
+        {
+            return new("ABC123", "Ava's Class", "Mrs. Ava", [
+                new("Reading List", 
+                [
+                    new("bookId1", "Title", ["Author1"])
+                ]),
+                new("Advanced Reading",
+                [
+                    new("bookId2", "Title", ["Author2"]), 
+                    new("bookId3", "Title", ["Author3", "Author10"])
+                ])
+            ]);
+        }
+    }
+    
+    public class ClassroomChildResponseListExample : IExamplesProvider<List<ClassroomChildResponse>>
+    {
+        public List<ClassroomChildResponse> GetExamples()
+        {
+            return
+            [
+                new("ABC123", "Ava's Class", "Mrs. Ava", [
+                    new("Reading List",
+                    [
+                        new("bookId1", "Title", ["Author1"])
+                    ]),
+                    new("Advanced Reading",
+                    [
+                        new("bookId2", "Title", ["Author2"]),
+                        new("bookId3", "Title", ["Author3", "Author10"])
+                    ])
+                ]),
+                new("ALP234", "Mustard's Class", "Mr. Mustard", [
+                    new("Rad Reading List",
+                    [
+                        new("bookId1", "Title", ["Author1"])
+                    ])
+                ]),
+            ];
+        }
+    }
+
+    public class ClassroomResponseExample : IExamplesProvider<ClassroomTeacherResponse>
+    {
+        public ClassroomTeacherResponse GetExamples()
+        {
+            return new("ABC123", "Ava's Class", 
+                [
+                    new("childId1", "Jack", 0, 3, new(2017, 02, 15)),
+                    new("childId2", "Wyatt", 1, 45, new(2019, 08, 17)),
+                    new("childId3", "Sadie", 2, 72, new(2018, 05, 28))
+                ], 
+                [
+                new("Reading List", 
+                [
+                    new("bookId1", "Title", ["Author1"])
+                ]),
+                new("Advanced Reading",
+                [
+                    new("bookId2", "Title", ["Author2"]), 
+                    new("bookId3", "Title", ["Author3", "Author10"])
+                ])
             ]);
         }
     }

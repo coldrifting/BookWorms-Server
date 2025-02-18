@@ -1,6 +1,5 @@
 ﻿using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,9 +11,11 @@ public class DifficultyRatingController(BookwormsDbContext context) : AuthContro
 {
     /// <summary>
     /// Adds the given child's rating for the given book to the book's difficulty rating history.
-    /// If the child is not leveled or the book's level has been frozen, the child's level will be updated;
-    /// otherwise the book's level will updated, unless neither are leveled in which case no action will be taken. 
     /// </summary>
+    /// <remarks>
+    /// If the child is not leveled or the book's level has been frozen, the child's level will be updated;
+    /// otherwise the book's level will updated, unless neither are leveled in which case no action will be taken.
+    /// </remarks>
     /// <returns>Info about the updated entity and its updated level</returns>
     /// <response code="200">Success. The rating update the book's or child's level</response>
     /// <response code="204">Success. The rating had no effect</response>

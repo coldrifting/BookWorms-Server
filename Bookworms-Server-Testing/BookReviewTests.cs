@@ -161,7 +161,7 @@ public class BookReviewTests(CompositeFixture fixture) : BookwormsIntegrationTes
         // Assert that targeted review exists
         Assert.NotNull(Context.Reviews
             .Where(r => r.BookId == bookId)
-            .SingleOrDefault(r => r.Reviewer != null && r.Username == username));
+            .SingleOrDefault(r => r.Username == username));
 
         await CheckResponse<ReviewResponse>(
             async () => await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),
@@ -181,7 +181,7 @@ public class BookReviewTests(CompositeFixture fixture) : BookwormsIntegrationTes
         // Assert that targeted review exists
         Assert.NotNull(Context.Reviews
             .Where(r => r.BookId == bookId)
-            .SingleOrDefault(r => r.Reviewer != null && r.Username == username));
+            .SingleOrDefault(r => r.Username == username));
 
         await CheckResponse<ReviewResponse>(
             async () => await Client.PutPayloadAsync(Routes.Reviews.Edit(bookId),

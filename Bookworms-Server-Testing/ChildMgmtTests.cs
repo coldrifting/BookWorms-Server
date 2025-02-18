@@ -86,21 +86,6 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
             HttpStatusCode.Forbidden,
             ErrorResponse.UserNotParent);
     }
-    
-    [Theory]
-    [InlineData("parent2", Constants.Parent2Child2Id, "BadVal")]
-    public async Task Test_EditChild_InvalidClassroomCode(string username, string childId, string classroomCode)
-    {
-        await CheckForError(
-            () => Client.PutPayloadAsync(Routes.Children.Edit(childId),
-                new ChildEditRequest(ClassroomCode: classroomCode, ReadingLevel: 35), username),
-            HttpStatusCode.UnprocessableEntity,
-            ErrorResponse.ClassroomNotFound);
-        
-        List<Child> children = Context.Children.Where(c => c.ParentUsername == username).ToList();
-        Assert.Equal(2, children.Count);
-        Assert.Contains(children, c => c.ChildId == childId && c.ClassroomCode is null && c.ReadingLevel is null);
-    }
 
     [Theory]
     [InlineData("parent2", Constants.InvalidChildId, "newName")]
@@ -331,7 +316,4 @@ public class ChildMgmtTests(CompositeFixture fixture) : BookwormsIntegrationTest
         Assert.Equal(3, children.Count);
         Assert.Contains(children, c => c.ChildId == childId && c.DateOfBirth == DateOnly.Parse(dob));
     }
-
-    // TODO - Add more classroom code edit validation when classrooms are added
-
 }

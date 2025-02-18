@@ -34,6 +34,40 @@ public static class Routes
             $"/children/{childId}/shelves/{bookshelfName}/remove?bookId={bookId}";
     }
 
+    public static class Classrooms
+    {
+        // Parents (Children)
+        public static string All(string childId) =>
+            $"/children/{childId}/classrooms/all";
+        public static string Join(string childId, string classCode) =>
+            $"/children/{childId}/classrooms/{classCode}/join";
+        public static string Leave(string childId, string classCode) =>
+            $"/children/{childId}/classrooms/{classCode}/leave";
+        
+        // Teachers
+        public const string Details = "/homeroom/details";
+        public static string Create(string className) =>
+            $"/homeroom/create?className={className}";
+        public static string Rename(string newClassName) => 
+            $"/homeroom/rename?newClassName={newClassName}";
+        public const string Delete = "/homeroom/delete";
+
+        public static string BookshelfCreate(string bookshelfName) =>
+            $"/homeroom/shelves/{bookshelfName}/create";
+
+        public static string BookshelfRename(string bookshelfName, string newName) =>
+            $"/homeroom/shelves/{bookshelfName}/rename?newBookshelfName={newName}";
+
+        public static string BookshelfDelete(string bookshelfName) =>
+            $"/homeroom/shelves/{bookshelfName}/delete";
+
+        public static string BookshelfInsertBook(string bookshelfName, string bookId) =>
+            $"/homeroom/shelves/{bookshelfName}/insert?bookId={bookId}";
+
+        public static string BookshelfRemoveBook(string bookshelfName, string bookId) =>
+            $"/homeroom/shelves/{bookshelfName}/remove?bookId={bookId}";
+    }
+
     public static string Search(
         string? query = null,
         string? title = null,

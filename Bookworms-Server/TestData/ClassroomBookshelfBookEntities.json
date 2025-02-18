@@ -1,0 +1,26 @@
+[
+  {
+    "bookshelfId": 1,
+    "bookId": "OL3368288W"
+  },
+  {
+    "bookshelfId": 2,
+    "bookId": "OL47935W"
+  },
+  {
+    "bookshelfId": 3,
+    "bookId": "OL286593W"
+  },
+  {
+    "bookshelfId": 4,
+    "bookId": "OL286593W"
+  },
+  {
+    "bookshelfId": 4,
+    "bookId": "OL892371W"
+  },
+  {
+    "bookshelfId": 6,
+    "bookId": "OL892371W"
+  }
+]

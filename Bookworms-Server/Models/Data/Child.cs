@@ -12,9 +12,6 @@ public record ChildEditRequest(
     [Range(0, 100, ErrorMessage = "Child reading level must be between {1} and {2}.")]
     int? ReadingLevel = null,
 
-    [StringLength(6, MinimumLength = 6, ErrorMessage = "Child classroom code must be exactly {1} characters long.")]
-    string? ClassroomCode = null,
-
     [Range(typeof(DateOnly), "01/01/1900", "01/01/2100",
         ErrorMessage = "Child date of birth must fall between {1} and {2}.")]
     DateOnly? DateOfBirth = null);
@@ -23,6 +20,5 @@ public record ChildResponse(
     string ChildId, 
     string Name, 
     int? ChildIcon, 
-    int? ReadingLevel, 
-    string? ClassroomCode, 
+    int? ReadingLevel,
     DateOnly? DateOfBirth);

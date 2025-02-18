@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BookWormsServer.Migrations
+namespace BookwormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
     partial class BookwormsDbContextModelSnapshot : ModelSnapshot
@@ -31,9 +31,6 @@ namespace BookWormsServer.Migrations
                     b.Property<string>("Authors")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<string>("ClassroomCode")
-                        .HasColumnType("varchar(6)");
 
                     b.Property<int?>("CoverId")
                         .HasColumnType("int");
@@ -81,8 +78,6 @@ namespace BookWormsServer.Migrations
 
                     b.HasKey("BookId");
 
-                    b.HasIndex("ClassroomCode");
-
                     b.ToTable("Books");
                 });
 
@@ -94,10 +89,6 @@ namespace BookWormsServer.Migrations
 
                     b.Property<int>("ChildIcon")
                         .HasColumnType("int");
-
-                    b.Property<string>("ClassroomCode")
-                        .HasMaxLength(6)
-                        .HasColumnType("varchar(6)");
 
                     b.Property<DateOnly?>("DateOfBirth")
                         .HasColumnType("date");
@@ -116,8 +107,6 @@ namespace BookWormsServer.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ChildId");
-
-                    b.HasIndex("ClassroomCode");
 
                     b.HasIndex("ParentUsername");
 
@@ -183,6 +172,9 @@ namespace BookWormsServer.Migrations
 
                     b.HasKey("ClassroomCode");
 
+                    b.HasIndex("TeacherUsername")
+                        .IsUnique();
+
                     b.ToTable("Classrooms");
                 });
 
@@ -225,6 +217,21 @@ namespace BookWormsServer.Migrations
                     b.HasIndex("BookId");
 
                     b.ToTable("ClassroomBookshelfBooks");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomChild", b =>
+                {
+                    b.Property<string>("ClassroomCode")
+                        .HasColumnType("varchar(6)");
+
+                    b.Property<string>("ChildId")
+                        .HasColumnType("char(14)");
+
+                    b.HasKey("ClassroomCode", "ChildId");
+
+                    b.HasIndex("ChildId");
+
+                    b.ToTable("ClassroomChildren");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.CompletedBookshelf", b =>
@@ -436,38 +443,18 @@ namespace BookWormsServer.Migrations
                 {
                     b.HasBaseType("BookwormsServer.Models.Entities.User");
 
-                    b.Property<string>("ClassroomCode")
-                        .HasMaxLength(6)
-                        .HasColumnType("varchar(6)");
-
-                    b.HasIndex("ClassroomCode")
-                        .IsUnique();
-
                     b.ToTable("Users");
 
                     b.HasDiscriminator().HasValue("Teacher");
                 });
 
-            modelBuilder.Entity("BookwormsServer.Models.Entities.Book", b =>
-                {
-                    b.HasOne("BookwormsServer.Models.Entities.Classroom", null)
-                        .WithMany("Books")
-                        .HasForeignKey("ClassroomCode");
-                });
-
             modelBuilder.Entity("BookwormsServer.Models.Entities.Child", b =>
                 {
-                    b.HasOne("BookwormsServer.Models.Entities.Classroom", "Classroom")
-                        .WithMany("Children")
-                        .HasForeignKey("ClassroomCode");
-
                     b.HasOne("BookwormsServer.Models.Entities.Parent", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentUsername")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Classroom");
 
                     b.Navigation("Parent");
                 });
@@ -486,13 +473,13 @@ namespace BookWormsServer.Migrations
             modelBuilder.Entity("BookwormsServer.Models.Entities.ChildBookshelfBook", b =>
                 {
                     b.HasOne("BookwormsServer.Models.Entities.Book", "Book")
-                        .WithMany("ChildBookshelfBooks")
+                        .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BookwormsServer.Models.Entities.ChildBookshelf", "Bookshelf")
-                        .WithMany("BookshelfBooks")
+                        .WithMany()
                         .HasForeignKey("BookshelfId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -502,10 +489,21 @@ namespace BookWormsServer.Migrations
                     b.Navigation("Bookshelf");
                 });
 
+            modelBuilder.Entity("BookwormsServer.Models.Entities.Classroom", b =>
+                {
+                    b.HasOne("BookwormsServer.Models.Entities.Teacher", "Teacher")
+                        .WithOne("Classroom")
+                        .HasForeignKey("BookwormsServer.Models.Entities.Classroom", "TeacherUsername")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomBookshelf", b =>
                 {
                     b.HasOne("BookwormsServer.Models.Entities.Classroom", "Classroom")
-                        .WithMany("ClassroomBookshelves")
+                        .WithMany("Bookshelves")
                         .HasForeignKey("ClassroomCode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -516,13 +514,13 @@ namespace BookWormsServer.Migrations
             modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomBookshelfBook", b =>
                 {
                     b.HasOne("BookwormsServer.Models.Entities.Book", "Book")
-                        .WithMany("ClassroomBookshelfBooks")
+                        .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BookwormsServer.Models.Entities.ClassroomBookshelf", "Bookshelf")
-                        .WithMany("BookshelfBooks")
+                        .WithMany()
                         .HasForeignKey("BookshelfId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -530,6 +528,25 @@ namespace BookWormsServer.Migrations
                     b.Navigation("Book");
 
                     b.Navigation("Bookshelf");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomChild", b =>
+                {
+                    b.HasOne("BookwormsServer.Models.Entities.Child", "Child")
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookwormsServer.Models.Entities.Classroom", "Classroom")
+                        .WithMany()
+                        .HasForeignKey("ClassroomCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Child");
+
+                    b.Navigation("Classroom");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.CompletedBookshelf", b =>
@@ -546,13 +563,13 @@ namespace BookWormsServer.Migrations
             modelBuilder.Entity("BookwormsServer.Models.Entities.CompletedBookshelfBook", b =>
                 {
                     b.HasOne("BookwormsServer.Models.Entities.Book", "Book")
-                        .WithMany("CompletedBookshelfBooks")
+                        .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BookwormsServer.Models.Entities.CompletedBookshelf", "Bookshelf")
-                        .WithMany("BookshelfBooks")
+                        .WithMany()
                         .HasForeignKey("BookshelfId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -595,13 +612,13 @@ namespace BookWormsServer.Migrations
             modelBuilder.Entity("BookwormsServer.Models.Entities.InProgressBookshelfBook", b =>
                 {
                     b.HasOne("BookwormsServer.Models.Entities.Book", "Book")
-                        .WithMany("InProgressBookshelfBooks")
+                        .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BookwormsServer.Models.Entities.InProgressBookshelf", "Bookshelf")
-                        .WithMany("BookshelfBooks")
+                        .WithMany()
                         .HasForeignKey("BookshelfId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -630,26 +647,9 @@ namespace BookWormsServer.Migrations
                     b.Navigation("Reviewer");
                 });
 
-            modelBuilder.Entity("BookwormsServer.Models.Entities.Teacher", b =>
-                {
-                    b.HasOne("BookwormsServer.Models.Entities.Classroom", "Classroom")
-                        .WithOne("Teacher")
-                        .HasForeignKey("BookwormsServer.Models.Entities.Teacher", "ClassroomCode");
-
-                    b.Navigation("Classroom");
-                });
-
             modelBuilder.Entity("BookwormsServer.Models.Entities.Book", b =>
                 {
-                    b.Navigation("ChildBookshelfBooks");
-
-                    b.Navigation("ClassroomBookshelfBooks");
-
-                    b.Navigation("CompletedBookshelfBooks");
-
                     b.Navigation("DifficultyRatings");
-
-                    b.Navigation("InProgressBookshelfBooks");
 
                     b.Navigation("Reviews");
                 });
@@ -663,36 +663,9 @@ namespace BookWormsServer.Migrations
                     b.Navigation("InProgress");
                 });
 
-            modelBuilder.Entity("BookwormsServer.Models.Entities.ChildBookshelf", b =>
-                {
-                    b.Navigation("BookshelfBooks");
-                });
-
             modelBuilder.Entity("BookwormsServer.Models.Entities.Classroom", b =>
                 {
-                    b.Navigation("Books");
-
-                    b.Navigation("Children");
-
-                    b.Navigation("ClassroomBookshelves");
-
-                    b.Navigation("Teacher")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomBookshelf", b =>
-                {
-                    b.Navigation("BookshelfBooks");
-                });
-
-            modelBuilder.Entity("BookwormsServer.Models.Entities.CompletedBookshelf", b =>
-                {
-                    b.Navigation("BookshelfBooks");
-                });
-
-            modelBuilder.Entity("BookwormsServer.Models.Entities.InProgressBookshelf", b =>
-                {
-                    b.Navigation("BookshelfBooks");
+                    b.Navigation("Bookshelves");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.User", b =>
@@ -703,6 +676,11 @@ namespace BookWormsServer.Migrations
             modelBuilder.Entity("BookwormsServer.Models.Entities.Parent", b =>
                 {
                     b.Navigation("Children");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.Teacher", b =>
+                {
+                    b.Navigation("Classroom");
                 });
 #pragma warning restore 612, 618
         }

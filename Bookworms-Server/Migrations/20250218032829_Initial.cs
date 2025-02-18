@@ -16,23 +16,6 @@ namespace BookwormsServer.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Classrooms",
-                columns: table => new
-                {
-                    ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClassroomName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TeacherUsername = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Classrooms", x => x.ClassroomCode);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Books",
                 columns: table => new
                 {
@@ -56,41 +39,11 @@ namespace BookwormsServer.Migrations
                     Level = table.Column<int>(type: "int", nullable: true),
                     LevelIsLocked = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     StarRating = table.Column<double>(type: "double", nullable: true),
-                    TimeAdded = table.Column<DateTime>(type: "datetime(0)", nullable: true),
-                    ClassroomCode = table.Column<string>(type: "varchar(6)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    TimeAdded = table.Column<DateTime>(type: "datetime(0)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Books", x => x.BookId);
-                    table.ForeignKey(
-                        name: "FK_Books_Classrooms_ClassroomCode",
-                        column: x => x.ClassroomCode,
-                        principalTable: "Classrooms",
-                        principalColumn: "ClassroomCode");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "ClassroomBookshelves",
-                columns: table => new
-                {
-                    BookshelfId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClassroomBookshelves", x => x.BookshelfId);
-                    table.ForeignKey(
-                        name: "FK_ClassroomBookshelves_Classrooms_ClassroomCode",
-                        column: x => x.ClassroomCode,
-                        principalTable: "Classrooms",
-                        principalColumn: "ClassroomCode",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -108,44 +61,11 @@ namespace BookwormsServer.Migrations
                     Hash = table.Column<byte[]>(type: "longblob", nullable: false),
                     Salt = table.Column<byte[]>(type: "longblob", nullable: false),
                     Discriminator = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Username);
-                    table.ForeignKey(
-                        name: "FK_Users_Classrooms_ClassroomCode",
-                        column: x => x.ClassroomCode,
-                        principalTable: "Classrooms",
-                        principalColumn: "ClassroomCode");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "ClassroomBookshelfBooks",
-                columns: table => new
-                {
-                    BookshelfId = table.Column<int>(type: "int", nullable: false),
-                    BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClassroomBookshelfBooks", x => new { x.BookshelfId, x.BookId });
-                    table.ForeignKey(
-                        name: "FK_ClassroomBookshelfBooks_Books_BookId",
-                        column: x => x.BookId,
-                        principalTable: "Books",
-                        principalColumn: "BookId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ClassroomBookshelfBooks_ClassroomBookshelves_BookshelfId",
-                        column: x => x.BookshelfId,
-                        principalTable: "ClassroomBookshelves",
-                        principalColumn: "BookshelfId",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -161,21 +81,37 @@ namespace BookwormsServer.Migrations
                     DateOfBirth = table.Column<DateOnly>(type: "date", nullable: true),
                     ReadingLevel = table.Column<int>(type: "int", nullable: true),
                     ParentUsername = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Children", x => x.ChildId);
                     table.ForeignKey(
-                        name: "FK_Children_Classrooms_ClassroomCode",
-                        column: x => x.ClassroomCode,
-                        principalTable: "Classrooms",
-                        principalColumn: "ClassroomCode");
-                    table.ForeignKey(
                         name: "FK_Children_Users_ParentUsername",
                         column: x => x.ParentUsername,
+                        principalTable: "Users",
+                        principalColumn: "Username",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Classrooms",
+                columns: table => new
+                {
+                    ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TeacherUsername = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClassroomName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Classrooms", x => x.ClassroomCode);
+                    table.ForeignKey(
+                        name: "FK_Classrooms_Users_TeacherUsername",
+                        column: x => x.TeacherUsername,
                         principalTable: "Users",
                         principalColumn: "Username",
                         onDelete: ReferentialAction.Cascade);
@@ -313,6 +249,56 @@ namespace BookwormsServer.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "ClassroomBookshelves",
+                columns: table => new
+                {
+                    BookshelfId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClassroomCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClassroomBookshelves", x => x.BookshelfId);
+                    table.ForeignKey(
+                        name: "FK_ClassroomBookshelves_Classrooms_ClassroomCode",
+                        column: x => x.ClassroomCode,
+                        principalTable: "Classrooms",
+                        principalColumn: "ClassroomCode",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "ClassroomChildren",
+                columns: table => new
+                {
+                    ClassroomCode = table.Column<string>(type: "varchar(6)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ChildId = table.Column<string>(type: "char(14)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClassroomChildren", x => new { x.ClassroomCode, x.ChildId });
+                    table.ForeignKey(
+                        name: "FK_ClassroomChildren_Children_ChildId",
+                        column: x => x.ChildId,
+                        principalTable: "Children",
+                        principalColumn: "ChildId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ClassroomChildren_Classrooms_ClassroomCode",
+                        column: x => x.ClassroomCode,
+                        principalTable: "Classrooms",
+                        principalColumn: "ClassroomCode",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "ChildBookshelfBooks",
                 columns: table => new
                 {
@@ -391,10 +377,31 @@ namespace BookwormsServer.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Books_ClassroomCode",
-                table: "Books",
-                column: "ClassroomCode");
+            migrationBuilder.CreateTable(
+                name: "ClassroomBookshelfBooks",
+                columns: table => new
+                {
+                    BookshelfId = table.Column<int>(type: "int", nullable: false),
+                    BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClassroomBookshelfBooks", x => new { x.BookshelfId, x.BookId });
+                    table.ForeignKey(
+                        name: "FK_ClassroomBookshelfBooks_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "BookId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ClassroomBookshelfBooks_ClassroomBookshelves_BookshelfId",
+                        column: x => x.BookshelfId,
+                        principalTable: "ClassroomBookshelves",
+                        principalColumn: "BookshelfId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ChildBookshelfBooks_BookId",
@@ -405,11 +412,6 @@ namespace BookwormsServer.Migrations
                 name: "IX_ChildBookshelves_ChildId",
                 table: "ChildBookshelves",
                 column: "ChildId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Children_ClassroomCode",
-                table: "Children",
-                column: "ClassroomCode");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Children_ParentUsername",
@@ -425,6 +427,17 @@ namespace BookwormsServer.Migrations
                 name: "IX_ClassroomBookshelves_ClassroomCode",
                 table: "ClassroomBookshelves",
                 column: "ClassroomCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClassroomChildren_ChildId",
+                table: "ClassroomChildren",
+                column: "ChildId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Classrooms_TeacherUsername",
+                table: "Classrooms",
+                column: "TeacherUsername",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_CompletedBookshelfBooks_BookId",
@@ -463,12 +476,6 @@ namespace BookwormsServer.Migrations
                 name: "IX_Reviews_Username",
                 table: "Reviews",
                 column: "Username");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_ClassroomCode",
-                table: "Users",
-                column: "ClassroomCode",
-                unique: true);
         }
 
         /// <inheritdoc />
@@ -479,6 +486,9 @@ namespace BookwormsServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClassroomBookshelfBooks");
+
+            migrationBuilder.DropTable(
+                name: "ClassroomChildren");
 
             migrationBuilder.DropTable(
                 name: "CompletedBookshelfBooks");
@@ -508,13 +518,13 @@ namespace BookwormsServer.Migrations
                 name: "Books");
 
             migrationBuilder.DropTable(
+                name: "Classrooms");
+
+            migrationBuilder.DropTable(
                 name: "Children");
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Classrooms");
         }
     }
 }

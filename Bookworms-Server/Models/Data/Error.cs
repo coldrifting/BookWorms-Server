@@ -31,32 +31,41 @@ public record ErrorResponse(string Error, string Description)
         "A child can only rate a book's difficulty once");
 
     public static ErrorResponse ChildNotFound => new("Child Not Found",
-       "Unable to find a child with the given name under the logged in parent");
+       "Unable to find a child matching the requested id");
 
     public static ErrorResponse UserNotFound => new("User Not Found",
        "Unable to find a user matching the given username");
-
-    public static ErrorResponse UserNotAdmin => new("User is not an Administrator",
+   
+   public static ErrorResponse UserNotAdmin => new("User is not an Administrator",
        "User must be an administrator to access this route");
-
-    public static ErrorResponse UserNotParent => new("User is not a Parent",
+   
+   public static ErrorResponse UserNotParent => new("User is not a Parent",
        "User must be a parent to access this route");
-
-    public static ErrorResponse UserNotTeacher => new("User is not a Teacher",
+   
+   public static ErrorResponse UserNotTeacher => new("User is not a Teacher",
        "User must be a teacher to access this route");
 
-    public static ErrorResponse BookshelfNotFound => new("Bookshelf Not Found",
+   public static ErrorResponse BookshelfNotFound => new("Bookshelf Not Found",
        "Unable to find a bookshelf with the given name for the currently selected child");
 
-    public static ErrorResponse BookshelfAlreadyExists => new("Bookshelf Already Exists",
+   public static ErrorResponse BookshelfAlreadyExists => new("Bookshelf Already Exists",
        "Unable to add a bookshelf with the given name as one already exists under the selected child");
 
-    public static ErrorResponse BookshelfBookNotFound => new("Bookshelf Book Not Found",
+   public static ErrorResponse BookshelfBookNotFound => new("Bookshelf Book Not Found",
        "Unable to find a book with the given id in this bookshelf");
-
-    public static ErrorResponse ClassroomNotFound => new("Classroom Not Found", 
+   
+   public static ErrorResponse ClassroomNotFound => new("Classroom Not Found", 
        "Unable to find a class with the given classroom code");
+   
+   public static ErrorResponse BookAlreadyInClass => new("Book Already In Class", 
+       "The requested book is already part of this classroom's reading list");
 
-    public static ErrorResponse InvalidIconIndex => new("Invalid Icon Index", 
-       "The requested icon index is not valid");
+   public static ErrorResponse ChildAlreadyInClass => new("Child Already In Class",
+       "The child is already a member of this classroom");
+
+   public static ErrorResponse ChildNotInClass => new("Child Not In Class",
+       "The child is not a member of this classroom");
+
+   public static ErrorResponse ClassroomAlreadyExists => new("Classroom Already Exists",
+       "The classroom already exists for this teacher");
 }

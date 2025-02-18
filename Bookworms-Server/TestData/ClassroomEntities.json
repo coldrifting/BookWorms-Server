@@ -1,0 +1,22 @@
+[
+  {
+    "classroomCode": "ABC123",
+    "classroomName": "Ms Johnson's Class",
+    "teacherUsername": "teacher1"
+  },
+  {
+    "classroomCode": "BBB222",
+    "classroomName": "Mrs Brown's Class",
+    "teacherUsername": "teacher2"
+  },
+  {
+    "classroomCode": "UTA801",
+    "classroomName": "Utah History",
+    "teacherUsername": "teacher3"
+  },
+  {
+    "classroomCode": "ZETA28",
+    "classroomName": "WELCOME TO THE WORLD OF TOMORROW",
+    "teacherUsername": "teacher4"
+  }
+]

@@ -10,9 +10,11 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
 {
     /// <summary>
     /// Returns all bookshelves for the selected child under the logged in parent.
+    /// </summary>
+    /// <remarks>
     /// Each bookshelf will have up to 3 books with their author, title and id for
     /// preview icon purposes.
-    /// </summary>
+    /// </remarks>
     /// <param name="childId">The ID of the child to use for this route</param>
     /// <returns>A list of all bookshelves for a given child with preview book data</returns>
     /// <response code="200">Success</response>
@@ -47,8 +49,10 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     
     /// <summary>
     /// Returns a bookshelves for the selected child under the logged in parent.
-    /// The bookshelf preview will contain all books in the bookshelf.
     /// </summary>
+    /// <remarks>
+    /// The bookshelf preview will contain all books in the bookshelf.
+    /// </remarks>
     /// <param name="childId">The ID of the child to use for this route</param>
     /// <param name="bookshelfName">The name of the bookshelf to get</param>
     /// <returns>A bookshelf's name and all it's books</returns>
@@ -213,7 +217,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
 
         Child? child = DbContext.Children
             .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
+            .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
         if (child is null)
         {
@@ -226,15 +230,14 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
             return NotFound(ErrorResponse.BookshelfNotFound);
         }
         
-        if (childBookshelf.BookshelfBooks.All(b => b.BookId != bookId))
+        if (childBookshelf.Books.All(b => b.BookId != bookId))
         {
-            Book? book = DbContext.Books.Find(bookId);
-            if (book is null)
+            if (DbContext.Books.Find(bookId) is not {} book)
             {
                 return UnprocessableEntity(ErrorResponse.BookIdInvalid);
             }
             
-            childBookshelf.BookshelfBooks.Add(new(childBookshelf.BookshelfId, book.BookId));
+            childBookshelf.Books.Add(book);
             DbContext.SaveChanges();
         }
         
@@ -267,26 +270,25 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
 
         Child? child = DbContext.Children
             .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
+            .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
         if (child is null)
         {
             return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
-        if (childBookshelf is null)
+        if (child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName) is not {} childBookshelf)
         {
             return NotFound(ErrorResponse.BookshelfNotFound);
         }
-
-        ChildBookshelfBook? bookshelfBook = childBookshelf.BookshelfBooks.FirstOrDefault(b => b.BookId == bookId);
-        if (bookshelfBook is null)
+        
+        if (childBookshelf.Books.All(b => b.BookId != bookId))
         {
             return NotFound(ErrorResponse.BookshelfBookNotFound);
         }
-
-        DbContext.ChildBookshelfBooks.Remove(bookshelfBook);
+        
+        Book book = DbContext.Books.Find(bookId)!;
+        childBookshelf.Books.Remove(book);
         DbContext.SaveChanges();
         
         return Details(childId, bookshelfName);
@@ -316,7 +318,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
 
         Child? child = DbContext.Children
             .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.BookshelfBooks)
+            .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
         if (child is null)
         {
@@ -329,7 +331,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
             return NotFound(ErrorResponse.BookshelfNotFound);
         }
 
-        childBookshelf.BookshelfBooks.Clear();
+        childBookshelf.Books.Clear();
         DbContext.SaveChanges();
 
         return NoContent();
