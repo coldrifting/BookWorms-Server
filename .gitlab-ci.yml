@@ -14,6 +14,8 @@ variables:
 # When Merge Request is opened
 
 build_job:
+    rules:
+        - if: '$CI_MERGE_REQUEST_ID'
     stage: build
     image: mcr.microsoft.com/dotnet/sdk:$DOTNET_VERSION
     script:
@@ -24,10 +26,10 @@ build_job:
             - bin/
         expire_in: 1 week
     resource_group: common
-    rules:
-        - if: '$CI_MERGE_REQUEST_ID'
 
 test_job:
+    rules:
+        - if: '$CI_MERGE_REQUEST_ID'
     stage: test
     image: mcr.microsoft.com/dotnet/sdk:$DOTNET_VERSION
     services:
@@ -54,11 +56,11 @@ test_job:
     dependencies:
         - build_job # test_job depends on artifacts produced by build_job (avoids rebuilding the project)
     resource_group: common
-    rules:
-        - if: '$CI_MERGE_REQUEST_ID'
 
 # This doesn't cause the pipeline to fail if a vulnerability is found, but vulnerabilities do get printed
 dependency_scanning:
+    rules:
+        - if: '$CI_MERGE_REQUEST_ID'
     stage: security
     image: mcr.microsoft.com/dotnet/sdk:$DOTNET_VERSION
     script:
@@ -66,16 +68,14 @@ dependency_scanning:
         - dotnet restore
         - dotnet list package --vulnerable
     resource_group: common
-    rules:
-        - if: '$CI_MERGE_REQUEST_ID'
 
 
 
-# When a merge is made into dev
+# When "trigger-deploy" is included in the commit message
 
 publish_job:
-    only:
-        - main
+    rules:
+        - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
     stage: publish
     image: mcr.microsoft.com/dotnet/sdk:$DOTNET_VERSION
     script:
@@ -87,8 +87,8 @@ publish_job:
     resource_group: common
 
 prepare_job:
-    only:
-        - main
+    rules:
+        - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
     stage: prepare
     image: alpine:latest
     before_script:
@@ -120,8 +120,8 @@ prepare_job:
     resource_group: common
 
 release_job:
-    only:
-        - main
+    rules:
+        - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
     stage: release
     image: registry.gitlab.com/gitlab-org/release-cli:latest
     dependencies:
@@ -137,8 +137,8 @@ release_job:
     resource_group: common
 
 deploy_job:
-    only:
-        - main
+    rules:
+        - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
     stage: deploy
     image: alpine:latest
     dependencies:
