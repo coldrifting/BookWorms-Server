@@ -46,7 +46,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     public async Task Test_GetBookshelf_AsLoggedOutShouldError(string childId, string bookshelfName)
     {
         await CheckForError(
-            () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName)),
+            () => Client.GetAsync(Routes.Bookshelves.Details(childId, BookshelfType.Custom, bookshelfName)),
             HttpStatusCode.Unauthorized,
             ErrorResponse.Unauthorized);
     }
@@ -56,7 +56,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     public async Task Test_GetBookshelf_AsTeacherShouldError(string username, string childId, string bookshelfName)
     {
         await CheckForError(
-            () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
+            () => Client.GetAsync(Routes.Bookshelves.Details(childId, BookshelfType.Custom, bookshelfName), username),
             HttpStatusCode.Forbidden,
             ErrorResponse.UserNotParent);
     }
@@ -66,7 +66,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     public async Task Test_GetBookshelf_NoChildrenShouldError(string username, string childId, string bookshelfName)
     {
         await CheckForError(
-            () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
+            () => Client.GetAsync(Routes.Bookshelves.Details(childId, BookshelfType.Custom, bookshelfName), username),
             HttpStatusCode.NotFound,
             ErrorResponse.ChildNotFound);
     }
@@ -76,7 +76,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     public async Task Test_GetBookshelf_BookshelfNotExist_ShouldError(string username, string childId, string bookshelfName)
     {
         await CheckForError(
-            () => Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
+            () => Client.GetAsync(Routes.Bookshelves.Details(childId, BookshelfType.Custom, bookshelfName), username),
             HttpStatusCode.NotFound,
             ErrorResponse.BookshelfNotFound);
     }
@@ -113,12 +113,23 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
 
     [Theory]
     [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)")]
-    public async Task Test_AddBookshelf_BookshelfNameAlreadyExists(string username, string childId, string bookshelfName)
+    public async Task Test_AddBookshelf_BookshelfNameAlreadyExistsShouldError(string username, string childId, string bookshelfName)
     {
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName), username),
             HttpStatusCode.UnprocessableEntity,
             ErrorResponse.BookshelfAlreadyExists);
+    }
+    
+    [Theory]
+    [InlineData("parent1", Constants.Parent1Child1Id, "Completed")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "In Progress")]
+    public async Task Test_AddBookshelf_BookshelfNameReservedShouldError(string username, string childId, string bookshelfName)
+    {
+        await CheckForError(
+            () => Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName), username),
+            HttpStatusCode.UnprocessableEntity,
+            ErrorResponse.BookshelfNameReserved(bookshelfName));
     }
 
     [Theory]
@@ -183,7 +194,10 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
 
     [Theory]
     [InlineData("parent1", Constants.Parent1Child1Id, "invalidBookshelf", "newBookshelfName")]
-    public async Task Test_RenameBookshelf_BookshelfNotExist(string username, string childId, string bookshelfName, string newBookshelfName)
+    [InlineData("parent1", Constants.Parent1Child1Id, "Completed", "newBookshelfName")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "In Progress", "newBookshelfName")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "Class Books", "newBookshelfName")]
+    public async Task Test_RenameBookshelf_BookshelfNotExistShouldError(string username, string childId, string bookshelfName, string newBookshelfName)
     {
         await CheckForError(
             () => Client.PostAsync(Routes.Bookshelves.Rename(childId, bookshelfName, newBookshelfName), username),
@@ -232,6 +246,16 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     }
 
     [Theory]
+    [InlineData("parent5", Constants.Parent5Child1Id, "OL3368273W")]
+    public async Task Test_BookshelfInsert_Completed_NoRating_ShouldError(string username, string childId, string bookId)
+    {
+        await CheckForError(
+            () => Client.PutAsync(Routes.Bookshelves.Insert(childId, "Completed", bookId), username),
+            HttpStatusCode.UnprocessableEntity,
+            ErrorResponse.StarRatingRequired);
+    }
+    
+    [Theory]
     [InlineData("teacher1", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", "OL3368273W")]
     public async Task Test_BookshelfRemove_NotParent_ShouldError(string username, string childId, string bookshelfName, string bookId)
     {
@@ -254,6 +278,9 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
 
     [Theory]
     [InlineData("parent1", Constants.Parent1Child1Id, "Ryn's Empty Bookshelf")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "Completed")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "In Progress")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "Class Books")]
     public async Task Test_BookshelfDelete_BookshelfNotFound_ShouldError(string username, string childId, string bookshelfName)
     {
         await CheckForError(
@@ -323,13 +350,17 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     }
     
     [Theory]
-    [InlineData("parent5", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", 0)]
-    [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", 1)]
-    [InlineData("parent2", Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent2)", 3)]
-    public async Task Test_GetBookshelfDetails_Basic(string username, string childId, string bookshelfName, int expectedBooks)
+    [InlineData("parent2", Constants.Parent2Child1Id, BookshelfType.Custom, "Evelyn's bookshelf (Parent2)", 3)]
+    [InlineData("parent4", Constants.Parent4Child1Id, BookshelfType.Custom, "Madison's collection", 1)]
+    [InlineData("parent5", Constants.Parent5Child1Id, BookshelfType.Custom, "Ryn's Empty Bookshelf", 0)]
+    [InlineData("parent4", Constants.Parent4Child1Id, BookshelfType.Completed, "Completed", 3)]
+    [InlineData("parent4", Constants.Parent4Child1Id, BookshelfType.InProgress, "In Progress", 3)]
+    [InlineData("parent4", Constants.Parent4Child1Id, BookshelfType.Classroom, "History Readings", 2)]
+    [InlineData("parent4", Constants.Parent4Child1Id, BookshelfType.Classroom, "Empty Readings", 0)]
+    public async Task Test_GetBookshelfDetails_Basic(string username, string childId, BookshelfType bookshelfType, string bookshelfName, int expectedBooks)
     {
         await CheckResponse<BookshelfResponse>(
-            async () => await Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfName), username),
+            async () => await Client.GetAsync(Routes.Bookshelves.Details(childId, bookshelfType, bookshelfName), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
@@ -348,7 +379,6 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     
     [Theory]
     [InlineData("parent5", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", 0)]
-    [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", 1)]
     [InlineData("parent2", Constants.Parent2Child1Id, "Evelyn's bookshelf (Parent2)", 3)]
     public async Task Test_GetAllBookshelves_Basic(string username, string childId, string bookshelfName, int expectedBooks)
     {
@@ -356,11 +386,12 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             async () => await Client.GetAsync(Routes.Bookshelves.All(childId), username),
             HttpStatusCode.OK,
             content => {
-                Assert.Single(content);
-                Assert.NotNull(content[0]);
-                Assert.Equal(bookshelfName, content[0].Name);
-                Assert.Equal(expectedBooks, content[0].Books.Count);
-                Assert.True(content[0].Books.Count <= 3, "Expected num of books per list to be less than 3");
+                Assert.Equal(3, content.Count);
+                Assert.NotNull(content[2]);
+                Assert.Equal(BookshelfType.Custom, content[2].Type);
+                Assert.Equal(bookshelfName, content[2].Name);
+                Assert.Equal(expectedBooks, content[2].Books.Count);
+                Assert.True(content[2].Books.Count <= 3, "Expected num of books per list to be no more than 3");
                 foreach (var b in content[0].Books)
                 {
                     Assert.NotNull(b.BookId);
@@ -384,7 +415,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             async () => await Client.GetAsync(Routes.Bookshelves.All(childId), username),
             HttpStatusCode.OK,
             content => {
-                Assert.Equal(2, content.Count);
+                Assert.Equal(4, content.Count);
                 Assert.Contains(content, c => c.Name == bookshelfName && c.Books.Count == expectedBooks);
             });
     }
@@ -412,15 +443,14 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             async () => await Client.PostAsync(Routes.Bookshelves.Add(childId, bookshelfName), username),
             HttpStatusCode.OK,
             content => {
-                Assert.Single(content);
-                Assert.NotNull(content[0]);
-                Assert.Equal(content[0].Name, bookshelfName);
-                Assert.Empty(content[0].Books);
+                Assert.Equal(5, content.Count); // C + IP + 2 custom + 1 classroom
+                Assert.NotNull(content[2]);
+                Assert.Equal(BookshelfType.Custom, content[2].Type);
+                Assert.Equal(bookshelfName, content[2].Name);
+                Assert.Empty(content[2].Books);
             });
 
-        List<ChildBookshelf> shelves = Context.ChildBookshelves
-            .Where(c => c.ChildId == childId)
-            .Include(childBookshelf => childBookshelf.Books).ToList(); 
+        List<ChildBookshelf> shelves = GetChildBookshelves(childId);
         Assert.Single(shelves);
         Assert.NotNull(shelves[0]);
         Assert.Equal(shelves[0].Name, bookshelfName);
@@ -460,10 +490,11 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             async () => await Client.PostAsync(Routes.Bookshelves.Add(child1Id, bookshelfName1), username1),
             HttpStatusCode.OK,
             content => {
-                Assert.Single(content);
-                Assert.NotNull(content[0]);
-                Assert.Equal(content[0].Name, bookshelfName1);
-                Assert.Empty(content[0].Books);
+                Assert.Equal(3, content.Count);
+                Assert.NotNull(content[2]);
+                Assert.Equal(BookshelfType.Custom, content[2].Type);
+                Assert.Equal(bookshelfName1, content[2].Name);
+                Assert.Empty(content[2].Books);
             });
 
         // Insert a book to distinguish the two 
@@ -473,31 +504,34 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             async () => await Client.PostAsync(Routes.Bookshelves.Add(child2Id, bookshelfName2), username2),
             HttpStatusCode.OK,
             content => {
-                Assert.Single(content);
-                Assert.NotNull(content[0]);
-                Assert.Equal(content[0].Name, bookshelfName2);
-                Assert.Empty(content[0].Books);
+                Assert.Equal(3, content.Count);
+                Assert.NotNull(content[2]);
+                Assert.Equal(BookshelfType.Custom, content[2].Type);
+                Assert.Equal(bookshelfName2, content[2].Name);
+                Assert.Empty(content[2].Books);
             });
         
         await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.GetAsync(Routes.Bookshelves.All(child1Id), username1),
             HttpStatusCode.OK,
             content => {
-                Assert.Single(content);
+                Assert.Equal(3, content.Count);
                 Assert.NotNull(content[0]);
-                Assert.Equal(content[0].Name, bookshelfName1);
-                Assert.Single(content[0].Books);
-                Assert.Contains(content[0].Books, c => c.BookId == bookId);
+                Assert.Equal(BookshelfType.Custom, content[2].Type);
+                Assert.Equal(bookshelfName1, content[2].Name);
+                Assert.Single(content[2].Books);
+                Assert.Contains(content[2].Books, c => c.BookId == bookId);
             });
         
         await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.GetAsync(Routes.Bookshelves.All(child2Id), username2),
             HttpStatusCode.OK,
             content => {
-                Assert.Single(content);
-                Assert.NotNull(content[0]);
-                Assert.Equal(content[0].Name, bookshelfName2);
-                Assert.Empty(content[0].Books);
+                Assert.Equal(3, content.Count);
+                Assert.NotNull(content[2]);
+                Assert.Equal(BookshelfType.Custom, content[2].Type);
+                Assert.Equal(bookshelfName2, content[2].Name);
+                Assert.Empty(content[2].Books);
             });
     }
 
@@ -508,7 +542,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
             HttpStatusCode.OK,
-            Assert.Empty);
+            content => Assert.Equal(3, content.Count)); // C + IP + 1 classroom
     }
 
     [Theory]
@@ -518,7 +552,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(childId, bookshelfName), username),
             HttpStatusCode.OK,
-            Assert.Empty);
+            content => Assert.Equal(3, content.Count)); // C + IP + 1 classroom
     }
 
     [Theory]
@@ -532,10 +566,11 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(childId, existingBookshelf), username),
             HttpStatusCode.OK,
             content => {
-                Assert.Single(content);
-                Assert.NotNull(content[0]);
-                Assert.Equal(content[0].Name, newBookshelf);
-                Assert.Empty(content[0].Books);
+                Assert.Equal(4, content.Count); // C + IP + 1 custom + 1 classroom
+                Assert.NotNull(content[2]);
+                Assert.Equal(BookshelfType.Custom, content[2].Type);
+                Assert.Equal(newBookshelf, content[2].Name);
+                Assert.Empty(content[2].Books);
             });
     }
 
@@ -547,18 +582,17 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             async () => await Client.PostAsync(Routes.Bookshelves.Rename(childId, oldBookshelfName, newBookshelfName), username),
             HttpStatusCode.OK,
             content => {
-                Assert.Single(content);
-                Assert.NotNull(content[0]);
-                Assert.Equal(content[0].Name, newBookshelfName);
-                Assert.Equal(3, content[0].Books.Count);
+                Assert.Equal(4, content.Count); // C + IP + 1 custom + 1 classroom
+                Assert.NotNull(content[2]);
+                Assert.Equal(BookshelfType.Custom, content[2].Type);
+                Assert.Equal(newBookshelfName, content[2].Name);
+                Assert.Equal(3, content[2].Books.Count);
             });
         
-        List<ChildBookshelf> shelves = Context.ChildBookshelves
-            .Where(c => c.ChildId == childId)
-            .Include(childBookshelf => childBookshelf.Books).ToList(); 
+        List<ChildBookshelf> shelves = GetChildBookshelves(childId);
         Assert.Single(shelves);
         Assert.NotNull(shelves[0]);
-        Assert.Equal(shelves[0].Name, newBookshelfName);
+        Assert.Equal(newBookshelfName, shelves[0].Name);
         Assert.Equal(4, shelves[0].Books.Count);
     }
 
@@ -574,9 +608,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             HttpStatusCode.UnprocessableEntity,
             ErrorResponse.BookshelfAlreadyExists);
         
-        List<ChildBookshelf> shelves = Context.ChildBookshelves
-            .Where(c => c.ChildId == childId)
-            .Include(childBookshelf => childBookshelf.Books).ToList(); 
+        List<ChildBookshelf> shelves = GetChildBookshelves(childId);
         Assert.Equal(2, shelves.Count);
         Assert.Contains(shelves, b => b.Name == newBookshelfName);
         Assert.Contains(shelves, b => b.Name == oldBookshelfName);
@@ -592,19 +624,15 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             async () => await Client.PostAsync(Routes.Bookshelves.Rename(child1Id, bookshelfName1, bookshelfName2), username1),
             HttpStatusCode.OK,
             content => {
-                Assert.Single(content);
+                Assert.Equal(4, content.Count); // C + IP + 1 custom + 1 classroom
                 Assert.Contains(content, b => b.Name == bookshelfName2);
             });
         
-        List<ChildBookshelf> child1Shelves = Context.ChildBookshelves
-            .Where(c => c.ChildId == child1Id)
-            .Include(childBookshelf => childBookshelf.Books).ToList();
+        List<ChildBookshelf> child1Shelves = GetChildBookshelves(child1Id);
         Assert.Single(child1Shelves);
         Assert.Contains(child1Shelves, b => b.Name == bookshelfName2);
         
-        List<ChildBookshelf> child2Shelves = Context.ChildBookshelves
-            .Where(c => c.ChildId == child2Id)
-            .Include(childBookshelf => childBookshelf.Books).ToList();
+        List<ChildBookshelf> child2Shelves = GetChildBookshelves(child2Id);
         Assert.Single(child2Shelves);
         Assert.Contains(child2Shelves, b => b.Name == bookshelfName2);
     }
@@ -619,13 +647,11 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(child1Id, bookshelfName1), username1),
             HttpStatusCode.OK,
-            Assert.Empty);
+            content => Assert.Equal(3, content.Count)); // C + IP + 1 classroom
         
         Assert.Empty(Context.ChildBookshelves.Where(c => c.ChildId == child1Id));
         
-        List<ChildBookshelf> child2Shelves = Context.ChildBookshelves
-            .Where(c => c.ChildId == child2Id)
-            .Include(childBookshelf => childBookshelf.Books).ToList(); 
+        List<ChildBookshelf> child2Shelves = GetChildBookshelves(child2Id);
         Assert.Single(child2Shelves);
         Assert.Contains(child2Shelves, b => b.Name == bookshelfName2);
     }
@@ -640,11 +666,9 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
         await CheckResponse<List<BookshelfResponse>>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Delete(child2Id, bookshelfName), username),
             HttpStatusCode.OK,
-            Assert.Empty);
+            content => Assert.Equal(4, content.Count)); // C + IP + 1 custom + 1 classroom
 
-        List<ChildBookshelf> child1Shelves = Context.ChildBookshelves
-            .Where(c => c.ChildId == child1Id)
-            .Include(childBookshelf => childBookshelf.Books).ToList(); 
+        List<ChildBookshelf> child1Shelves = GetChildBookshelves(child1Id);
         Assert.Single(child1Shelves);
         Assert.Contains(child1Shelves, b => b.Name == bookshelfName);
     }
@@ -665,7 +689,9 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
 
     [Theory]
     [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", "OL3368273W", "OL48763W")]
-    public async Task Test_BookshelfInsert_NonEmptyBookshelf_BookNotAlreadyInBookshelf(string username, string childId, string bookshelfName, string bookId, string existingBookId)
+    [InlineData("parent4", Constants.Parent4Child1Id, "In Progress", "OL3368273W", "OL3368286W")]
+    public async Task Test_BookshelfInsert_NonEmptyBookshelf_BookNotAlreadyInBookshelf(string username, string childId,
+        string bookshelfName, string bookId, string existingBookId)
     {
         await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
@@ -679,29 +705,36 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
 
     [Theory]
     [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", "OL48763W")]
-    public async Task Test_BookshelfInsert_NonEmptyBookshelf_BookAlreadyInBookshelf(string username, string childId, string bookshelfName, string bookId)
+    [InlineData("parent4", Constants.Parent4Child1Id, "In Progress", "OL3368286W")]
+    public async Task Test_BookshelfInsert_NonEmptyBookshelf_BookAlreadyInBookshelf(string username, string childId,
+        string bookshelfName, string bookId)
     {
+        int initialShelfSize = GetBookshelf(childId, bookshelfName)!.Books.Count;
+        
         await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Single(content.Books);
+                Assert.Equal(initialShelfSize, content.Books.Count);
                 Assert.Contains(content.Books, b => b.BookId == bookId);
             });
     }
 
     [Theory]
     [InlineData("parent3", Constants.Parent3Child2Id, "Eric's books", "OL3368286W", "OL48763W")]
+    [InlineData("parent4", Constants.Parent4Child1Id, "In Progress", "OL3368273W", "OL286593W")]
     public async Task Test_BookshelfInsert_Multiple_NeitherAlreadyExists(string username, string childId,
         string bookshelfName, string bookId1, string bookId2)
     {
+        int initialShelfSize = GetBookshelf(childId, bookshelfName)!.Books.Count;
+        
         await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId1), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Equal(3, content.Books.Count);
+                Assert.Equal(initialShelfSize + 1, content.Books.Count);
                 Assert.Contains(content.Books, b => b.BookId == bookId1);
             });
         
@@ -710,7 +743,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Equal(4, content.Books.Count);
+                Assert.Equal(initialShelfSize + 2, content.Books.Count);
                 Assert.Contains(content.Books, b => b.BookId == bookId1);
                 Assert.Contains(content.Books, b => b.BookId == bookId2);
             });
@@ -719,6 +752,7 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     [Theory]
     [InlineData("parent3", Constants.Parent3Child2Id, "Eric's books", "OL28633459W", "OL48763W", 2, 3)]
     [InlineData("parent3", Constants.Parent3Child2Id, "Eric's books", "OL48763W", "OL28633459W", 3, 3)]
+    [InlineData("parent4", Constants.Parent4Child1Id, "In Progress", "OL3368286W", "OL3368273W", 3, 4)]
     public async Task Test_BookshelfInsert_Multiple_OneAlreadyExists(string username, string childId,
         string bookshelfName, string bookId1, string bookId2, int expectedFirst, int expectedSecond)
     {
@@ -744,15 +778,18 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
 
     [Theory]
     [InlineData("parent3", Constants.Parent3Child2Id, "Eric's books", "OL28633459W", "OL3368273W")]
+    [InlineData("parent4", Constants.Parent4Child1Id, "In Progress", "OL3368286W", "OL14912086W")]
     public async Task Test_BookshelfInsert_Multiple_BothAlreadyExists(string username, string childId,
         string bookshelfName, string bookId1, string bookId2)
     {
+        int initialShelfSize = GetBookshelf(childId, bookshelfName)!.Books.Count;
+        
         await CheckResponse<BookshelfResponse>(
             async () => await Client.PutAsync(Routes.Bookshelves.Insert(childId, bookshelfName, bookId1), username),
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Equal(2, content.Books.Count);
+                Assert.Equal(initialShelfSize, content.Books.Count);
                 Assert.Contains(content.Books, b => b.BookId == bookId1);
                 Assert.Contains(content.Books, b => b.BookId == bookId2);
             });
@@ -762,12 +799,36 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             HttpStatusCode.OK,
             content => {
                 Assert.Equal(bookshelfName, content.Name);
-                Assert.Equal(2, content.Books.Count);
+                Assert.Equal(initialShelfSize, content.Books.Count);
                 Assert.Contains(content.Books, b => b.BookId == bookId1);
                 Assert.Contains(content.Books, b => b.BookId == bookId2);
             });
     }
 
+    [Theory]
+    [InlineData("parent3", Constants.Parent3Child1Id, "OL2191470M", 2.5)]
+    [InlineData("parent3", Constants.Parent3Child2Id, "OL28633459W", 2.5)]
+    [InlineData("parent3", Constants.Parent3Child3Id, "OL8843356W", 2.5)]
+    public async Task Test_BookshelfInsert_Completed(string username, string childId, string bookId, double starRating)
+    {
+        Bookshelf bookshelf = GetBookshelf(childId, "Completed")!;
+        int initialShelfSize = bookshelf.Books.Count;
+        
+        await CheckResponse<BookshelfResponse>(
+            async () => await Client.PutAsync(Routes.Bookshelves.InsertCompleted(childId, "Completed", bookId, starRating), username),
+            HttpStatusCode.OK,
+            content => {
+                Assert.Equal("Completed", content.Name);
+                Assert.Equal(initialShelfSize + 1, content.Books.Count);
+                Assert.Contains(content.Books, b => b.BookId == bookId);
+            });
+        
+        List<CompletedBookshelfBook> shelving = Context.CompletedBookshelfBooks
+            .Where(b => b.BookId == bookId && b.BookshelfId == bookshelf.BookshelfId)
+            .ToList();
+        Assert.NotNull(shelving);
+        Assert.Single(shelving); }
+    
     [Theory]
     [InlineData("parent4", Constants.Parent4Child1Id, "Madison's collection", "OL48763W")]
     public async Task Test_RemoveBookshelfItem_SingleItemInBookshelf(string username, string childId, string bookshelfName,
@@ -787,30 +848,65 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
     [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "OL48763W")]
     [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "OL28633459W")]
     [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)", "OL3368286W")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "Completed", "OL28633459W")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "Completed", "OL8843356W")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "Completed", "OL3368288W")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "In Progress", "OL286593W")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "In Progress", "OL48763W")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "In Progress", "OL2191470M")]
     public async Task Test_RemoveBookshelfItem_MultipleItemsInBookshelf(string username, string childId, string bookshelfName,
         string bookId)
     {
+        int initialShelfSize = GetBookshelf(childId, bookshelfName)!.Books.Count;
+        
         await CheckResponse<BookshelfResponse>(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Remove(childId, bookshelfName, bookId), username),
             HttpStatusCode.OK,
             content => {
-                Assert.Equal(3, content.Books.Count);
+                Assert.Equal(initialShelfSize - 1, content.Books.Count);
                 Assert.DoesNotContain(content.Books, c => c.BookId == bookId);
             });
     }
 
     [Theory]
     [InlineData("parent1", Constants.Parent1Child1Id, "Evelyn's bookshelf (Parent1)")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "Completed")]
+    [InlineData("parent1", Constants.Parent1Child1Id, "In Progress")]
     public async Task Test_ClearBookshelf_Basic(string username, string childId, string bookshelfName)
     {
         await CheckResponse(
             async () => await Client.DeleteAsync(Routes.Bookshelves.Clear(childId, bookshelfName), username), 
             HttpStatusCode.NoContent);
 
-        ChildBookshelf? shelf = Context.ChildBookshelves
-            .Include(childBookshelf => childBookshelf.Books)
-            .FirstOrDefault(cb => cb.Name == bookshelfName && cb.ChildId == childId);  
+        Bookshelf? shelf = GetBookshelf(childId, bookshelfName); 
         Assert.NotNull(shelf);
         Assert.Empty(shelf.Books);
+    }
+    
+    
+    // Helpers
+
+    private List<ChildBookshelf> GetChildBookshelves(string childId)
+    {
+        return Context.ChildBookshelves
+            .Where(c => c.ChildId == childId)
+            .Include(childBookshelf => childBookshelf.Books).ToList(); 
+    }
+
+    private Bookshelf? GetBookshelf(string childId, string bookshelfName)
+    {
+        return bookshelfName switch
+        {
+            "Completed" => this.Context.CompletedBookshelves
+                .Include(b => b.Books)
+                .FirstOrDefault(b => b.ChildId == childId),
+            "In Progress" => this.Context.InProgressBookshelves
+                .Include(b => b.Books)
+                .FirstOrDefault(b => b.ChildId == childId),
+            _ => this.Context.Children
+                .SelectMany(c => c.Bookshelves)
+                .Include(b => b.Books)
+                .FirstOrDefault(b => b.ChildId == childId && b.Name == bookshelfName)
+        };
     }
 }

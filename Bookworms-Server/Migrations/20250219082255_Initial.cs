@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -179,8 +179,6 @@ namespace BookwormsServer.Migrations
                 {
                     BookshelfId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     ChildId = table.Column<string>(type: "char(22)", maxLength: 22, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -231,8 +229,6 @@ namespace BookwormsServer.Migrations
                 {
                     BookshelfId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     ChildId = table.Column<string>(type: "char(22)", maxLength: 22, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },

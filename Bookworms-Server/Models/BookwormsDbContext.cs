@@ -31,26 +31,71 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+	    // [CompletedBookshelf] M----M [Book]   using CompletedBookshelfBook
 	    modelBuilder.Entity<CompletedBookshelf>()
 		    .HasMany(completedBookshelf => completedBookshelf.Books)
 		    .WithMany(book => book.CompletedBookshelves)
 		    .UsingEntity<CompletedBookshelfBook>();
 	    
+	    modelBuilder.Entity<CompletedBookshelfBook>()
+		    .HasOne(cbb => cbb.Bookshelf)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookshelfId);
+	    
+	    modelBuilder.Entity<CompletedBookshelfBook>()
+		    .HasOne(cbb => cbb.Book)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookId);
+	    
+	    // [InProgressBookshelf] M----M [Book]   using InProgressBookshelfBook
 	    modelBuilder.Entity<InProgressBookshelf>()
 		    .HasMany(inProgressBookshelf => inProgressBookshelf.Books)
 		    .WithMany(book => book.InProgressBookshelves)
 		    .UsingEntity<InProgressBookshelfBook>();
 	    
+	    modelBuilder.Entity<InProgressBookshelfBook>()
+		    .HasOne(ipbb => ipbb.Bookshelf)
+		    .WithMany()
+		    .HasForeignKey(ipbb => ipbb.BookshelfId);
+	    
+	    modelBuilder.Entity<InProgressBookshelfBook>()
+		    .HasOne(ipbb => ipbb.Book)
+		    .WithMany()
+		    .HasForeignKey(ipbb => ipbb.BookId);
+	    
+	    // [ChildBookshelf] M----M [Book]   using ChildBookshelfBook
 	    modelBuilder.Entity<ChildBookshelf>()
 		    .HasMany(childBookshelf => childBookshelf.Books)
 		    .WithMany(book => book.ChildBookshelves)
 		    .UsingEntity<ChildBookshelfBook>();
 	    
+	    modelBuilder.Entity<ChildBookshelfBook>()
+		    .HasOne(cbb => cbb.Bookshelf)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookshelfId);
+	    
+	    modelBuilder.Entity<ChildBookshelfBook>()
+		    .HasOne(cbb => cbb.Book)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookId);
+
+	    // [ClassroomBookshelf] M----M [Book]   using ClassroomBookshelfBook
 	    modelBuilder.Entity<ClassroomBookshelf>()
 		    .HasMany(classroomBookshelf => classroomBookshelf.Books)
 		    .WithMany(book => book.ClassroomBookshelves)
 		    .UsingEntity<ClassroomBookshelfBook>();
 	    
+	    modelBuilder.Entity<ClassroomBookshelfBook>()
+		    .HasOne(cbb => cbb.Bookshelf)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookshelfId);
+	    
+	    modelBuilder.Entity<ClassroomBookshelfBook>()
+		    .HasOne(cbb => cbb.Book)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookId);
+	    
+	    // [Child] M----M [Classroom]   using ClassroomChild
 	    modelBuilder.Entity<Child>()
 		    .HasMany(child => child.Classrooms)
 		    .WithMany(classroom => classroom.Children)
@@ -76,6 +121,10 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	    Seed<Review>();
 		    
 	    Seed<Child>();
+	    Seed<CompletedBookshelf>();
+	    Seed<CompletedBookshelfBook>();
+	    Seed<InProgressBookshelf>();
+	    Seed<InProgressBookshelfBook>();
 	    Seed<ChildBookshelf>();
 	    Seed<ChildBookshelfBook>();
 

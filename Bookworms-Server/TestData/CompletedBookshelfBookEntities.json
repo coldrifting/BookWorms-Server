@@ -1,0 +1,122 @@
+﻿[
+  {
+    "bookshelfId": 1,
+    "bookId": "OL28633459W",
+    "starRating": 1.0
+  },
+  {
+    "bookshelfId": 1,
+    "bookId": "OL8843356W",
+    "starRating": 2.5
+  },
+  {
+    "bookshelfId": 1,
+    "bookId": "OL3368288W",
+    "starRating": 4.0
+  },
+  {
+    "bookshelfId": 2,
+    "bookId": "OL3368273W",
+    "starRating": 1.0
+  },
+  {
+    "bookshelfId": 2,
+    "bookId": "OL892371W",
+    "starRating": 4.0
+  },
+  {
+    "bookshelfId": 2,
+    "bookId": "OL47935W",
+    "starRating": 0.5
+  },
+  {
+    "bookshelfId": 3,
+    "bookId": "OL892371W",
+    "starRating": 5.0
+  },
+  {
+    "bookshelfId": 3,
+    "bookId": "OL8843356W",
+    "starRating": 5.0
+  },
+  {
+    "bookshelfId": 3,
+    "bookId": "OL286593W",
+    "starRating": 5.0
+  },
+  {
+    "bookshelfId": 4,
+    "bookId": "OL3368273W",
+    "starRating": 0.0
+  },
+  {
+    "bookshelfId": 4,
+    "bookId": "OL3368286W",
+    "starRating": 3.0
+  },
+  {
+    "bookshelfId": 4,
+    "bookId": "OL892371W",
+    "starRating": 1.5
+  },
+  {
+    "bookshelfId": 5,
+    "bookId": "OL2191470M",
+    "starRating": 1.5
+  },
+  {
+    "bookshelfId": 5,
+    "bookId": "OL3368273W",
+    "starRating": 1.5
+  },
+  {
+    "bookshelfId": 5,
+    "bookId": "OL26571192W",
+    "starRating": 3.0
+  },
+  {
+    "bookshelfId": 6,
+    "bookId": "OL3368273W",
+    "starRating": 4.5
+  },
+  {
+    "bookshelfId": 6,
+    "bookId": "OL28633459W",
+    "starRating": 4.0
+  },
+  {
+    "bookshelfId": 6,
+    "bookId": "OL286593W",
+    "starRating": 4.0
+  },
+  {
+    "bookshelfId": 7,
+    "bookId": "OL8843356W",
+    "starRating": 3.5
+  },
+  {
+    "bookshelfId": 7,
+    "bookId": "OL47935W",
+    "starRating": 3.0
+  },
+  {
+    "bookshelfId": 7,
+    "bookId": "OL28633459W",
+    "starRating": 3.5
+  },
+  {
+    "bookshelfId": 8,
+    "bookId": "OL28633459W",
+    "starRating": 4.0
+  },
+  {
+    "bookshelfId": 8,
+    "bookId": "OL21025297W",
+    "starRating": 0.0
+  },
+  {
+    "bookshelfId": 8,
+    "bookId": "OL286593W",
+    "starRating": 0.0
+  }
+]

@@ -215,9 +215,18 @@ public static class SwaggerExamples
         {
             return
             [
-                new("Some Books", [new("bookId1", "Title1", ["Author1"]), new("bookId2", "Title2", ["Author2"]), new("bookId3", "Title3", ["Author3", "Author10"])]),
-                new("Not many Books", []),
-                new("Some More Books", [new("bookId1", "Title", ["Author1"])])
+                new(BookshelfType.Completed, "Completed", [
+                        new("bookId1", "Title1", ["Author1"]),
+                        new("bookId2", "Title2", ["Author2"]),
+                        new("bookId3", "Title3", ["Author3", "Author10"])
+                    ]),
+                new(BookshelfType.InProgress, "In Progress", []),
+                new(BookshelfType.Custom, "Some other books", [
+                    new("bookId1", "Title1", ["Author1"])
+                ]),
+                new(BookshelfType.Classroom, "Mrs. Smith's Class Reading List", [
+                    new("bookId4", "Title4", ["Author4"])
+                ])
             ];
         }
     }
@@ -226,7 +235,7 @@ public static class SwaggerExamples
     {
         public BookshelfResponse GetExamples()
         {
-            return new("Bookshelf Name",
+            return new(BookshelfType.Custom, "Bookshelf Name",
             [
                 new("bookId1", "Title", ["Author1"]), 
                 new("bookId2", "Title", ["Author2"]), 
@@ -243,11 +252,11 @@ public static class SwaggerExamples
         public ClassroomChildResponse GetExamples()
         {
             return new("ABC123", "Ava's Class", "Mrs. Ava", [
-                new("Reading List", 
+                new(BookshelfType.Classroom, "Reading List", 
                 [
                     new("bookId1", "Title", ["Author1"])
                 ]),
-                new("Advanced Reading",
+                new(BookshelfType.Classroom, "Advanced Reading",
                 [
                     new("bookId2", "Title", ["Author2"]), 
                     new("bookId3", "Title", ["Author3", "Author10"])
@@ -263,18 +272,18 @@ public static class SwaggerExamples
             return
             [
                 new("ABC123", "Ava's Class", "Mrs. Ava", [
-                    new("Reading List",
+                    new(BookshelfType.Classroom, "Reading List",
                     [
                         new("bookId1", "Title", ["Author1"])
                     ]),
-                    new("Advanced Reading",
+                    new(BookshelfType.Classroom, "Advanced Reading",
                     [
                         new("bookId2", "Title", ["Author2"]),
                         new("bookId3", "Title", ["Author3", "Author10"])
                     ])
                 ]),
                 new("ALP234", "Mustard's Class", "Mr. Mustard", [
-                    new("Rad Reading List",
+                    new(BookshelfType.Classroom, "Rad Reading List",
                     [
                         new("bookId1", "Title", ["Author1"])
                     ])
@@ -294,11 +303,11 @@ public static class SwaggerExamples
                     new("childId3", "Sadie", 2, 72, new(2018, 05, 28))
                 ], 
                 [
-                new("Reading List", 
+                new(BookshelfType.Classroom, "Reading List", 
                 [
                     new("bookId1", "Title", ["Author1"])
                 ]),
-                new("Advanced Reading",
+                new(BookshelfType.Classroom, "Advanced Reading",
                 [
                     new("bookId2", "Title", ["Author2"]), 
                     new("bookId3", "Title", ["Author3", "Author10"])

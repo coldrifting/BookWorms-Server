@@ -1,13 +1,27 @@
 namespace BookwormsServer.Models.Data;
 
-public class BookshelfResponse(string name, List<BookResponsePreview> books)
+public enum BookshelfType
 {
+    Completed,
+    InProgress,
+    Custom,
+    Classroom
+} 
+
+public class BookshelfResponse(BookshelfType type, string name, List<BookResponsePreview> books)
+{
+    public BookshelfType Type { get; } = type;
     public string Name { get; } = name;
     public List<BookResponsePreview> Books { get; } = books;
 
     public override bool Equals(object? other)
     {
         if (other is not BookshelfResponse otherBookshelfPreview)
+        {
+            return false;
+        }
+
+        if (Type != otherBookshelfPreview.Type)
         {
             return false;
         }
@@ -35,6 +49,6 @@ public class BookshelfResponse(string name, List<BookResponsePreview> books)
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Name, Books);
+        return HashCode.Combine(Type, Name, Books);
     }
 }

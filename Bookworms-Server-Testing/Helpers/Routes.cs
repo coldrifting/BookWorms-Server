@@ -1,4 +1,6 @@
-﻿namespace BookwormsServerTesting.Helpers;
+﻿using BookwormsServer.Models.Data;
+
+namespace BookwormsServerTesting.Helpers;
 
 public static class Routes
 {
@@ -18,8 +20,8 @@ public static class Routes
     {
         public static string All(string childId) =>
             $"/children/{childId}/shelves";
-        public static string Details(string childId, string bookshelfName) =>
-            $"/children/{childId}/shelves/{bookshelfName}/details";
+        public static string Details(string childId, BookshelfType bookshelfType, string bookshelfName) =>
+            $"/children/{childId}/shelves/{bookshelfType}/{bookshelfName}/details";
         public static string Add(string childId, string bookshelfName) =>
             $"/children/{childId}/shelves/{bookshelfName}/add";
         public static string Rename(string childId, string bookshelfName, string newName) =>
@@ -30,6 +32,8 @@ public static class Routes
             $"/children/{childId}/shelves/{bookshelfName}/clear";
         public static string Insert(string childId, string bookshelfName, string bookId) =>
             $"/children/{childId}/shelves/{bookshelfName}/insert?bookId={bookId}";
+        public static string InsertCompleted(string childId, string bookshelfName, string bookId, double starRating) =>
+            $"/children/{childId}/shelves/{bookshelfName}/insert?bookId={bookId}&starRating={starRating}";
         public static string Remove(string childId, string bookshelfName, string bookId) =>
             $"/children/{childId}/shelves/{bookshelfName}/remove?bookId={bookId}";
     }

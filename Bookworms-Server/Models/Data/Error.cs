@@ -27,8 +27,11 @@ public record ErrorResponse(string Error, string Description)
     public static ErrorResponse BookCoverNotFound => new("Book Cover Not Found",
         "Unable to find the requested book cover on external API server");
 
-    public static ErrorResponse DuplicateDifficultyRating => new("Difficulty rating already exists",
+    public static ErrorResponse DuplicateDifficultyRating => new("Difficulty Rating Already Exists",
         "A child can only rate a book's difficulty once");
+
+    public static ErrorResponse StarRatingRequired => new("Star Rating Required",
+        "A star rating is required when inserting into a Completed bookshelf");
 
     public static ErrorResponse ChildNotFound => new("Child Not Found",
        "Unable to find a child matching the requested id");
@@ -50,6 +53,9 @@ public record ErrorResponse(string Error, string Description)
 
    public static ErrorResponse BookshelfAlreadyExists => new("Bookshelf Already Exists",
        "Unable to add a bookshelf with the given name as one already exists under the selected child");
+
+   public static ErrorResponse BookshelfNameReserved(string name) => new("Bookshelf Name Reserved",
+       $"The name \"{name}\" is reserved and cannot be used for custom bookshelves");
 
    public static ErrorResponse BookshelfBookNotFound => new("Bookshelf Book Not Found",
        "Unable to find a book with the given id in this bookshelf");

@@ -36,8 +36,8 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
     // Skip-navigation (many-to-many)
     [InverseProperty("Children")] public ICollection<Classroom> Classrooms { get; set; } = null!;
 
-    public CompletedBookshelf? Completed { get; set; }
-    public InProgressBookshelf? InProgress { get; set; }
+    public CompletedBookshelf? Completed { get; set; } // 1:1 - Reference navigation to dependent
+    public InProgressBookshelf? InProgress { get; set; } // 1:1 - Reference navigation to dependent
     public ICollection<ChildBookshelf> Bookshelves { get; set; } = null!;
 
     public ChildResponse ToResponse()

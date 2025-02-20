@@ -247,11 +247,6 @@ namespace BookwormsServer.Migrations
                         .HasMaxLength(22)
                         .HasColumnType("char(22)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
                     b.HasKey("BookshelfId");
 
                     b.HasIndex("ChildId")
@@ -314,11 +309,6 @@ namespace BookwormsServer.Migrations
                         .IsRequired()
                         .HasMaxLength(22)
                         .HasColumnType("char(22)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
 
                     b.HasKey("BookshelfId");
 
