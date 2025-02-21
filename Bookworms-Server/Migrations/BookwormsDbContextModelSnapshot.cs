@@ -154,6 +154,75 @@ namespace BookwormsServer.Migrations
                     b.ToTable("ChildBookshelfBooks");
                 });
 
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassGoal", b =>
+                {
+                    b.Property<string>("ClassGoalId")
+                        .HasMaxLength(14)
+                        .HasColumnType("char");
+
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("varchar(6)");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("varchar(21)");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.HasKey("ClassGoalId");
+
+                    b.HasIndex("ClassCode");
+
+                    b.ToTable("ClassGoals");
+
+                    b.HasDiscriminator().HasValue("ClassGoal");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassGoalLog", b =>
+                {
+                    b.Property<string>("ClassGoalId")
+                        .HasMaxLength(14)
+                        .HasColumnType("char");
+
+                    b.Property<string>("ChildId")
+                        .HasMaxLength(14)
+                        .HasColumnType("char(14)");
+
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("varchar(6)");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("varchar(34)");
+
+                    b.HasKey("ClassGoalId", "ChildId");
+
+                    b.HasIndex("ClassCode", "ChildId");
+
+                    b.ToTable("ClassGoalLogs");
+
+                    b.HasDiscriminator().HasValue("ClassGoalLog");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("BookwormsServer.Models.Entities.Classroom", b =>
                 {
                     b.Property<string>("ClassroomCode")
@@ -411,6 +480,54 @@ namespace BookwormsServer.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassGoalCompletion", b =>
+                {
+                    b.HasBaseType("BookwormsServer.Models.Entities.ClassGoal");
+
+                    b.ToTable("ClassGoals");
+
+                    b.HasDiscriminator().HasValue("ClassGoalCompletion");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassGoalNumBooks", b =>
+                {
+                    b.HasBaseType("BookwormsServer.Models.Entities.ClassGoal");
+
+                    b.Property<int>("TargetNumBooks")
+                        .HasColumnType("int");
+
+                    b.ToTable("ClassGoals");
+
+                    b.HasDiscriminator().HasValue("ClassGoalNumBooks");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassGoalLogCompletion", b =>
+                {
+                    b.HasBaseType("BookwormsServer.Models.Entities.ClassGoalLog");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Progress")
+                        .HasColumnType("float");
+
+                    b.ToTable("ClassGoalLogs");
+
+                    b.HasDiscriminator().HasValue("ClassGoalLogCompletion");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassGoalLogNumBooks", b =>
+                {
+                    b.HasBaseType("BookwormsServer.Models.Entities.ClassGoalLog");
+
+                    b.Property<int>("NumBooks")
+                        .HasColumnType("int");
+
+                    b.ToTable("ClassGoalLogs");
+
+                    b.HasDiscriminator().HasValue("ClassGoalLogNumBooks");
+                });
+
             modelBuilder.Entity("BookwormsServer.Models.Entities.Admin", b =>
                 {
                     b.HasBaseType("BookwormsServer.Models.Entities.User");
@@ -477,6 +594,36 @@ namespace BookwormsServer.Migrations
                     b.Navigation("Book");
 
                     b.Navigation("Bookshelf");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassGoal", b =>
+                {
+                    b.HasOne("BookwormsServer.Models.Entities.Classroom", "Classroom")
+                        .WithMany("Goals")
+                        .HasForeignKey("ClassCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Classroom");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassGoalLog", b =>
+                {
+                    b.HasOne("BookwormsServer.Models.Entities.ClassGoal", "ClassGoal")
+                        .WithMany("GoalLogs")
+                        .HasForeignKey("ClassGoalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookwormsServer.Models.Entities.ClassroomChild", "ClassroomChild")
+                        .WithMany()
+                        .HasForeignKey("ClassCode", "ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClassGoal");
+
+                    b.Navigation("ClassroomChild");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.Classroom", b =>
@@ -653,9 +800,16 @@ namespace BookwormsServer.Migrations
                     b.Navigation("InProgress");
                 });
 
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassGoal", b =>
+                {
+                    b.Navigation("GoalLogs");
+                });
+
             modelBuilder.Entity("BookwormsServer.Models.Entities.Classroom", b =>
                 {
                     b.Navigation("Bookshelves");
+
+                    b.Navigation("Goals");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.User", b =>

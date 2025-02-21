@@ -72,6 +72,19 @@ public static class Routes
             $"/homeroom/shelves/{bookshelfName}/remove?bookId={bookId}";
     }
 
+    public static class ClassGoals
+    {
+        public const string All = "/homeroom/goals";
+        public const string Add = "/homeroom/goals/add";
+        public static string Edit(string goalId) => $"/homeroom/goals/{goalId}/edit";
+        public static string Delete(string goalId) => $"/homeroom/goals/{goalId}/delete";
+        public static string Details(string goalId) => $"/homeroom/goals/{goalId}/details";
+        public static string DetailsAll(string goalId) => $"/homeroom/goals/{goalId}/details/all";
+        
+        public static string UpdateLog(string childId, string classCode, string goalId) =>
+            $"/children/{childId}/classrooms/{classCode}/goals/{goalId}/update";
+    }
+
     public static string Search(
         string? query = null,
         string? title = null,

@@ -315,4 +315,37 @@ public static class SwaggerExamples
             ]);
         }
     }
+
+    public class ClassGoalAddRequestExample : IExamplesProvider<ClassGoalAddRequest>
+    {
+        public ClassGoalAddRequest GetExamples()
+        {
+            return new(
+                "Goal_Title",
+                DateOnly.Parse("2025-02-19"),
+                null);
+        }
+    }
+
+    public class ClassGoalEditRequestExample : IExamplesProvider<ClassGoalEditRequest>
+    {
+        public ClassGoalEditRequest GetExamples()
+        {
+            return new(
+                "New_Goal_Title",
+                DateOnly.Parse("2025-02-20"),
+                5);
+        }
+    }
+
+    public class ClassGoalLogEditRequestExample : IExamplesProvider<ClassGoalLogEditRequest>
+    {
+        public ClassGoalLogEditRequest GetExamples()
+        {
+            return new(
+                0.5f,
+                20,
+                3);
+        }
+    }
 }

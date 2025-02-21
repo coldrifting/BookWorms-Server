@@ -108,6 +108,15 @@ public static class Common
     }
     
     // Test helpers
+    public static async Task CheckForErrorBatch(List<Func<Task<HttpResponseMessage>>> requestFunc,
+        HttpStatusCode statusCode, ErrorResponse errorType)
+    {
+        foreach (Func<Task<HttpResponseMessage>> func in requestFunc)
+        {
+            await CheckForError(func, statusCode, errorType);
+        }
+    }
+    
     public static async Task CheckForError(Func<Task<HttpResponseMessage>> requestFunc, HttpStatusCode statusCode, ErrorResponse errorType)
     {
         HttpResponseMessage response = await requestFunc.Invoke();

@@ -74,4 +74,13 @@ public record ErrorResponse(string Error, string Description)
 
    public static ErrorResponse ClassroomAlreadyExists => new("Classroom Already Exists",
        "The classroom already exists for this teacher");
+   
+    public static ErrorResponse GoalNotFound => new("Goal Not Found",
+        "Could not find the requested goal");
+
+    public static ErrorResponse GoalEditInfoMissing => new("Goal Edit Info Missing",
+        "A required field was left null. Please ensure the correct info was added for the requested goal type.");
+
+    public static ErrorResponse GoalEditInfoInvalid => new("Goal Edit Info Invalid",
+        "Provided values can not be 0");
 }

@@ -28,7 +28,15 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     public DbSet<ClassroomChild> ClassroomChildren { get; set; }
     public DbSet<ClassroomBookshelf> ClassroomBookshelves { get; set; }
     public DbSet<ClassroomBookshelfBook> ClassroomBookshelfBooks { get; set; }
+
+    public DbSet<ClassGoal> ClassGoals { get; set; }
+    public DbSet<ClassGoalCompletion> ClassGoalCompletions { get; set; }
+    public DbSet<ClassGoalNumBooks> ClassGoalNumBooks { get; set; }
     
+    public DbSet<ClassGoalLog> ClassGoalLogs { get; set; }
+    public DbSet<ClassGoalLogCompletion> ClassGoalLogCompletions { get; set; }
+    public DbSet<ClassGoalLogNumBooks> ClassGoalLogNumBooks { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 	    // [CompletedBookshelf] M----M [Book]   using CompletedBookshelfBook
@@ -132,6 +140,11 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	    Seed<ClassroomChild>();
 	    Seed<ClassroomBookshelf>();
 	    Seed<ClassroomBookshelfBook>();
+
+	    Seed<ClassGoalCompletion>();
+	    Seed<ClassGoalNumBooks>();
+	    Seed<ClassGoalLogCompletion>();
+	    Seed<ClassGoalLogNumBooks>();
 	    
 	    // Fix any inconsistencies that result from inserting directly into DB
 	    foreach (Book book in Books.Include(b => b.Reviews))
@@ -151,6 +164,8 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	                           DELETE FROM ChildBookshelfBooks;
 	                           DELETE FROM ChildBookshelves;
 	                           DELETE FROM Children;
+	                           DELETE FROM ClassGoalLogs;
+	                           DELETE FROM ClassGoals;
 	                           DELETE FROM ClassroomBookshelfBooks;
 	                           DELETE FROM ClassroomBookshelves;
 	                           DELETE FROM ClassroomChildren;
