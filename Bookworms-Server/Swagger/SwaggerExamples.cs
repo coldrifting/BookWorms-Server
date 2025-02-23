@@ -216,16 +216,16 @@ public static class SwaggerExamples
             return
             [
                 new(BookshelfType.Completed, "Completed", [
-                        new("bookId1", "Title1", ["Author1"]),
-                        new("bookId2", "Title2", ["Author2"]),
-                        new("bookId3", "Title3", ["Author3", "Author10"])
+                        new("bookId1", "Title1", ["Author1"], 3.5, 30),
+                        new("bookId2", "Title2", ["Author2"], 4.0, 42),
+                        new("bookId3", "Title3", ["Author3", "Author10"], 2.5, 55)
                     ]),
                 new(BookshelfType.InProgress, "In Progress", []),
                 new(BookshelfType.Custom, "Some other books", [
-                    new("bookId1", "Title1", ["Author1"])
+                    new("bookId1", "Title1", ["Author1"], 3.5, 30)
                 ]),
                 new(BookshelfType.Classroom, "Mrs. Smith's Class Reading List", [
-                    new("bookId4", "Title4", ["Author4"])
+                    new("bookId4", "Title4", ["Author4"], 5.0, 21)
                 ])
             ];
         }
@@ -237,10 +237,10 @@ public static class SwaggerExamples
         {
             return new(BookshelfType.Custom, "Bookshelf Name",
             [
-                new("bookId1", "Title", ["Author1"]), 
-                new("bookId2", "Title", ["Author2"]), 
-                new("bookId3", "Title", ["Author3", "Author10"]),
-                new("bookId4", "Title", ["Author4"])
+                new("bookId1", "Title", ["Author1"], 3.5, 30), 
+                new("bookId2", "Title", ["Author2"], 4.0, 42), 
+                new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55),
+                new("bookId4", "Title", ["Author4"], 5.0, 21)
             ]);
         }
     }
@@ -254,12 +254,12 @@ public static class SwaggerExamples
             return new("ABC123", "Ava's Class", "Mrs. Ava", [
                 new(BookshelfType.Classroom, "Reading List", 
                 [
-                    new("bookId1", "Title", ["Author1"])
+                    new("bookId1", "Title", ["Author1"], 3.5, 30)
                 ]),
                 new(BookshelfType.Classroom, "Advanced Reading",
                 [
-                    new("bookId2", "Title", ["Author2"]), 
-                    new("bookId3", "Title", ["Author3", "Author10"])
+                    new("bookId2", "Title", ["Author2"], 4.0, 42), 
+                    new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
                 ])
             ]);
         }
@@ -274,18 +274,18 @@ public static class SwaggerExamples
                 new("ABC123", "Ava's Class", "Mrs. Ava", [
                     new(BookshelfType.Classroom, "Reading List",
                     [
-                        new("bookId1", "Title", ["Author1"])
+                        new("bookId1", "Title", ["Author1"], 3.5, 30)
                     ]),
                     new(BookshelfType.Classroom, "Advanced Reading",
                     [
-                        new("bookId2", "Title", ["Author2"]),
-                        new("bookId3", "Title", ["Author3", "Author10"])
+                        new("bookId2", "Title", ["Author2"], 4.0, 42),
+                        new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
                     ])
                 ]),
                 new("ALP234", "Mustard's Class", "Mr. Mustard", [
                     new(BookshelfType.Classroom, "Rad Reading List",
                     [
-                        new("bookId1", "Title", ["Author1"])
+                        new("bookId1", "Title", ["Author1"], 3.5, 30)
                     ])
                 ]),
             ];
@@ -305,12 +305,12 @@ public static class SwaggerExamples
                 [
                 new(BookshelfType.Classroom, "Reading List", 
                 [
-                    new("bookId1", "Title", ["Author1"])
+                    new("bookId1", "Title", ["Author1"], 3.5, 30)
                 ]),
                 new(BookshelfType.Classroom, "Advanced Reading",
                 [
-                    new("bookId2", "Title", ["Author2"]), 
-                    new("bookId3", "Title", ["Author3", "Author10"])
+                    new("bookId2", "Title", ["Author2"], 4.0, 42), 
+                    new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
                 ])
             ]);
         }

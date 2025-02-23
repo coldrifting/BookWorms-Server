@@ -73,7 +73,9 @@ public class Book(string bookId, string title, List<string> authors, string desc
         return new(
             BookId,
             Title,
-            Authors
+            Authors,
+            StarRating,
+            Level
         );
     }
     
