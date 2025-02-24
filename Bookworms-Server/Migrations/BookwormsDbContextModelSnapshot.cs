@@ -61,6 +61,9 @@ namespace BookwormsServer.Migrations
                     b.Property<int>("PublishYear")
                         .HasColumnType("int");
 
+                    b.Property<string>("SimilarBooks")
+                        .HasColumnType("longtext");
+
                     b.Property<double?>("StarRating")
                         .HasColumnType("double");
 

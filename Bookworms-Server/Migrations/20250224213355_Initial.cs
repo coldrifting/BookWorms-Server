@@ -39,7 +39,9 @@ namespace BookwormsServer.Migrations
                     Level = table.Column<int>(type: "int", nullable: true),
                     LevelIsLocked = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     StarRating = table.Column<double>(type: "double", nullable: true),
-                    TimeAdded = table.Column<DateTime>(type: "datetime(0)", nullable: true)
+                    TimeAdded = table.Column<DateTime>(type: "datetime(0)", nullable: true),
+                    SimilarBooks = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {

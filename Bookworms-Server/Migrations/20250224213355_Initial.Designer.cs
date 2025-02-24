@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookwormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
-    [Migration("20250221054049_Initial")]
+    [Migration("20250224213355_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -63,6 +63,9 @@ namespace BookwormsServer.Migrations
 
                     b.Property<int>("PublishYear")
                         .HasColumnType("int");
+
+                    b.Property<string>("SimilarBooks")
+                        .HasColumnType("longtext");
 
                     b.Property<double?>("StarRating")
                         .HasColumnType("double");

@@ -49,6 +49,8 @@ public class Book(string bookId, string title, List<string> authors, string desc
     [Column(TypeName = "datetime(0)")]
     public DateTime? TimeAdded { get; set; }
     
+    public List<string>? SimilarBooks { get; set; } = [];
+    
     // Navigation
     
     public ICollection<Review> Reviews { get; set; } = null!;
