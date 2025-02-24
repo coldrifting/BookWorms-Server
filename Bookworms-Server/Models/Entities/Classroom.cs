@@ -17,7 +17,9 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
 
     [StringLength(256, ErrorMessage = "Classroom name cannot be longer than {0} characters.")]
     public string ClassroomName { get; set; } = classroomName;
-    
+
+    public int ClassIcon { get; set; } = 0;
+
     // Navigation
     [ForeignKey(nameof(TeacherUsername))] 
     public Teacher Teacher { get; set; } = null!;
@@ -61,6 +63,7 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
         return new(
             ClassroomCode,
             ClassroomName,
+            ClassIcon,
             Children.Select(child => child.ToResponse()).ToList(),
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
@@ -71,6 +74,7 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
             ClassroomCode,
             ClassroomName,
             Teacher.LastName,
+            ClassIcon,
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
 }

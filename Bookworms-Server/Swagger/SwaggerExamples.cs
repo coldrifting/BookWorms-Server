@@ -251,7 +251,7 @@ public static class SwaggerExamples
     {
         public ClassroomChildResponse GetExamples()
         {
-            return new("ABC123", "Ava's Class", "Mrs. Ava", [
+            return new("ABC123", "Ava's Class", "Mrs. Ava", 1, [
                 new(BookshelfType.Classroom, "Reading List", 
                 [
                     new("bookId1", "Title", ["Author1"], 3.5, 30)
@@ -271,7 +271,7 @@ public static class SwaggerExamples
         {
             return
             [
-                new("ABC123", "Ava's Class", "Mrs. Ava", [
+                new("ABC123", "Ava's Class", "Mrs. Ava", 2, [
                     new(BookshelfType.Classroom, "Reading List",
                     [
                         new("bookId1", "Title", ["Author1"], 3.5, 30)
@@ -282,7 +282,7 @@ public static class SwaggerExamples
                         new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
                     ])
                 ]),
-                new("ALP234", "Mustard's Class", "Mr. Mustard", [
+                new("ALP234", "Mustard's Class", "Mr. Mustard", 1, [
                     new(BookshelfType.Classroom, "Rad Reading List",
                     [
                         new("bookId1", "Title", ["Author1"], 3.5, 30)
@@ -296,7 +296,7 @@ public static class SwaggerExamples
     {
         public ClassroomTeacherResponse GetExamples()
         {
-            return new("ABC123", "Ava's Class", 
+            return new("ABC123", "Ava's Class", 3,
                 [
                     new("childId1", "Jack", 0, 3, new(2017, 02, 15)),
                     new("childId2", "Wyatt", 1, 45, new(2019, 08, 17)),

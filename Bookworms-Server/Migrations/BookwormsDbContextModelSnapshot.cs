@@ -232,6 +232,9 @@ namespace BookwormsServer.Migrations
                         .HasMaxLength(6)
                         .HasColumnType("varchar(6)");
 
+                    b.Property<int>("ClassIcon")
+                        .HasColumnType("int");
+
                     b.Property<string>("ClassroomName")
                         .IsRequired()
                         .HasMaxLength(256)

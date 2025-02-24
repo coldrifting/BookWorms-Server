@@ -150,6 +150,7 @@ public class ClassroomParentTests(CompositeFixture fixture) : BookwormsIntegrati
                 {
                     Assert.Single(bookshelf.Books);
                 }
+                Assert.Equal(1, content.ClassIcon);
             });
         
         Assert.True(Context.ClassroomChildren.Contains(new(classCode, childId)));
