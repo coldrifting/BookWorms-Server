@@ -141,4 +141,4 @@ _NCrunch
 *.sln.DotSettings.user
 
 # Web App Static Files
-Bookworms-Server/wwwroot/PWA
+Bookworms-Server/wwwroot/app

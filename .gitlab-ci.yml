@@ -144,20 +144,36 @@ deploy_job:
     dependencies:
         - publish_job
     before_script:
-        # Install open-ssh client
-        - apk add --no-cache openssh-client
-        # Start ssh-agent
-        - eval $(ssh-agent -s)
-        # Add the private key to ssh-agent
-        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -q -
+        - |
+          # Install open-ssh client
+          apk add --no-cache openssh-client
+          # Start ssh-agent
+          eval $(ssh-agent -s)
+          # Add the private key to ssh-agent
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -q -
+          # Ensure deployment directory variable has been properly set
+          if [ -z "$DEPLOYMENT_DIR" ]; then
+            echo "ERROR: DEPLOYMENT_DIR variable is not set"
+            exit 1
+          fi
     script:
         # Replace the build artifacts in the EC2 instance, and restart the server
-        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo systemctl stop bookworms.service'
-        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo rm -rf $DEPLOYMENT_DIR/*'
+        - |
+          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST <<- EOF
+            sudo systemctl stop bookworms.service
+            cd \$(dirname "$DEPLOYMENT_DIR") || {
+              echo "ERROR: Failed to change to parent directory of deployment directory"
+              exit 1
+            }
+            find \$(basename "$DEPLOYMENT_DIR") -mindepth 1 -delete || {
+              echo "ERROR: Failed to clean deployment directory"
+              exit 1
+            }
+          EOF
         - scp -r -C out/* $EC2_USER@$EC2_HOST:$DEPLOYMENT_DIR
         - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo systemctl start bookworms.service'
     variables:
         # Don't pull the repository for this job
         GIT_STRATEGY: none
-        DEPLOYMENT_DIR: /var/www/api/
+        DEPLOYMENT_DIR: /var/www/server/
     resource_group: common

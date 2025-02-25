@@ -20,9 +20,7 @@ builder.Services.AddSystemd();
 
 // Establish database context ----------------------------------------------------------------------------------
 
-string? connectionString = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production"
-	? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
-	: builder.Configuration.GetConnectionString("DefaultConnection");
+string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<BookwormsDbContext>(opt =>
 {
 	opt.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mySqlOpt =>
@@ -49,17 +47,14 @@ builder.Services.AddControllers(opt =>
 builder.Services.AddResponseCaching();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(opt =>
 {
 	// Show padlock icon only on authenticated methods
 	opt.OperationFilter<AuthenticationFilter>();
 	
 	// Setup authorize box
-	opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
-	opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+	opt.SwaggerDoc("v1", new() { Title = "MyAPI", Version = "v1" });
+	opt.AddSecurityDefinition("Bearer", new()
 	{
 		Name = "Authorization",
 		Description = "Enter API Token Here",
@@ -102,8 +97,6 @@ builder.Services.AddAuthorization();
 // (Dependency Injections)
 
 builder.Services.AddSingleton<IBookApiService, OpenLibraryApiService>();
-// builder.Services.AddSingleton<IBookApiService, GoogleBooksApiService>();
-// builder.Services.AddSingleton<IBookApiService, TestDataApiService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
@@ -133,28 +126,36 @@ if (!app.Environment.IsProduction())
 
 // Configure the HTTP request pipeline -------------------------------------------------------------------------
 
-app.UseSwagger();
-app.UseSwaggerUI(opt =>
+// Redirect to API or App from base URL depending on if production or development
+app.Use((context, next) =>
 {
-	// Use Dark theme
-	opt.InjectStylesheet("/Swagger/Themes/_base.css");
-	opt.InjectStylesheet("/Swagger/Themes/one-dark.css");
-	opt.InjectStylesheet("/Swagger/Themes/one-light.css");
+	var url = context.Request.Path.Value;
+	if (url is "/" or "/index.html")
+	{
+		context.Request.Path = app.Environment.IsProduction()
+			? "/app/index.html"
+			: "/api/index.html";
+	}
+
+	return next();
+});
+
+// Use short urls
+app.Use((context, next) =>
+{
+	var url = context.Request.Path.Value;
 	
-	// Other style tweaks
-	opt.InjectStylesheet("/Swagger/Themes/_custom.css");
-	opt.InjectJavascript("/Swagger/AuthorizationTweaks.js");
-	opt.InjectJavascript("/Swagger/ResponseTweaks.js");
-    
-	// Use Root URL
-	opt.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-	opt.RoutePrefix = string.Empty;
-    
-	// Minimize Schemas at bottom of page by default
-	opt.DefaultModelsExpandDepth(0);
-    
-	// Enable Try it out mode by default
-	opt.EnableTryItOutByDefault();
+	if (url is "/api" or "/api/" or "/api/index.html")
+	{
+		context.Request.Path = "/swagger/index.html";
+	}
+
+	if (url is "/app" or "/app/" or "/app/index.html")
+	{
+		context.Request.Path = "/app/index.html";
+	}
+	
+	return next();
 });
 
 // Don't bother with static files and other web stuff in Staging, which is only used for running tests
@@ -169,11 +170,13 @@ if (!app.Environment.IsStaging())
 		.AllowCredentials());
 	
 	app.UseHttpsRedirection();
-	app.UseDefaultFiles();
 	app.UseStaticFiles();
 	app.UseAuthentication();
 	app.UseAuthorization();
 }
+
+// Generate Swagger json API file (But generate manually with static files)
+app.UseSwagger();
 
 // Enable endpoint caching
 app.UseResponseCaching();
