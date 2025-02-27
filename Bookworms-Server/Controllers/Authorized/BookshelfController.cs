@@ -226,7 +226,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        if (GetChildWithSpecifiedBookshelves(childId, parent, BookshelfType.Custom, includeBooks:true) is not { } child)
+        if (GetChildWithSpecifiedBookshelves(childId, parent, bookshelfType, includeBooks:true) is not { } child)
         {
             return NotFound(ErrorResponse.ChildNotFound);
         }
