@@ -34,16 +34,19 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = DbContext.Children
-            .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.Books)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
+        Child? child = GetChildWithAllBookshelves(childId, parent);
         if (child is null)
         {
             return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        List<BookshelfResponse> shelves = child.Bookshelves.Select(cb => cb.ToResponse(3)).ToList();
+        List<BookshelfResponse> shelves = [
+            child.Completed!.ToResponse(3),
+            child.InProgress!.ToResponse(3)
+        ];
+        shelves.AddRange(child.Bookshelves.Select(cb => cb.ToResponse(3)).ToList());
+        shelves.AddRange(child.Classrooms.SelectMany(
+            c => c.Bookshelves.Select(cb => cb.ToResponse(3)).ToList()).ToList());
         return Ok(shelves);
     }
     
@@ -54,6 +57,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     /// The bookshelf preview will contain all books in the bookshelf.
     /// </remarks>
     /// <param name="childId">The ID of the child to use for this route</param>
+    /// <param name="bookshelfType">The type of the bookshelf to get</param>
     /// <param name="bookshelfName">The name of the bookshelf to get</param>
     /// <returns>A bookshelf's name and all it's books</returns>
     /// <response code="200">Success</response>
@@ -61,34 +65,31 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     /// <response code="403">The user is not a parent</response>
     /// <response code="404">The child or bookshelf does not exist</response>
     [HttpGet]
-    [Route("/children/{childId}/shelves/{bookshelfName}/[action]")]
+    [Route("/children/{childId}/shelves/{bookshelfType}/{bookshelfName}/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookshelfResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
-    public IActionResult Details(string childId, string bookshelfName)
+    public IActionResult Details(string childId, BookshelfType bookshelfType, string bookshelfName)
     {
         if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = DbContext.Children
-            .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.Books)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
+        Child? child = GetChildWithSpecifiedBookshelves(childId, parent, bookshelfType, includeBooks:true);
         if (child is null)
         {
             return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
-        if (childBookshelf is null)
+        Bookshelf? bookshelf = GetBookshelfByName(child, bookshelfName, bookshelfType);
+        if (bookshelf is null)
         {
             return NotFound(ErrorResponse.BookshelfNotFound);
         }
 
-        return Ok(childBookshelf.ToResponse());
+        return Ok(bookshelf.ToResponse());
     }
 
     /// <summary>
@@ -116,16 +117,17 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = DbContext.Children
-            .Include(child => child.Bookshelves)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
-        if (child is null)
+        if (bookshelfName is "Completed" or "In Progress")
+        {
+            return UnprocessableEntity(ErrorResponse.BookshelfNameReserved(bookshelfName));
+        }
+
+        if (GetChildWithSpecifiedBookshelves(childId, parent, BookshelfType.Custom) is not { } child)
         {
             return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
-        if (childBookshelf is not null)
+        if (GetBookshelfByName(child, bookshelfName, BookshelfType.Custom) is ChildBookshelf)
         {
             return UnprocessableEntity(ErrorResponse.BookshelfAlreadyExists);
         }
@@ -162,22 +164,17 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = DbContext.Children
-            .Include(child => child.Bookshelves)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
-        if (child is null)
+        if (GetChildWithSpecifiedBookshelves(childId, parent, BookshelfType.Custom) is not { } child)
         {
             return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
-        if (childBookshelf is null)
+        if (GetBookshelfByName(child, bookshelfName, BookshelfType.Custom) is not ChildBookshelf childBookshelf)
         {
             return NotFound(ErrorResponse.BookshelfNotFound);
         }
         
-        ChildBookshelf? childBookshelf2 = child.Bookshelves.FirstOrDefault(cb => cb.Name == newName);
-        if (childBookshelf2 is not null)
+        if (GetBookshelfByName(child, newName, BookshelfType.Custom) is ChildBookshelf)
         {
             return UnprocessableEntity(ErrorResponse.BookshelfAlreadyExists);
         }
@@ -195,6 +192,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     /// <param name="childId">The ID of the child to use for this route</param>
     /// <param name="bookshelfName">The name of the bookshelf to insert a book into</param>
     /// <param name="bookId">The id of the book to insert</param>
+    /// <param name="starRating">The child's star rating of the book, if inserting into Completed</param>
     /// <returns>The bookshelf name and a list of all the books it contains</returns>
     /// <response code="200">The book was inserted successfully</response>
     /// <response code="401">The user is not logged in</response>
@@ -208,40 +206,61 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
-    public IActionResult Insert(string childId, string bookshelfName, [FromQuery] string bookId)
+    public IActionResult Insert(string childId, string bookshelfName, [FromQuery] string bookId, [FromQuery] double? starRating = null)
     {
+        BookshelfType bookshelfType = bookshelfName switch
+        {
+            "Completed" => BookshelfType.Completed,
+            "In Progress" => BookshelfType.InProgress,
+            _ => BookshelfType.Custom
+        };
+
+        // Okay to ignore star rating if it's provided in error, but not if it's not provided when needed
+        if (bookshelfType is BookshelfType.Completed && starRating is null)
+        {
+            return UnprocessableEntity(ErrorResponse.StarRatingRequired);
+        }
+        
         if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = DbContext.Children
-            .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.Books)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
-        if (child is null)
+        if (GetChildWithSpecifiedBookshelves(childId, parent, bookshelfType, includeBooks:true) is not { } child)
         {
             return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
-        if (childBookshelf is null)
+        if (GetBookshelfByName(child, bookshelfName, bookshelfType) is not { } bookshelf)
         {
             return NotFound(ErrorResponse.BookshelfNotFound);
         }
         
-        if (childBookshelf.Books.All(b => b.BookId != bookId))
+        if (bookshelf.Books.All(b => b.BookId != bookId))
         {
-            if (DbContext.Books.Find(bookId) is not {} book)
+            if (DbContext.Books.Find(bookId) is not { } book)
             {
                 return UnprocessableEntity(ErrorResponse.BookIdInvalid);
             }
             
-            childBookshelf.Books.Add(book);
+            bookshelf.Books.Add(book);
+            
+            // Inserting into Completed needs a bit extra to happen
+            if (bookshelfType == BookshelfType.Completed)
+            {
+                DbContext.CompletedBookshelfBooks.Add(new()
+                {
+                    BookshelfId = bookshelf.BookshelfId,
+                    BookId = book.BookId,
+                    StarRating = (double)starRating!
+                });
+                child.InProgress!.Books.Remove(book);
+            }
+            
             DbContext.SaveChanges();
         }
         
-        return Details(childId, bookshelfName);
+        return Details(childId, bookshelfType, bookshelfName);
     }
 
     /// <summary>
@@ -263,35 +282,38 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Remove(string childId, string bookshelfName, [FromQuery] string bookId)
     {
+        BookshelfType bookshelfType = bookshelfName switch
+        {
+            "Completed" => BookshelfType.Completed,
+            "In Progress" => BookshelfType.InProgress,
+            _ => BookshelfType.Custom
+        };
+
         if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = DbContext.Children
-            .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.Books)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
-        if (child is null)
+        if (GetChildWithSpecifiedBookshelves(childId, parent, bookshelfType, includeBooks:true) is not { } child)
         {
             return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        if (child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName) is not {} childBookshelf)
+        if (GetBookshelfByName(child, bookshelfName, bookshelfType) is not { } bookshelf)
         {
             return NotFound(ErrorResponse.BookshelfNotFound);
         }
         
-        if (childBookshelf.Books.All(b => b.BookId != bookId))
+        if (bookshelf.Books.All(b => b.BookId != bookId))
         {
             return NotFound(ErrorResponse.BookshelfBookNotFound);
         }
         
         Book book = DbContext.Books.Find(bookId)!;
-        childBookshelf.Books.Remove(book);
+        bookshelf.Books.Remove(book);
         DbContext.SaveChanges();
         
-        return Details(childId, bookshelfName);
+        return Details(childId, bookshelfType, bookshelfName);
     }
 
     /// <summary>
@@ -311,27 +333,29 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Clear(string childId, string bookshelfName)
     {
+        BookshelfType bookshelfType = bookshelfName switch
+        {
+            "Completed" => BookshelfType.Completed,
+            "In Progress" => BookshelfType.InProgress,
+            _ => BookshelfType.Custom
+        };
+        
         if (CurrentUser is not Parent parent)
         {
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = DbContext.Children
-            .Include(child => child.Bookshelves)
-            .ThenInclude(bookshelf => bookshelf.Books)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
-        if (child is null)
+        if (GetChildWithSpecifiedBookshelves(childId, parent, bookshelfType, includeBooks:true) is not { } child)
         {
             return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
-        if (childBookshelf is null)
+        if (GetBookshelfByName(child, bookshelfName, bookshelfType) is not { } bookshelf)
         {
             return NotFound(ErrorResponse.BookshelfNotFound);
         }
 
-        childBookshelf.Books.Clear();
+        bookshelf.Books.Clear();
         DbContext.SaveChanges();
 
         return NoContent();
@@ -342,7 +366,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     /// </summary>
     /// <param name="childId">The ID of the child to use for this route</param>
     /// <param name="bookshelfName">The name of the bookshelf to delete</param>
-    /// <returns>A list of all remaning bookshelves for the selected child</returns>
+    /// <returns>A list of all remaining bookshelves for the selected child</returns>
     /// <response code="200">Success</response>
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a parent</response>
@@ -360,17 +384,12 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
             return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
         }
 
-        Child? child = DbContext.Children
-            .Include(child => child.Bookshelves)
-            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
-        
-        if (child is null)
+        if (GetChildWithSpecifiedBookshelves(childId, parent, BookshelfType.Custom) is not { } child)
         {
             return NotFound(ErrorResponse.ChildNotFound);
         }
 
-        ChildBookshelf? childBookshelf = child.Bookshelves.FirstOrDefault(cb => cb.Name == bookshelfName);
-        if (childBookshelf is null)
+        if (GetBookshelfByName(child, bookshelfName, BookshelfType.Custom) is not ChildBookshelf childBookshelf)
         {
             return NotFound(ErrorResponse.BookshelfNotFound);
         }
@@ -379,5 +398,72 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
         DbContext.SaveChanges();
 
         return All(childId);
+    }
+    
+    
+    // Helpers
+
+    private Child? GetChildWithAllBookshelves(string childId, Parent parent)
+    {
+        return this.DbContext.Children
+            .Include(child => child.Completed)
+            .ThenInclude(bookshelf => bookshelf!.Books)
+            .Include(child => child.InProgress)
+            .ThenInclude(bookshelf => bookshelf!.Books)
+            .Include(child => child.Bookshelves)
+            .ThenInclude(bookshelf => bookshelf.Books)
+            .Include(child => child.Classrooms)
+            .ThenInclude(classroom => classroom.Bookshelves)
+            .ThenInclude(bookshelf => bookshelf.Books)
+            .FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
+    }
+
+    private Child? GetChildWithSpecifiedBookshelves(
+        string childId,
+        Parent parent,
+        BookshelfType bookshelfType,
+        bool includeBooks = false)
+    {
+        IQueryable<Child> query = this.DbContext.Children;
+
+        query = bookshelfType switch
+        {
+            BookshelfType.Completed => includeBooks
+                ? query.Include(child => child.Completed!)
+                    .ThenInclude(completed => completed.Books)
+                : query.Include(child => child.Completed!),
+            BookshelfType.InProgress => includeBooks
+                ? query.Include(child => child.InProgress!)
+                    .ThenInclude(completed => completed.Books)
+                : query.Include(child => child.InProgress!),
+            BookshelfType.Custom => includeBooks
+                ? query.Include(child => child.Bookshelves)
+                    .ThenInclude(completed => completed.Books)
+                : query.Include(child => child.Bookshelves),
+            BookshelfType.Classroom => includeBooks
+                ? query.Include(child => child.Classrooms)
+                    .ThenInclude(classroom => classroom.Bookshelves)
+                    .ThenInclude(bookshelf => bookshelf.Books)
+                : query.Include(child => child.Classrooms)
+                    .ThenInclude(classroom => classroom.Bookshelves),
+            _ => query
+        };
+
+        return query.FirstOrDefault(c => c.ChildId == childId && c.ParentUsername == parent.Username);
+    }
+
+    private static Bookshelf? GetBookshelfByName(Child child, string bookshelfName, BookshelfType bookshelfType)
+    {
+        return bookshelfType switch
+        {
+            BookshelfType.Completed => child.Completed,
+            BookshelfType.InProgress => child.InProgress,
+            BookshelfType.Custom => child.Bookshelves
+                .FirstOrDefault(b => b.Name == bookshelfName),
+            BookshelfType.Classroom => child.Classrooms
+                .SelectMany(c => c.Bookshelves)
+                .FirstOrDefault(cb => cb.Name == bookshelfName),
+            _ => null
+        };
     }
 }

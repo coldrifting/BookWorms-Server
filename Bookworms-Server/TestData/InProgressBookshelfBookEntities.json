@@ -1,0 +1,98 @@
+﻿[
+  {
+    "bookshelfId": 1,
+    "bookId": "OL286593W"
+  },
+  {
+    "bookshelfId": 1,
+    "bookId": "OL48763W"
+  },
+  {
+    "bookshelfId": 1,
+    "bookId": "OL2191470M"
+  },
+  {
+    "bookshelfId": 2,
+    "bookId": "OL21025297W"
+  },
+  {
+    "bookshelfId": 2,
+    "bookId": "OL14912086W"
+  },
+  {
+    "bookshelfId": 2,
+    "bookId": "OL3368288W"
+  },
+  {
+    "bookshelfId": 3,
+    "bookId": "OL26571192W"
+  },
+  {
+    "bookshelfId": 3,
+    "bookId": "OL28633459W"
+  },
+  {
+    "bookshelfId": 3,
+    "bookId": "OL21025297W"
+  },
+  {
+    "bookshelfId": 4,
+    "bookId": "OL26571192W"
+  },
+  {
+    "bookshelfId": 4,
+    "bookId": "OL47935W"
+  },
+  {
+    "bookshelfId": 4,
+    "bookId": "OL48763W"
+  },
+  {
+    "bookshelfId": 5,
+    "bookId": "OL3368286W"
+  },
+  {
+    "bookshelfId": 5,
+    "bookId": "OL21025297W"
+  },
+  {
+    "bookshelfId": 5,
+    "bookId": "OL3368288W"
+  },
+  {
+    "bookshelfId": 6,
+    "bookId": "OL47935W"
+  },
+  {
+    "bookshelfId": 6,
+    "bookId": "OL3368288W"
+  },
+  {
+    "bookshelfId": 6,
+    "bookId": "OL892371W"
+  },
+  {
+    "bookshelfId": 7,
+    "bookId": "OL3368286W"
+  },
+  {
+    "bookshelfId": 7,
+    "bookId": "OL14912086W"
+  },
+  {
+    "bookshelfId": 7,
+    "bookId": "OL892371W"
+  },
+  {
+    "bookshelfId": 8,
+    "bookId": "OL3368273W"
+  },
+  {
+    "bookshelfId": 8,
+    "bookId": "OL8843356W"
+  },
+  {
+    "bookshelfId": 8,
+    "bookId": "OL48763W"
+  }
+]

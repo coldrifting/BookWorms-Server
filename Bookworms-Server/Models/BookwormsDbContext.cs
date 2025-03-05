@@ -28,29 +28,86 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     public DbSet<ClassroomChild> ClassroomChildren { get; set; }
     public DbSet<ClassroomBookshelf> ClassroomBookshelves { get; set; }
     public DbSet<ClassroomBookshelfBook> ClassroomBookshelfBooks { get; set; }
+
+    public DbSet<ClassGoal> ClassGoals { get; set; }
+    public DbSet<ClassGoalCompletion> ClassGoalCompletions { get; set; }
+    public DbSet<ClassGoalNumBooks> ClassGoalNumBooks { get; set; }
     
+    public DbSet<ClassGoalLog> ClassGoalLogs { get; set; }
+    public DbSet<ClassGoalLogCompletion> ClassGoalLogCompletions { get; set; }
+    public DbSet<ClassGoalLogNumBooks> ClassGoalLogNumBooks { get; set; }
+    
+    public DbSet<ChildGoal> ChildGoals { get; set; }
+    public DbSet<ChildGoalCompletion> ChildGoalCompletions { get; set; }
+    public DbSet<ChildGoalNumBooks> ChildGoalNumBooks { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+	    // [CompletedBookshelf] M----M [Book]   using CompletedBookshelfBook
 	    modelBuilder.Entity<CompletedBookshelf>()
 		    .HasMany(completedBookshelf => completedBookshelf.Books)
 		    .WithMany(book => book.CompletedBookshelves)
 		    .UsingEntity<CompletedBookshelfBook>();
 	    
+	    modelBuilder.Entity<CompletedBookshelfBook>()
+		    .HasOne(cbb => cbb.Bookshelf)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookshelfId);
+	    
+	    modelBuilder.Entity<CompletedBookshelfBook>()
+		    .HasOne(cbb => cbb.Book)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookId);
+	    
+	    // [InProgressBookshelf] M----M [Book]   using InProgressBookshelfBook
 	    modelBuilder.Entity<InProgressBookshelf>()
 		    .HasMany(inProgressBookshelf => inProgressBookshelf.Books)
 		    .WithMany(book => book.InProgressBookshelves)
 		    .UsingEntity<InProgressBookshelfBook>();
 	    
+	    modelBuilder.Entity<InProgressBookshelfBook>()
+		    .HasOne(ipbb => ipbb.Bookshelf)
+		    .WithMany()
+		    .HasForeignKey(ipbb => ipbb.BookshelfId);
+	    
+	    modelBuilder.Entity<InProgressBookshelfBook>()
+		    .HasOne(ipbb => ipbb.Book)
+		    .WithMany()
+		    .HasForeignKey(ipbb => ipbb.BookId);
+	    
+	    // [ChildBookshelf] M----M [Book]   using ChildBookshelfBook
 	    modelBuilder.Entity<ChildBookshelf>()
 		    .HasMany(childBookshelf => childBookshelf.Books)
 		    .WithMany(book => book.ChildBookshelves)
 		    .UsingEntity<ChildBookshelfBook>();
 	    
+	    modelBuilder.Entity<ChildBookshelfBook>()
+		    .HasOne(cbb => cbb.Bookshelf)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookshelfId);
+	    
+	    modelBuilder.Entity<ChildBookshelfBook>()
+		    .HasOne(cbb => cbb.Book)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookId);
+
+	    // [ClassroomBookshelf] M----M [Book]   using ClassroomBookshelfBook
 	    modelBuilder.Entity<ClassroomBookshelf>()
 		    .HasMany(classroomBookshelf => classroomBookshelf.Books)
 		    .WithMany(book => book.ClassroomBookshelves)
 		    .UsingEntity<ClassroomBookshelfBook>();
 	    
+	    modelBuilder.Entity<ClassroomBookshelfBook>()
+		    .HasOne(cbb => cbb.Bookshelf)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookshelfId);
+	    
+	    modelBuilder.Entity<ClassroomBookshelfBook>()
+		    .HasOne(cbb => cbb.Book)
+		    .WithMany()
+		    .HasForeignKey(cbb => cbb.BookId);
+	    
+	    // [Child] M----M [Classroom]   using ClassroomChild
 	    modelBuilder.Entity<Child>()
 		    .HasMany(child => child.Classrooms)
 		    .WithMany(classroom => classroom.Children)
@@ -76,6 +133,10 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	    Seed<Review>();
 		    
 	    Seed<Child>();
+	    Seed<CompletedBookshelf>();
+	    Seed<CompletedBookshelfBook>();
+	    Seed<InProgressBookshelf>();
+	    Seed<InProgressBookshelfBook>();
 	    Seed<ChildBookshelf>();
 	    Seed<ChildBookshelfBook>();
 
@@ -83,6 +144,14 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	    Seed<ClassroomChild>();
 	    Seed<ClassroomBookshelf>();
 	    Seed<ClassroomBookshelfBook>();
+
+	    Seed<ClassGoalCompletion>();
+	    Seed<ClassGoalNumBooks>();
+	    Seed<ClassGoalLogCompletion>();
+	    Seed<ClassGoalLogNumBooks>();
+
+	    Seed<ChildGoalCompletion>();
+	    Seed<ChildGoalNumBooks>();
 	    
 	    // Fix any inconsistencies that result from inserting directly into DB
 	    foreach (Book book in Books.Include(b => b.Reviews))
@@ -102,6 +171,9 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	                           DELETE FROM ChildBookshelfBooks;
 	                           DELETE FROM ChildBookshelves;
 	                           DELETE FROM Children;
+	                           DELETE FROM ChildGoals;
+	                           DELETE FROM ClassGoalLogs;
+	                           DELETE FROM ClassGoals;
 	                           DELETE FROM ClassroomBookshelfBooks;
 	                           DELETE FROM ClassroomBookshelves;
 	                           DELETE FROM ClassroomChildren;

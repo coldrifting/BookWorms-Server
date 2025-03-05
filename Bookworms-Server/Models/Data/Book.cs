@@ -25,4 +25,6 @@ public record BookResponseExtended(
 public record BookResponsePreview(
     string BookId, 
     string Title, 
-    List<string> Authors);
+    List<string> Authors,
+    double? Rating,
+    int? Level);

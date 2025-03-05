@@ -111,6 +111,38 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     }
     
     /// <summary>
+    /// Changes the icon for the logged-in teacher's classroom
+    /// </summary>
+    /// <returns>The updated class details</returns>
+    /// <response code="200">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a teacher</response>
+    /// <response code="404">The teacher has not created a class</response>
+    [HttpPut]
+    [Route("/homeroom/[action]")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ClassroomTeacherResponse))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    public IActionResult Icon([FromQuery] int newIcon)
+    {
+        if (CurrentUser is not Teacher teacher)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+        }
+
+        if (GetClassroomRelations(teacher) is not { } classroom)
+        {
+            return NotFound(ErrorResponse.ClassroomNotFound);
+        }
+        
+        classroom.ClassIcon = newIcon;
+        DbContext.SaveChanges();
+
+        return Ok(classroom.ToResponseTeacher());
+    }
+    
+    /// <summary>
     /// Deletes the logged-in teacher's classroom
     /// </summary>
     /// <response code="204">Success</response>

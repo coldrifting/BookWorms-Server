@@ -215,9 +215,18 @@ public static class SwaggerExamples
         {
             return
             [
-                new("Some Books", [new("bookId1", "Title1", ["Author1"]), new("bookId2", "Title2", ["Author2"]), new("bookId3", "Title3", ["Author3", "Author10"])]),
-                new("Not many Books", []),
-                new("Some More Books", [new("bookId1", "Title", ["Author1"])])
+                new(BookshelfType.Completed, "Completed", [
+                        new("bookId1", "Title1", ["Author1"], 3.5, 30),
+                        new("bookId2", "Title2", ["Author2"], 4.0, 42),
+                        new("bookId3", "Title3", ["Author3", "Author10"], 2.5, 55)
+                    ]),
+                new(BookshelfType.InProgress, "In Progress", []),
+                new(BookshelfType.Custom, "Some other books", [
+                    new("bookId1", "Title1", ["Author1"], 3.5, 30)
+                ]),
+                new(BookshelfType.Classroom, "Mrs. Smith's Class Reading List", [
+                    new("bookId4", "Title4", ["Author4"], 5.0, 21)
+                ])
             ];
         }
     }
@@ -226,12 +235,12 @@ public static class SwaggerExamples
     {
         public BookshelfResponse GetExamples()
         {
-            return new("Bookshelf Name",
+            return new(BookshelfType.Custom, "Bookshelf Name",
             [
-                new("bookId1", "Title", ["Author1"]), 
-                new("bookId2", "Title", ["Author2"]), 
-                new("bookId3", "Title", ["Author3", "Author10"]),
-                new("bookId4", "Title", ["Author4"])
+                new("bookId1", "Title", ["Author1"], 3.5, 30), 
+                new("bookId2", "Title", ["Author2"], 4.0, 42), 
+                new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55),
+                new("bookId4", "Title", ["Author4"], 5.0, 21)
             ]);
         }
     }
@@ -242,15 +251,15 @@ public static class SwaggerExamples
     {
         public ClassroomChildResponse GetExamples()
         {
-            return new("ABC123", "Ava's Class", "Mrs. Ava", [
-                new("Reading List", 
+            return new("ABC123", "Ava's Class", "Mrs. Ava", 1, [
+                new(BookshelfType.Classroom, "Reading List", 
                 [
-                    new("bookId1", "Title", ["Author1"])
+                    new("bookId1", "Title", ["Author1"], 3.5, 30)
                 ]),
-                new("Advanced Reading",
+                new(BookshelfType.Classroom, "Advanced Reading",
                 [
-                    new("bookId2", "Title", ["Author2"]), 
-                    new("bookId3", "Title", ["Author3", "Author10"])
+                    new("bookId2", "Title", ["Author2"], 4.0, 42), 
+                    new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
                 ])
             ]);
         }
@@ -262,21 +271,21 @@ public static class SwaggerExamples
         {
             return
             [
-                new("ABC123", "Ava's Class", "Mrs. Ava", [
-                    new("Reading List",
+                new("ABC123", "Ava's Class", "Mrs. Ava", 2, [
+                    new(BookshelfType.Classroom, "Reading List",
                     [
-                        new("bookId1", "Title", ["Author1"])
+                        new("bookId1", "Title", ["Author1"], 3.5, 30)
                     ]),
-                    new("Advanced Reading",
+                    new(BookshelfType.Classroom, "Advanced Reading",
                     [
-                        new("bookId2", "Title", ["Author2"]),
-                        new("bookId3", "Title", ["Author3", "Author10"])
+                        new("bookId2", "Title", ["Author2"], 4.0, 42),
+                        new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
                     ])
                 ]),
-                new("ALP234", "Mustard's Class", "Mr. Mustard", [
-                    new("Rad Reading List",
+                new("ALP234", "Mustard's Class", "Mr. Mustard", 1, [
+                    new(BookshelfType.Classroom, "Rad Reading List",
                     [
-                        new("bookId1", "Title", ["Author1"])
+                        new("bookId1", "Title", ["Author1"], 3.5, 30)
                     ])
                 ]),
             ];
@@ -287,23 +296,56 @@ public static class SwaggerExamples
     {
         public ClassroomTeacherResponse GetExamples()
         {
-            return new("ABC123", "Ava's Class", 
+            return new("ABC123", "Ava's Class", 3,
                 [
                     new("childId1", "Jack", 0, 3, new(2017, 02, 15)),
                     new("childId2", "Wyatt", 1, 45, new(2019, 08, 17)),
                     new("childId3", "Sadie", 2, 72, new(2018, 05, 28))
                 ], 
                 [
-                new("Reading List", 
+                new(BookshelfType.Classroom, "Reading List", 
                 [
-                    new("bookId1", "Title", ["Author1"])
+                    new("bookId1", "Title", ["Author1"], 3.5, 30)
                 ]),
-                new("Advanced Reading",
+                new(BookshelfType.Classroom, "Advanced Reading",
                 [
-                    new("bookId2", "Title", ["Author2"]), 
-                    new("bookId3", "Title", ["Author3", "Author10"])
+                    new("bookId2", "Title", ["Author2"], 4.0, 42), 
+                    new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
                 ])
             ]);
+        }
+    }
+
+    public class ClassGoalAddRequestExample : IExamplesProvider<ClassGoalAddRequest>
+    {
+        public ClassGoalAddRequest GetExamples()
+        {
+            return new(
+                "Goal_Title",
+                DateOnly.Parse("2025-02-19"),
+                null);
+        }
+    }
+
+    public class ClassGoalEditRequestExample : IExamplesProvider<ClassGoalEditRequest>
+    {
+        public ClassGoalEditRequest GetExamples()
+        {
+            return new(
+                "New_Goal_Title",
+                DateOnly.Parse("2025-02-20"),
+                5);
+        }
+    }
+
+    public class ClassGoalLogEditRequestExample : IExamplesProvider<ClassGoalLogEditRequest>
+    {
+        public ClassGoalLogEditRequest GetExamples()
+        {
+            return new(
+                0.5f,
+                20,
+                3);
         }
     }
 }

@@ -50,6 +50,8 @@ public class ChildDetailsController(BookwormsDbContext context) : AuthController
         }
 
         Child child = new(childName, parent.Username);
+        child.Completed = new(child.ChildId);
+        child.InProgress = new(child.ChildId);
         DbContext.Children.Add(child);
 
         DbContext.SaveChanges();

@@ -1,0 +1,42 @@
+﻿[
+  {
+    "classGoalId": "413b1d8ae564c2",
+    "classCode": "BBB222",
+    "title": "Class Goal Num Books All Complete",
+    "startDate": "2025-01-01",
+    "endDate": "2025-01-31",
+    "targetNumBooks": 1
+  },
+  {
+    "classGoalId": "413b1d8ae99498",
+    "classCode": "BBB222",
+    "title": "Class Goal Num Books 1 Complete 1 In Progress",
+    "startDate": "2025-01-01",
+    "endDate": "2025-01-31",
+    "targetNumBooks": 3
+  },
+  {
+    "classGoalId": "413b1d8ae65108",
+    "classCode": "BBB222",
+    "title": "Class Goal Num Books 1 Complete",
+    "startDate": "2025-01-01",
+    "endDate": "2025-01-31",
+    "targetNumBooks": 2
+  },
+  {
+    "classGoalId": "413b1d8ae55090",
+    "classCode": "BBB222",
+    "title": "Class Goal Num Books 1 In Progress",
+    "startDate": "2025-01-01",
+    "endDate": "2025-01-31",
+    "targetNumBooks": 2
+  },
+  {
+    "classGoalId": "413b217f330ce8",
+    "classCode": "ZETA28",
+    "title": "Class Goal Num Books None In Progress",
+    "startDate": "2025-01-12",
+    "endDate": "2026-01-01",
+    "targetNumBooks": 12
+  }
+]

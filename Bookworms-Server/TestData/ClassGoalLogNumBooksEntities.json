@@ -1,0 +1,38 @@
+﻿[
+  {
+    "classGoalId": "413b1d8ae564c2",
+    "classCode": "BBB222",
+    "childId": "2bc5ae6239c988",
+    "numBooks": 2
+  },
+  {
+    "classGoalId": "413b1d8ae564c2",
+    "classCode": "BBB222",
+    "childId": "2bc5b2a4771d7f",
+    "numBooks": 1
+  },
+  {
+    "classGoalId": "413b1d8ae99498",
+    "classCode": "BBB222",
+    "childId": "2bc5ae6239c988",
+    "numBooks": 3
+  },
+  {
+    "classGoalId": "413b1d8ae99498",
+    "classCode": "BBB222",
+    "childId": "2bc5b2a4771d7f",
+    "numBooks": 1
+  },
+  {
+    "classGoalId": "413b1d8ae65108",
+    "classCode": "BBB222",
+    "childId": "2bc5b2a4771d7f",
+    "numBooks": 2
+  },
+  {
+    "classGoalId": "413b1d8ae55090",
+    "classCode": "BBB222",
+    "childId": "2bc5b2a4771d7f",
+    "numBooks": 1
+  }
+]

@@ -36,29 +36,11 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
     // Skip-navigation (many-to-many)
     [InverseProperty("Children")] public ICollection<Classroom> Classrooms { get; set; } = null!;
 
-    public CompletedBookshelf? Completed { get; set; }
-    public InProgressBookshelf? InProgress { get; set; }
+    public CompletedBookshelf? Completed { get; set; } // 1:1 - Reference navigation to dependent
+    public InProgressBookshelf? InProgress { get; set; } // 1:1 - Reference navigation to dependent
     public ICollection<ChildBookshelf> Bookshelves { get; set; } = null!;
-
-    public ChildResponse ToResponse()
-    {
-        return new(
-            ChildId,
-            Name,
-            ChildIcon,
-            ReadingLevel,
-            DateOfBirth);
-    }
     
-    public UpdatedLevelResponse ToUpdatedLevelResponse(int? oldLevel)
-    {
-        return new(
-            "child",
-            ChildId,
-            oldLevel,
-            ReadingLevel
-        );
-    }
+    public ICollection<ChildGoal> Goals { get; set; } = null!;
 
 
     public void AdjustReadingLevel(Book book, int difficultyRating)
@@ -115,5 +97,65 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
         
         // Percentage of the way between 3 yrs old and 18 yrs old
         return (int?)Math.Round(daysPastThree / fifteenYears);
+    }
+}
+
+public static class ChildExt
+{
+    public static ChildResponse ToResponse(this Child child)
+    {
+        return new(
+            child.ChildId,
+            child.Name,
+            child.ChildIcon,
+            child.ReadingLevel,
+            child.DateOfBirth);
+    }
+    
+    public static UpdatedLevelResponse ToUpdatedLevelResponse(this Child child, int? oldLevel)
+    {
+        return new(
+            "child",
+            child.ChildId,
+            oldLevel,
+            child.ReadingLevel
+        );
+    }
+
+    public static AllGoalOverviewResponse ToGoalsResponse(this Child child)
+    {
+        List<ChildGoalCompletionResponse> childCompletionGoals = [];
+        List<ChildGoalNumBooksResponse> childNumBooksGoals = [];
+        List<ClassGoalCompletionChildResponse> classCompletionGoals = [];
+        List<ClassGoalNumBooksChildResponse> classNumBooksGoals = [];
+
+        foreach (ChildGoal childGoal in child.Goals)
+        {
+            switch (childGoal)
+            {
+                case ChildGoalCompletion completion:
+                    childCompletionGoals.Add(completion.ToChildResponse());
+                    break;
+                case ChildGoalNumBooks numBooks:
+                    childNumBooksGoals.Add(numBooks.ToChildResponse());
+                    break;
+            }
+        }
+
+        var childClassGoalLogs = child.Classrooms.SelectMany(c => c.Goals);
+        foreach (ClassGoal classGoal in childClassGoalLogs)
+        {
+            switch (classGoal)
+            {
+                case ClassGoalCompletion completion:
+                    classCompletionGoals.Add(completion.ToChildResponse(child.ChildId));
+                    break;
+                case ClassGoalNumBooks numBooks:
+                    classNumBooksGoals.Add(numBooks.ToChildResponse(child.ChildId));
+                    break;
+            }
+        }
+        
+        return new(childCompletionGoals, childNumBooksGoals, classCompletionGoals, classNumBooksGoals);
     }
 }

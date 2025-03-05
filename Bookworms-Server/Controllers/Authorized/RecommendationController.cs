@@ -6,8 +6,10 @@ namespace BookwormsServer.Controllers;
 
 [Tags("Recommend")]
 [Route("/Recommend/[action]")]
-public class RecommendationController(BookwormsDbContext context, HttpClient httpClient): AuthControllerBase(context)
+public class RecommendationController(BookwormsDbContext context): AuthControllerBase(context)
 {
+    private const double PositiveReviewThreshold = 3.0;
+
     /// <summary>
     /// Gets a list of books by the same authors the user has left positive reviews for
     /// </summary>
@@ -21,10 +23,51 @@ public class RecommendationController(BookwormsDbContext context, HttpClient htt
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> SameAuthors(string? childId = null)
+    public IActionResult SameAuthors(string? childId = null)
     {
-        const string endpoint = "http://localhost:8000/recommend/same-authors";
-        return await GetRecommendedBooks(endpoint, childId);
+        if (!string.IsNullOrEmpty(childId))
+        {
+            if (CurrentUser is not Parent)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            }
+            if (CurrentUserChild(childId) is not {})
+            {
+                return NotFound(ErrorResponse.ChildNotFound);
+            }
+        }
+
+        List<string> reviewedBooks = DbContext.Reviews
+        .Where(review => review.Reviewer.Username == CurrentUser.Username)
+        .Select(review => review.BookId)
+        .ToList();
+
+        List<string> positivelyReviewedBooks = DbContext.Reviews
+        .Where(review => review.Reviewer.Username == CurrentUser.Username && review.StarRating >= PositiveReviewThreshold)
+        .Select(review => review.BookId)
+        .ToList();
+
+        List<string> sameAuthors = DbContext.Books
+        .Where(book => positivelyReviewedBooks.Contains(book.BookId))
+        .SelectMany(book => book.Authors)
+        .Distinct()
+        .ToList();
+
+        List<string> booksSameAuthors = DbContext.Books
+        .Where(book => book.Authors.Any(author => sameAuthors.Contains(author)) && !reviewedBooks.Contains(book.BookId))
+        .Select(book => book.BookId)
+        .ToList();
+
+        if (booksSameAuthors.Count > 10)
+        {
+            var random = new Random();
+            booksSameAuthors = booksSameAuthors.OrderBy(x => random.Next()).Take(10).ToList();
+        }
+
+        List<Book> books = DbContext.Books.Where(book => booksSameAuthors.Contains(book.BookId)).ToList();
+        List<BookResponse> bookResponses = books.Select(book => book.ToResponse()).ToList();
+
+        return Ok(bookResponses);
     }
 
     /// <summary>
@@ -40,41 +83,46 @@ public class RecommendationController(BookwormsDbContext context, HttpClient htt
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> SimilarDescriptions(string? childId = null)
+    public IActionResult SimilarDescriptions(string? childId = null)
     {
-        const string endpoint = "http://localhost:8000/recommend/similar-descriptions";
-        return await GetRecommendedBooks(endpoint, childId);
-    }
-
-    private async Task<IActionResult> GetRecommendedBooks(string endpoint, string? childId)
-    {
-        User user = CurrentUser;
-        string url = $"{endpoint}?username={user.Username}";
         if (!string.IsNullOrEmpty(childId))
         {
             if (CurrentUser is not Parent)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
             }
-
-            if (CurrentUserChild(childId) is not { })
+            if (CurrentUserChild(childId) is not {})
             {
                 return NotFound(ErrorResponse.ChildNotFound);
             }
-            
-            url += $"&childID={childId}";   
         }
 
-        HttpResponseMessage response = await httpClient.GetAsync(url);
+        List<string> reviewedBooks = DbContext.Reviews
+        .Where(review => review.Reviewer.Username == CurrentUser.Username)
+        .Select(review => review.BookId)
+        .ToList();
 
-        if (response.IsSuccessStatusCode)
+        List<string> positivelyReviewedBooks = DbContext.Reviews
+        .Where(review => review.Reviewer.Username == CurrentUser.Username && review.StarRating >= PositiveReviewThreshold)
+        .Select(review => review.BookId)
+        .ToList();
+
+        List<string> similarBooks = DbContext.Books
+        .Where(book => positivelyReviewedBooks.Contains(book.BookId))
+        .SelectMany(book => book.SimilarBooks ?? Enumerable.Empty<string>())
+        .Where(book => !reviewedBooks.Contains(book))
+        .Distinct()
+        .ToList();
+
+        if (similarBooks.Count > 10)
         {
-            List<string> bookIds = await response.Content.ReadFromJsonAsync<List<string>>() ?? [];
-            List<Book> books = DbContext.Books.Where(b => bookIds.Contains(b.BookId)).ToList();
-            List<BookResponse> output = books.Select(book => book.ToResponse()).ToList();
-            return Ok(output);
+            var random = new Random();
+            similarBooks = similarBooks.OrderBy(x => random.Next()).Take(10).ToList();
         }
 
-        return Ok(new List<BookResponse>());
+        List<Book> books = DbContext.Books.Where(book => similarBooks.Contains(book.BookId)).ToList();
+        List<BookResponse> bookResponses = books.Select(book => book.ToResponse()).ToList();
+
+        return Ok(bookResponses);
     }
 }
