@@ -26,7 +26,8 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
     
     public ICollection<ClassGoal> Goals { get; set; } = null!;
     public ICollection<ClassroomBookshelf> Bookshelves { get; set; } = null!;
-    
+    public ICollection<ClassroomAnnouncement> Announcements { get; set; } = null!;
+
     // Skip-navigation (many-to-many)
     public ICollection<Child> Children { get; set; } = null!;
 
@@ -65,6 +66,7 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
             ClassroomName,
             ClassIcon,
             Children.Select(child => child.ToResponse()).ToList(),
+            Announcements.Select(announcement => announcement.ToResponse()).ToList(),
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
 
@@ -75,6 +77,7 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
             ClassroomName,
             Teacher.LastName,
             ClassIcon,
+            Announcements.Select(announcement => announcement.ToResponse()).ToList(),
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
 }

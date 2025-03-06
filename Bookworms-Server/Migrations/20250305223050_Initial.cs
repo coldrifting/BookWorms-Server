@@ -307,6 +307,32 @@ namespace BookwormsServer.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "ClassroomAnnouncements",
+                columns: table => new
+                {
+                    AnnouncementId = table.Column<string>(type: "char(14)", maxLength: 14, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClassCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Title = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Body = table.Column<string>(type: "varchar(1024)", maxLength: 1024, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Time = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClassroomAnnouncements", x => x.AnnouncementId);
+                    table.ForeignKey(
+                        name: "FK_ClassroomAnnouncements_Classrooms_ClassCode",
+                        column: x => x.ClassCode,
+                        principalTable: "Classrooms",
+                        principalColumn: "ClassroomCode",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "ClassroomBookshelves",
                 columns: table => new
                 {
@@ -526,6 +552,11 @@ namespace BookwormsServer.Migrations
                 column: "ClassCode");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ClassroomAnnouncements_ClassCode",
+                table: "ClassroomAnnouncements",
+                column: "ClassCode");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ClassroomBookshelfBooks_BookId",
                 table: "ClassroomBookshelfBooks",
                 column: "BookId");
@@ -596,6 +627,9 @@ namespace BookwormsServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClassGoalLogs");
+
+            migrationBuilder.DropTable(
+                name: "ClassroomAnnouncements");
 
             migrationBuilder.DropTable(
                 name: "ClassroomBookshelfBooks");

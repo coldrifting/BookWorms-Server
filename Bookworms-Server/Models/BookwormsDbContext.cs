@@ -28,6 +28,7 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     public DbSet<ClassroomChild> ClassroomChildren { get; set; }
     public DbSet<ClassroomBookshelf> ClassroomBookshelves { get; set; }
     public DbSet<ClassroomBookshelfBook> ClassroomBookshelfBooks { get; set; }
+    public DbSet<ClassroomAnnouncement> ClassroomAnnouncements { get; set; }
 
     public DbSet<ClassGoal> ClassGoals { get; set; }
     public DbSet<ClassGoalCompletion> ClassGoalCompletions { get; set; }
@@ -144,6 +145,7 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	    Seed<ClassroomChild>();
 	    Seed<ClassroomBookshelf>();
 	    Seed<ClassroomBookshelfBook>();
+	    Seed<ClassroomAnnouncement>();
 
 	    Seed<ClassGoalCompletion>();
 	    Seed<ClassGoalNumBooks>();
@@ -174,6 +176,7 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	                           DELETE FROM ChildGoals;
 	                           DELETE FROM ClassGoalLogs;
 	                           DELETE FROM ClassGoals;
+	                           DELETE FROM ClassroomAnnouncements;
 	                           DELETE FROM ClassroomBookshelfBooks;
 	                           DELETE FROM ClassroomBookshelves;
 	                           DELETE FROM ClassroomChildren;

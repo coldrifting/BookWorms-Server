@@ -74,6 +74,9 @@ public record ErrorResponse(string Error, string Description)
 
    public static ErrorResponse ClassroomAlreadyExists => new("Classroom Already Exists",
        "The classroom already exists for this teacher");
+
+   public static ErrorResponse ClassroomAnnouncementNotFound => new("Classroom Announcement Not Found",
+       "Unable to find a classroom announcement with the specified Id");
    
     public static ErrorResponse GoalNotFound => new("Goal Not Found",
         "Could not find the requested goal");

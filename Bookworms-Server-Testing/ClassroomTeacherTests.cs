@@ -151,9 +151,9 @@ public class ClassroomTeacherTests(CompositeFixture fixture) : BookwormsIntegrat
     }
 
     [Theory]
-    [InlineData("teacher1", "Ms Johnson's Class", "ABC123", 2, 0, 1)]
-    [InlineData("teacher3", "Utah History", "UTA801", 1, 2, 3)]
-    public async Task Test_ClassDetails_Basic(string username, string className, string classCode, int numBooks, int numStudents, int classIcon)
+    [InlineData("teacher1", "Ms Johnson's Class", "ABC123", 2, 0, 1, 1)]
+    [InlineData("teacher3", "Utah History", "UTA801", 1, 2, 3, 0)]
+    public async Task Test_ClassDetails_Basic(string username, string className, string classCode, int numBooks, int numStudents, int classIcon, int numAnnouncements)
     {
         await CheckResponse<ClassroomTeacherResponse>(
             async () => await Client.GetAsync(Routes.Classrooms.Details, username),
@@ -163,6 +163,7 @@ public class ClassroomTeacherTests(CompositeFixture fixture) : BookwormsIntegrat
                 Assert.Equal(className, content.ClassroomName);
                 Assert.Equal(classCode, content.ClassCode);
                 Assert.Equal(classIcon, content.ClassIcon);
+                Assert.Equal(numAnnouncements, content.Announcements.Count);
                 Assert.Equal(numBooks, content.Bookshelves.Select(s => s.Books).Count());
                 Assert.Equal(numStudents, content.Children.Count);
             });
@@ -180,6 +181,7 @@ public class ClassroomTeacherTests(CompositeFixture fixture) : BookwormsIntegrat
                 Assert.Equal(className, content.ClassroomName);
                 Assert.NotNull(content.ClassCode);
                 Assert.Equal(6, content.ClassCode.Length);
+                Assert.Empty(content.Announcements);
                 Assert.Empty(content.Bookshelves.Select(s => s.Books));
                 Assert.Empty(content.Children);
             });

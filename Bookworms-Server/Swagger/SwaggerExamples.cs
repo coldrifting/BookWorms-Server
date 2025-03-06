@@ -251,7 +251,12 @@ public static class SwaggerExamples
     {
         public ClassroomChildResponse GetExamples()
         {
-            return new("ABC123", "Ava's Class", "Mrs. Ava", 1, [
+            return new("ABC123", "Ava's Class", "Mrs. Ava", 1, 
+                [
+                    new("AnnouncementId1", "New Announcement", "Announcement Body Text", DateTime.Today),
+                    new("AnnouncementId2", "Old Announcement", "Old Announcement Body Text", DateTime.Today)
+                ],
+                [
                 new(BookshelfType.Classroom, "Reading List", 
                 [
                     new("bookId1", "Title", ["Author1"], 3.5, 30)
@@ -271,7 +276,11 @@ public static class SwaggerExamples
         {
             return
             [
-                new("ABC123", "Ava's Class", "Mrs. Ava", 2, [
+                new("ABC123", "Ava's Class", "Mrs. Ava", 2, 
+                [
+                    new("AnnouncementId1", "New Announcement", "Announcement Body Text", DateTime.Today)
+                ],
+                [
                     new(BookshelfType.Classroom, "Reading List",
                     [
                         new("bookId1", "Title", ["Author1"], 3.5, 30)
@@ -282,7 +291,11 @@ public static class SwaggerExamples
                         new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
                     ])
                 ]),
-                new("ALP234", "Mustard's Class", "Mr. Mustard", 1, [
+                new("ALP234", "Mustard's Class", "Mr. Mustard", 1, 
+                    [
+                        new("AnnouncementId1", "New Announcement", "Announcement Body Text", DateTime.Today)
+                    ],
+                    [
                     new(BookshelfType.Classroom, "Rad Reading List",
                     [
                         new("bookId1", "Title", ["Author1"], 3.5, 30)
@@ -303,6 +316,9 @@ public static class SwaggerExamples
                     new("childId3", "Sadie", 2, 72, new(2018, 05, 28))
                 ], 
                 [
+                    new("AnnouncementId1", "New Announcement", "Announcement Body Text", DateTime.Today)
+                ],
+                [
                 new(BookshelfType.Classroom, "Reading List", 
                 [
                     new("bookId1", "Title", ["Author1"], 3.5, 30)
@@ -313,6 +329,58 @@ public static class SwaggerExamples
                     new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
                 ])
             ]);
+        }
+    }
+
+    public class ClassroomAnnouncementResponseExample : IExamplesProvider<ClassroomAnnouncementResponse>
+    {
+        public ClassroomAnnouncementResponse GetExamples()
+        {
+            return new(
+                "AnnouncementId1", 
+                "New Announcement", 
+                "Announcement Body Text", 
+                DateTime.Today);
+        }
+    }
+
+    public class ClassroomAnnouncementResponseListExample : IExamplesProvider<List<ClassroomAnnouncementResponse>>
+    {
+        public List<ClassroomAnnouncementResponse> GetExamples()
+        {
+            return [
+                new(
+                    "AnnouncementId1", 
+                    "New Announcement", 
+                    "Announcement Body Text", 
+                    DateTime.Today),
+                new(
+                    "AnnouncementId2", 
+                    "Another Announcement", 
+                    "Some more Body Text", 
+                    DateTime.Today)
+            ];
+            
+        }
+    }
+
+    public class ClassroomAnnouncementAddRequestExample : IExamplesProvider<ClassroomAnnouncementAddRequest>
+    {
+        public ClassroomAnnouncementAddRequest GetExamples()
+        {
+            return new(
+                "__announcement_title__", 
+                "__announcement_body__");
+        }
+    }
+
+    public class ClassroomAnnouncementEditRequestExample : IExamplesProvider<ClassroomAnnouncementEditRequest>
+    {
+        public ClassroomAnnouncementEditRequest GetExamples()
+        {
+            return new(
+                "__announcement_title_or_NULL_", 
+                "__announcement_body_or_NULL_");
         }
     }
 

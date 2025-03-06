@@ -36,6 +36,7 @@ public class ClassroomParentController(BookwormsDbContext context) : AuthControl
 
         List<ClassroomChildResponse> classes = DbContext.Classrooms
             .Include(c => c.Children)
+            .Include(c => c.Announcements)
             .Include(c => c.Bookshelves)
             .ThenInclude(b => b.Books)
             .Include(c => c.Teacher)
@@ -146,6 +147,7 @@ public class ClassroomParentController(BookwormsDbContext context) : AuthControl
         return DbContext.Classrooms
             .Include(classroom => classroom.Teacher)
             .Include(classroom => classroom.Children)
+            .Include(classroom => classroom.Announcements)
             .Include(classroom => classroom.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ClassroomCode == classCode);

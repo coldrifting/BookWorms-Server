@@ -69,6 +69,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
         // Manually set relations to avoid unnecessary DB join calls on new object
         Classroom newClass = new(teacher.Username, className, newClassCode)
         {
+            Announcements = new List<ClassroomAnnouncement>(),
             Children = new List<Child>(),
             Bookshelves = new List<ClassroomBookshelf>()
         };
@@ -391,6 +392,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
         return DbContext.Classrooms
             .Include(classroom => classroom.Teacher)
             .Include(classroom => classroom.Children)
+            .Include(classroom => classroom.Announcements)
             .Include(classroom => classroom.Bookshelves)
             .ThenInclude(b => b.Books)
             .FirstOrDefault(classroom => classroom.Teacher == teacher);

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookwormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
-    [Migration("20250226203157_Initial")]
+    [Migration("20250305223050_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -292,6 +292,37 @@ namespace BookwormsServer.Migrations
                         .IsUnique();
 
                     b.ToTable("Classrooms");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomAnnouncement", b =>
+                {
+                    b.Property<string>("AnnouncementId")
+                        .HasMaxLength(14)
+                        .HasColumnType("char");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)");
+
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("varchar(6)");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.HasKey("AnnouncementId");
+
+                    b.HasIndex("ClassCode");
+
+                    b.ToTable("ClassroomAnnouncements");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomBookshelf", b =>
@@ -725,6 +756,17 @@ namespace BookwormsServer.Migrations
                     b.Navigation("Teacher");
                 });
 
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomAnnouncement", b =>
+                {
+                    b.HasOne("BookwormsServer.Models.Entities.Classroom", "Classroom")
+                        .WithMany("Announcements")
+                        .HasForeignKey("ClassCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Classroom");
+                });
+
             modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomBookshelf", b =>
                 {
                     b.HasOne("BookwormsServer.Models.Entities.Classroom", "Classroom")
@@ -897,6 +939,8 @@ namespace BookwormsServer.Migrations
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.Classroom", b =>
                 {
+                    b.Navigation("Announcements");
+
                     b.Navigation("Bookshelves");
 
                     b.Navigation("Goals");

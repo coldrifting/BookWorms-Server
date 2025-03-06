@@ -32,6 +32,7 @@ public class ClassroomGoalController(BookwormsDbContext context) : AuthControlle
         Classroom? classroom = DbContext.Classrooms
             .Include(classroom => classroom.Teacher)
             .Include(classroom => classroom.Children)
+            .Include(classroom => classroom.Announcements)
             .Include(classroom => classroom.Goals)
             .ThenInclude(classGoal => classGoal.GoalLogs)
             .ThenInclude(classGoalLog => classGoalLog.ClassroomChild)
@@ -258,6 +259,7 @@ public class ClassroomGoalController(BookwormsDbContext context) : AuthControlle
         return DbContext.Classrooms
             .Include(classroom => classroom.Teacher)
             .Include(classroom => classroom.Children)
+            .Include(classroom => classroom.Announcements)
             .Include(classroom => classroom.Goals)
             .ThenInclude(classGoal => classGoal.GoalLogs)
             .ThenInclude(classGoalLog => classGoalLog.ClassroomChild)

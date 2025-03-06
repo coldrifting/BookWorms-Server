@@ -72,6 +72,15 @@ public static class Routes
             $"/homeroom/shelves/{bookshelfName}/remove?bookId={bookId}";
     }
 
+    public static class ClassAnnouncements
+    {
+        public const string All = "/homeroom/announcements/all";
+        public const string Add = "/homeroom/announcements/add";
+        public const string Clear = "/homeroom/announcements/clear";
+        public static string Edit(string announcementId) => $"/homeroom/announcements/{announcementId}/edit";
+        public static string Delete(string announcementId) => $"/homeroom/announcements/{announcementId}/delete";
+    }
+
     public static class ClassGoals
     {
         public const string All = "/homeroom/goals";
