@@ -11,6 +11,7 @@ namespace BookwormsServer.Controllers;
 
 [ApiController]
 [Tags("Book Details")]
+[Produces("application/json")]
 public class BookDetailsController(BookwormsDbContext dbContext, IBookApiService bookApiService) : ControllerBase
 {
     /// <summary>

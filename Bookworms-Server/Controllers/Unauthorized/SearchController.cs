@@ -7,6 +7,7 @@ namespace BookwormsServer.Controllers;
 
 [ApiController]
 [Tags("Search")]
+[Produces("application/json")]
 public class SearchController(BookwormsDbContext dbContext) : ControllerBase
 {
     /// <summary>

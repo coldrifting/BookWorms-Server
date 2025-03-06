@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BookwormsServer.Controllers;
 
 [Tags("Book Reviews - Unauthorized")]
+[Produces("application/json")]
 public class ReviewDetailsController(BookwormsDbContext dbContext) : ControllerBase
 {
     /// <summary>

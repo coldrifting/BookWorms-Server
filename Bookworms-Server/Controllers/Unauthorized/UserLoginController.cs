@@ -10,6 +10,7 @@ namespace BookwormsServer.Controllers;
 [AllowAnonymous]
 [Tags("Users - Login")]
 [Route("user/[action]")]
+[Produces("application/json")]
 public class UserLoginController(BookwormsDbContext dbContext) : ControllerBase
 {
     /// <summary>

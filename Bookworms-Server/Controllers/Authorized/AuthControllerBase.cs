@@ -13,6 +13,7 @@ namespace BookwormsServer.Controllers;
 /// </summary>
 [Authorize]
 [ApiController]
+[Produces("application/json")]
 public class AuthControllerBase : ControllerBase
 {
     protected AuthControllerBase(BookwormsDbContext context)
