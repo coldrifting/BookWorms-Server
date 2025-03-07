@@ -1,6 +1,7 @@
 using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServer.Controllers;
 
@@ -38,25 +39,29 @@ public class RecommendationController(BookwormsDbContext context): AuthControlle
         }
 
         List<string> reviewedBooks = DbContext.Reviews
-        .Where(review => review.Reviewer.Username == CurrentUser.Username)
-        .Select(review => review.BookId)
-        .ToList();
+            .Where(review => review.Reviewer.Username == CurrentUser.Username)
+            .Select(review => review.BookId)
+            .ToList();
 
         List<string> positivelyReviewedBooks = DbContext.Reviews
-        .Where(review => review.Reviewer.Username == CurrentUser.Username && review.StarRating >= PositiveReviewThreshold)
-        .Select(review => review.BookId)
-        .ToList();
+            .Where(review => review.Reviewer.Username == CurrentUser.Username && review.StarRating >= PositiveReviewThreshold)
+            .Select(review => review.BookId)
+            .ToList();
 
-        List<string> sameAuthors = DbContext.Books
-        .Where(book => positivelyReviewedBooks.Contains(book.BookId))
-        .SelectMany(book => book.Authors)
-        .Distinct()
-        .ToList();
+        List<List<string>> sameAuthorsList = DbContext.Books
+            .Where(book => positivelyReviewedBooks.Contains(book.BookId))
+            .Select(book => book.Authors)
+            .Distinct()
+            .ToList();
+
+        List<string> sameAuthors = sameAuthorsList.SelectMany(authors => authors).Distinct().ToList();
+
+        List<string> formattedSameAuthors = sameAuthors.Select(author => $"\"{author}\"").ToList();
 
         List<string> booksSameAuthors = DbContext.Books
-        .Where(book => book.Authors.Any(author => sameAuthors.Contains(author)) && !reviewedBooks.Contains(book.BookId))
-        .Select(book => book.BookId)
-        .ToList();
+            .Where(book => formattedSameAuthors.Any(author => EF.Functions.Like((string)(object)book.Authors, author)) && !reviewedBooks.Contains(book.BookId))
+            .Select(book => book.BookId)
+            .ToList();
 
         if (booksSameAuthors.Count > 10)
         {
@@ -98,21 +103,22 @@ public class RecommendationController(BookwormsDbContext context): AuthControlle
         }
 
         List<string> reviewedBooks = DbContext.Reviews
-        .Where(review => review.Reviewer.Username == CurrentUser.Username)
-        .Select(review => review.BookId)
-        .ToList();
+            .Where(review => review.Reviewer.Username == CurrentUser.Username)
+            .Select(review => review.BookId)
+            .ToList();
 
         List<string> positivelyReviewedBooks = DbContext.Reviews
-        .Where(review => review.Reviewer.Username == CurrentUser.Username && review.StarRating >= PositiveReviewThreshold)
-        .Select(review => review.BookId)
-        .ToList();
+            .Where(review => review.Reviewer.Username == CurrentUser.Username && review.StarRating >= PositiveReviewThreshold)
+            .Select(review => review.BookId)
+            .ToList();
 
-        List<string> similarBooks = DbContext.Books
-        .Where(book => positivelyReviewedBooks.Contains(book.BookId))
-        .SelectMany(book => book.SimilarBooks ?? Enumerable.Empty<string>())
-        .Where(book => !reviewedBooks.Contains(book))
-        .Distinct()
-        .ToList();
+        List<List<string>?> similarBooksList = DbContext.Books
+            .Where(book => positivelyReviewedBooks.Contains(book.BookId))
+            .Select(book => book.SimilarBooks)
+            .Distinct()
+            .ToList();
+
+        List<string> similarBooks = similarBooksList.SelectMany(books => books ?? []).Where(book => !reviewedBooks.Contains(book)).Distinct().ToList();
 
         if (similarBooks.Count > 10)
         {
