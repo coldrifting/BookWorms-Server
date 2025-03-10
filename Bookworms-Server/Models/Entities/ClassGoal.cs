@@ -55,24 +55,16 @@ public abstract class ClassGoal(string classCode, string title, DateOnly startDa
 
 public static class ClassGoalExt
 {
-    public static ClassGoalOverviewTeacherResponse ToTeacherResponse(this IEnumerable<ClassGoal> goals)
+    public static List<ClassGoalTeacherResponse> ToTeacherResponse(this IEnumerable<ClassGoal> goals)
     {
-        List<ClassGoalCompletionTeacherResponse> completionGoals = [];
-        List<ClassGoalNumBooksTeacherResponse> numBooksGoals = [];
+        List<ClassGoalTeacherResponse> classGoalResponses = [];
 
         foreach (ClassGoal classGoal in goals)
         {
-            if (classGoal is ClassGoalCompletion completion)
-            {
-                completionGoals.Add(completion.ToTeacherResponse());
-            }
-            else if (classGoal is ClassGoalNumBooks numBooks)
-            {
-                numBooksGoals.Add(numBooks.ToTeacherResponse());
-            }
+            classGoalResponses.Add(classGoal.ToTeacherResponse());
         }
-        
-        return new(completionGoals, numBooksGoals);
+
+        return classGoalResponses;
     }
     
     public static ClassGoalTeacherResponse ToTeacherResponse(this ClassGoal classGoal)
@@ -133,7 +125,7 @@ public class ClassGoalCompletion(string classCode, string title, DateOnly startD
         }
     }
 
-    public ClassGoalCompletionTeacherResponse ToTeacherResponse()
+    public ClassGoalTeacherResponse ToTeacherResponse()
     {
         return new(
             ClassGoalId,
@@ -142,10 +134,11 @@ public class ClassGoalCompletion(string classCode, string title, DateOnly startD
             EndDate,
             NumStudentsCompleted,
             TotalStudents,
-            AverageCompletionTime);
+            new(AverageCompletionTime),
+            null);
     }
 
-    public ClassGoalCompletionDetailedTeacherResponse ToTeacherResponseFull()
+    public ClassGoalDetailedTeacherResponse ToTeacherResponseFull()
     {
         return new(
             ClassGoalId,
@@ -154,7 +147,8 @@ public class ClassGoalCompletion(string classCode, string title, DateOnly startD
             EndDate,
             NumStudentsCompleted,
             TotalStudents,
-            AverageCompletionTime,
+            new(AverageCompletionTime),
+            null,
             GetGoalDetails());
     }
 
@@ -182,7 +176,7 @@ public class ClassGoalNumBooks(string classCode, string title, DateOnly startDat
         ? GoalLogs.Average(goalLog => goalLog is ClassGoalLogNumBooks x ? x.NumBooks : 0)
         : null;
 
-    public ClassGoalNumBooksTeacherResponse ToTeacherResponse()
+    public ClassGoalTeacherResponse ToTeacherResponse()
     {
         return new(
             ClassGoalId,
@@ -191,11 +185,11 @@ public class ClassGoalNumBooks(string classCode, string title, DateOnly startDat
             EndDate,
             NumStudentsCompleted,
             TotalStudents,
-            TargetNumBooks,
-            AverageBooksRead);
+            null,
+            new(TargetNumBooks, AverageBooksRead));
     }
 
-    public ClassGoalNumBooksDetailedTeacherResponse ToTeacherResponseFull()
+    public ClassGoalDetailedTeacherResponse ToTeacherResponseFull()
     {
         return new(
             ClassGoalId,
@@ -204,8 +198,8 @@ public class ClassGoalNumBooks(string classCode, string title, DateOnly startDat
             EndDate,
             NumStudentsCompleted,
             TotalStudents,
-            TargetNumBooks,
-            AverageBooksRead,
+            null,
+            new(TargetNumBooks, AverageBooksRead),
             GetGoalDetails());
     }
     

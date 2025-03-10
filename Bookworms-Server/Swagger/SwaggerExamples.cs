@@ -416,4 +416,86 @@ public static class SwaggerExamples
                 3);
         }
     }
+
+    public class ClassGoalTeacherResponseExample : IExamplesProvider<ClassGoalTeacherResponse>
+    {
+        public ClassGoalTeacherResponse GetExamples()
+        {
+            return new(
+                "GoalId1",
+                "Goal Completion 1",
+                DateOnly.Parse("2025-02-20"),
+                DateOnly.Parse("2025-04-30"),
+                1,
+                5,
+                null,
+                new(5, 2.5));
+        }
+    }
+
+    public class ClassGoalListResponseExample : IExamplesProvider<List<ClassGoalTeacherResponse>>
+    {
+        public List<ClassGoalTeacherResponse> GetExamples()
+        {
+            return
+            [
+                new(
+                    "GoalId1",
+                    "Goal Completion 1",
+                    DateOnly.Parse("2025-02-20"),
+                    DateOnly.Parse("2025-04-30"),
+                    1,
+                    5,
+                    new(3),
+                    null),
+                new(
+                    "GoalId2",
+                    "Goal Completion 2",
+                    DateOnly.Parse("2025-02-20"),
+                    DateOnly.Parse("2025-04-30"),
+                    20,
+                    31,
+                    new(null),
+                    null),
+                new(
+                    "GoalId3",
+                    "Goal NumBooks 1",
+                    DateOnly.Parse("2025-02-20"),
+                    DateOnly.Parse("2025-04-30"),
+                    14,
+                    28,
+                    null,
+                    new(5, 3.5)),
+                new(
+                    "GoalId4",
+                    "Goal NumBooks 2",
+                    DateOnly.Parse("2025-02-20"),
+                    DateOnly.Parse("2025-04-30"),
+                    3,
+                    7,
+                    null,
+                    new(4, null))
+            ];
+        }
+    }
+
+    public class ClassGoalDetailedTeacherResponseExample : IExamplesProvider<ClassGoalDetailedTeacherResponse>
+    {
+        public ClassGoalDetailedTeacherResponse GetExamples()
+        {
+            return new(
+                "GoalId1",
+                "Goal Completion 1",
+                DateOnly.Parse("2025-02-20"),
+                DateOnly.Parse("2025-04-30"),
+                1,
+                5,
+                new(3),
+                null,
+                [
+                    new("Child 1", 0, true),
+                    new("Child 2", 1, false)
+                ]);
+        }
+    }
 }

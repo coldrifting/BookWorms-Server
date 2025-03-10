@@ -18,7 +18,7 @@ public class ClassroomGoalController(BookwormsDbContext context) : AuthControlle
     /// <response code="404">The teacher has not created a class</response>
     [HttpGet]
     [Route("/homeroom/goals")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ClassGoalOverviewTeacherResponse))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ClassGoalTeacherResponse>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
@@ -223,7 +223,7 @@ public class ClassroomGoalController(BookwormsDbContext context) : AuthControlle
     /// the goal is not part of this teachers class, or does not exist</response>
     [HttpDelete]
     [Route("/homeroom/goals/{goalId}/delete")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ClassGoalOverviewTeacherResponse))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ClassGoalTeacherResponse>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]

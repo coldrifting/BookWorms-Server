@@ -2,6 +2,8 @@
 
 namespace BookwormsServer.Models.Data;
 
+public record ClassGoalCompletionData(int? AverageCompletionTime);
+public record ClassGoalNumBooksData(int TargetNumBooks, double? AverageBooksRead);
 
 // REQUESTS
 
@@ -25,50 +27,15 @@ public record ClassGoalLogEditRequest(
 
 // TEACHER RESPONSES
 
-public record ClassGoalOverviewTeacherResponse(
-    List<ClassGoalCompletionTeacherResponse> CompletionGoals,
-    List<ClassGoalNumBooksTeacherResponse> NumBookGoals);
-
 public record ClassGoalTeacherResponse(
     string GoalId,
     string Title,
     DateOnly StartDate,
     DateOnly EndDate,
     int StudentsCompleted,
-    int TotalStudents);
-
-public record ClassGoalCompletionTeacherResponse(
-    string GoalId,
-    string Title,
-    DateOnly StartDate,
-    DateOnly EndDate,
-    int StudentsCompleted,
     int TotalStudents,
-    int? AverageCompletionTime)
-    : ClassGoalTeacherResponse(
-        GoalId,
-        Title,
-        StartDate,
-        EndDate,
-        StudentsCompleted,
-        TotalStudents);
-
-public record ClassGoalNumBooksTeacherResponse(
-    string GoalId,
-    string Title,
-    DateOnly StartDate,
-    DateOnly EndDate,
-    int StudentsCompleted,
-    int TotalStudents,
-    int TargetNumBooks,
-    double? AverageBooksRead)
-    : ClassGoalTeacherResponse(
-        GoalId,
-        Title,
-        StartDate,
-        EndDate,
-        StudentsCompleted,
-        TotalStudents);
+    ClassGoalCompletionData? CompletionGoalData,
+    ClassGoalNumBooksData? NumBooksGoalData);
 
 public record ClassGoalStudentStatusLine(
     string ChildName,
@@ -82,6 +49,8 @@ public record ClassGoalDetailedTeacherResponse(
     DateOnly EndDate,
     int StudentsCompleted,
     int TotalStudents,
+    ClassGoalCompletionData? CompletionGoalData,
+    ClassGoalNumBooksData? NumBooksGoalData,
     List<ClassGoalStudentStatusLine> StudentGoalStatus)
     : ClassGoalTeacherResponse(
         GoalId,
@@ -89,44 +58,9 @@ public record ClassGoalDetailedTeacherResponse(
         StartDate,
         EndDate,
         StudentsCompleted,
-        TotalStudents);
-
-public record ClassGoalCompletionDetailedTeacherResponse(
-    string GoalId,
-    string Title,
-    DateOnly StartDate,
-    DateOnly EndDate,
-    int StudentsCompleted,
-    int TotalStudents,
-    int? AverageCompletionTime,
-    List<ClassGoalStudentStatusLine> StudentGoalStatus)
-    : ClassGoalDetailedTeacherResponse(
-        GoalId,
-        Title,
-        StartDate,
-        EndDate,
-        StudentsCompleted,
         TotalStudents,
-        StudentGoalStatus);
-
-public record ClassGoalNumBooksDetailedTeacherResponse(
-    string GoalId,
-    string Title,
-    DateOnly StartDate,
-    DateOnly EndDate,
-    int StudentsCompleted,
-    int TotalStudents,
-    int TargetNumBooks,
-    double? AverageBooksRead,
-    List<ClassGoalStudentStatusLine> StudentGoalStatus)
-    : ClassGoalDetailedTeacherResponse(
-        GoalId,
-        Title,
-        StartDate,
-        EndDate,
-        StudentsCompleted,
-        TotalStudents,
-        StudentGoalStatus);
+        CompletionGoalData,
+        NumBooksGoalData);
 
 
 // CHILD RESPONSES

@@ -94,39 +94,34 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
     [Fact]
     public async Task Test_AllClassGoals_Basic()
     {
-        await CheckResponse<ClassGoalOverviewTeacherResponse>(async () => await Client.GetAsync(Routes.ClassGoals.All, "teacher2"), HttpStatusCode.OK,
+        await CheckResponse<List<ClassGoalTeacherResponse>>(async () => await Client.GetAsync(Routes.ClassGoals.All, "teacher2"), HttpStatusCode.OK,
             content =>
             {
-                Assert.Equal(9, content.CompletionGoals.Count + content.NumBookGoals.Count);
+                Assert.Equal(9, content.Count);
                 
-                foreach (var v in content.CompletionGoals)
-                {
-                    Assert.Equal(2, v.TotalStudents);
-                }
-                foreach (var v in content.NumBookGoals)
+                foreach (var v in content)
                 {
                     Assert.Equal(2, v.TotalStudents);
                 }
                 
-                Assert.Contains(content.CompletionGoals, c => c is { GoalId: "413a8732533462", StudentsCompleted: 2, AverageCompletionTime: 37 });
-                Assert.Contains(content.CompletionGoals, c => c is { GoalId: "413a8732545964", StudentsCompleted: 1, AverageCompletionTime: 50 });
-                Assert.Contains(content.CompletionGoals, c => c is { GoalId: "413a8732584729", StudentsCompleted: 1, AverageCompletionTime: 25 });
-                Assert.Contains(content.CompletionGoals, c => c is { GoalId: "413a8732581806", StudentsCompleted: 0, AverageCompletionTime: null });
-                Assert.Contains(content.CompletionGoals, c => c is { GoalId: "413a8732516249", StudentsCompleted: 0, AverageCompletionTime: null });
+                Assert.Contains(content, c => c is { GoalId: "413a8732533462", StudentsCompleted: 2, NumBooksGoalData: null, CompletionGoalData.AverageCompletionTime: 37});
+                Assert.Contains(content, c => c is { GoalId: "413a8732545964", StudentsCompleted: 1, NumBooksGoalData: null, CompletionGoalData.AverageCompletionTime: 50});
+                Assert.Contains(content, c => c is { GoalId: "413a8732584729", StudentsCompleted: 1, NumBooksGoalData: null, CompletionGoalData.AverageCompletionTime: 25});
+                Assert.Contains(content, c => c is { GoalId: "413a8732581806", StudentsCompleted: 0, NumBooksGoalData: null, CompletionGoalData.AverageCompletionTime: null});
+                Assert.Contains(content, c => c is { GoalId: "413a8732516249", StudentsCompleted: 0, NumBooksGoalData: null, CompletionGoalData.AverageCompletionTime: null});
                 
-                Assert.Contains(content.NumBookGoals, c => c is { GoalId: "413b1d8ae564c2", TargetNumBooks: 1, StudentsCompleted: 2, AverageBooksRead: 1.5 });
-                Assert.Contains(content.NumBookGoals, c => c is { GoalId: "413b1d8ae99498", TargetNumBooks: 3, StudentsCompleted: 1, AverageBooksRead: 2 });
-                Assert.Contains(content.NumBookGoals, c => c is { GoalId: "413b1d8ae65108", TargetNumBooks: 2, StudentsCompleted: 1, AverageBooksRead: 2 });
-                Assert.Contains(content.NumBookGoals, c => c is { GoalId: "413b1d8ae55090", TargetNumBooks: 2, StudentsCompleted: 0, AverageBooksRead: 1 });
+                Assert.Contains(content, c => c is { GoalId: "413b1d8ae564c2", StudentsCompleted: 2, CompletionGoalData: null, NumBooksGoalData.TargetNumBooks: 1, NumBooksGoalData.AverageBooksRead: 1.5});
+                Assert.Contains(content, c => c is { GoalId: "413b1d8ae99498", StudentsCompleted: 1, CompletionGoalData: null, NumBooksGoalData.TargetNumBooks: 3, NumBooksGoalData.AverageBooksRead: 2});
+                Assert.Contains(content, c => c is { GoalId: "413b1d8ae65108", StudentsCompleted: 1, CompletionGoalData: null, NumBooksGoalData.TargetNumBooks: 2, NumBooksGoalData.AverageBooksRead: 2});
+                Assert.Contains(content, c => c is { GoalId: "413b1d8ae55090", StudentsCompleted: 0, CompletionGoalData: null, NumBooksGoalData.TargetNumBooks: 2, NumBooksGoalData.AverageBooksRead: 1});
             });
         
-        await CheckResponse<ClassGoalOverviewTeacherResponse>(async () => await Client.GetAsync(Routes.ClassGoals.All, "teacher4"), HttpStatusCode.OK,
+        await CheckResponse<List<ClassGoalTeacherResponse>>(async () => await Client.GetAsync(Routes.ClassGoals.All, "teacher4"), HttpStatusCode.OK,
             content =>
             {
-                Assert.Empty(content.CompletionGoals);
-                Assert.Single(content.NumBookGoals);
+                Assert.Single(content);
                 
-                Assert.Contains(content.NumBookGoals, c => c is { GoalId: "413b217f330ce8", TotalStudents: 1, StudentsCompleted: 0, AverageBooksRead: null });
+                Assert.Contains(content, c => c is { GoalId: "413b217f330ce8", TotalStudents: 1, StudentsCompleted: 0, CompletionGoalData: null, NumBooksGoalData.TargetNumBooks: 12, NumBooksGoalData.AverageBooksRead: null });
             });
     }
     
@@ -153,14 +148,16 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
                 Assert.Equal(goalId, content.GoalId);
                 Assert.Equal(totalStudents, content.TotalStudents);
                 Assert.Equal(studentsCompleted, content.StudentsCompleted);
-                if (content is ClassGoalCompletionTeacherResponse contentCompletion)
+                if (targetNumBooks is null)
                 {
-                    Assert.Equal(averageCompletionTime, contentCompletion.AverageCompletionTime);
+                    Assert.NotNull(content.CompletionGoalData);
+                    Assert.Equal(averageCompletionTime, content.CompletionGoalData.AverageCompletionTime);
                 }
-                else if (content is ClassGoalNumBooksTeacherResponse contentNumBooks)
+                else
                 {
-                    Assert.Equal(targetNumBooks, contentNumBooks.TargetNumBooks);
-                    Assert.Equal(averageBooksRead, contentNumBooks.AverageBooksRead);
+                    Assert.NotNull(content.NumBooksGoalData);
+                    Assert.Equal(targetNumBooks, content.NumBooksGoalData.TargetNumBooks);
+                    Assert.Equal(averageBooksRead, content.NumBooksGoalData.AverageBooksRead);
                 }
             });
         
@@ -172,14 +169,16 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
                 Assert.Equal(goalId, content.GoalId);
                 Assert.Equal(totalStudents, content.TotalStudents);
                 Assert.Equal(studentsCompleted, content.StudentsCompleted);
-                if (content is ClassGoalCompletionDetailedTeacherResponse contentCompletion)
+                if (targetNumBooks is null)
                 {
-                    Assert.Equal(averageCompletionTime, contentCompletion.AverageCompletionTime);
+                    Assert.NotNull(content.CompletionGoalData);
+                    Assert.Equal(averageCompletionTime, content.CompletionGoalData.AverageCompletionTime);
                 }
-                else if (content is ClassGoalNumBooksDetailedTeacherResponse contentNumBooks)
+                else
                 {
-                    Assert.Equal(targetNumBooks, contentNumBooks.TargetNumBooks);
-                    Assert.Equal(averageBooksRead, contentNumBooks.AverageBooksRead);
+                    Assert.NotNull(content.NumBooksGoalData);
+                    Assert.Equal(targetNumBooks, content.NumBooksGoalData.TargetNumBooks);
+                    Assert.Equal(averageBooksRead, content.NumBooksGoalData.AverageBooksRead);
                 }
 
                 Assert.Equal(totalStudents, content.StudentGoalStatus.Count);
@@ -199,7 +198,7 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
     public async Task Test_AddGoal(string username)
     {
         ClassGoalAddRequest requestCompletion = new("Complete", DateOnly.Parse("2025-01-01"));
-        var goalId1 = await CheckResponse<ClassGoalCompletionTeacherResponse, string>(
+        var goalId1 = await CheckResponse<ClassGoalTeacherResponse, string>(
             async () => await Client.PostPayloadAsync(Routes.ClassGoals.Add, requestCompletion, username),
             HttpStatusCode.OK,
             content =>
@@ -214,7 +213,7 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
         Assert.Equal(10, Context.Classrooms.Include(classroom => classroom.Goals).First(c => c.TeacherUsername == username).Goals.Count);
         
         ClassGoalAddRequest requestNumBooks = new("NumBooks", DateOnly.Parse("2025-02-02"));
-        var goalId2 = await CheckResponse<ClassGoalNumBooksTeacherResponse, string>(
+        var goalId2 = await CheckResponse<ClassGoalTeacherResponse, string>(
             async () => await Client.PostPayloadAsync(Routes.ClassGoals.Add, requestNumBooks, username),
             HttpStatusCode.OK,
             content =>
@@ -277,8 +276,8 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
     }
     
     [Theory]
-    [InlineData("teacher2", "413a8732516249", 5)]
     [InlineData("teacher2", "413b1d8ae55090", 7)]
+    [InlineData("teacher2", "413b1d8ae65108", 5)]
     public async Task Test_EditGoalTargetNumBooks(string username, string goalId, int targetNumBooks)
     {
         ClassGoalEditRequest editRequest = new(null, null, targetNumBooks);
@@ -289,10 +288,9 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
             content =>
             {
                 Assert.Equal(goalId, content.GoalId);
-                if (content is ClassGoalNumBooksTeacherResponse numBooksContent)
-                {
-                    Assert.Equal(targetNumBooks, numBooksContent.TargetNumBooks);
-                }
+                Assert.Null(content.CompletionGoalData);
+                Assert.NotNull(content.NumBooksGoalData);
+                Assert.Equal(targetNumBooks, content.NumBooksGoalData.TargetNumBooks);
             });
 
         Assert.Equal(9, Context.Classrooms.Include(classroom => classroom.Goals).First(c => c.TeacherUsername == username).Goals.Count);
@@ -314,14 +312,14 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
     [InlineData("teacher2", "413b1d8ae55090")]
     public async Task Test_DeleteGoal(string username, string goalId)
     {
-        await CheckResponse<ClassGoalOverviewTeacherResponse>(
+        await CheckResponse<List<ClassGoalTeacherResponse>>(
             async () => await Client.DeleteAsync(Routes.ClassGoals.Delete(goalId), username),
             HttpStatusCode.OK,
             content =>
             {
-                Assert.Equal(8, content.CompletionGoals.Count + content.NumBookGoals.Count);
-                Assert.DoesNotContain(content.CompletionGoals, c => c.GoalId == goalId);
-                Assert.DoesNotContain(content.NumBookGoals, c => c.GoalId == goalId);
+                Assert.Equal(8, content.Count);
+                Assert.DoesNotContain(content, c => c.GoalId == goalId);
+                Assert.DoesNotContain(content, c => c.GoalId == goalId);
             });
         
         Assert.Null(await Context.ClassGoals.FindAsync(goalId));
