@@ -70,6 +70,9 @@ public static class Routes
 
         public static string BookshelfRemoveBook(string bookshelfName, string bookId) =>
             $"/homeroom/shelves/{bookshelfName}/remove?bookId={bookId}";
+        
+        public static string RemoveChild(string childId) => $"/homeroom/children/remove?childId={childId}";
+        public const string ClearChildren = "/homeroom/children/clear";
     }
 
     public static class ClassAnnouncements

@@ -1,5 +1,6 @@
 using System.Net;
 using BookwormsServer.Models.Data;
+using BookwormsServer.Models.Entities;
 using BookwormsServerTesting.Fixtures;
 using BookwormsServerTesting.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,16 @@ public class ClassroomTeacherTests(CompositeFixture fixture) : BookwormsIntegrat
             async () => await Client.DeleteAsync(Routes.Classrooms.BookshelfRemoveBook("books", "bookId")),
             HttpStatusCode.Unauthorized,
             ErrorResponse.Unauthorized);
+        
+        await CheckForError(
+            async () => await Client.DeleteAsync(Routes.Classrooms.RemoveChild("childId")),
+            HttpStatusCode.Unauthorized,
+            ErrorResponse.Unauthorized);
+        
+        await CheckForError(
+            async () => await Client.DeleteAsync(Routes.Classrooms.ClearChildren),
+            HttpStatusCode.Unauthorized,
+            ErrorResponse.Unauthorized);
     }
     
     [Theory]
@@ -106,6 +117,16 @@ public class ClassroomTeacherTests(CompositeFixture fixture) : BookwormsIntegrat
         
         await CheckForError(
             async () => await Client.DeleteAsync(Routes.Classrooms.BookshelfRemoveBook("books", "bookId"), username),
+            HttpStatusCode.Forbidden,
+            ErrorResponse.UserNotTeacher);
+        
+        await CheckForError(
+            async () => await Client.DeleteAsync(Routes.Classrooms.RemoveChild("childId")),
+            HttpStatusCode.Forbidden,
+            ErrorResponse.UserNotTeacher);
+        
+        await CheckForError(
+            async () => await Client.DeleteAsync(Routes.Classrooms.ClearChildren),
             HttpStatusCode.Forbidden,
             ErrorResponse.UserNotTeacher);
     }
@@ -446,5 +467,92 @@ public class ClassroomTeacherTests(CompositeFixture fixture) : BookwormsIntegrat
             .ThenInclude(b => b.Books)
             .First(c => c.TeacherUsername == username).Bookshelves
             .First(b => b.Name == bookshelfName).Books.Count);
+    }
+
+    [Theory]
+    [InlineData("teacher0", Constants.Parent1Child1Id)]
+    public async Task Test_RemoveChild_ClassNotExist(string username, string childId)
+    {
+        await CheckForError(
+            async () => await Client.DeleteAsync(Routes.Classrooms.RemoveChild(childId), username),
+            HttpStatusCode.NotFound,
+            ErrorResponse.ClassroomNotFound);
+    }
+
+    [Theory]
+    [InlineData("teacher2", Constants.InvalidChildId)]
+    public async Task Test_RemoveChild_ChildNotExist(string username, string childId)
+    {
+        await CheckForError(
+            async () => await Client.DeleteAsync(Routes.Classrooms.RemoveChild(childId), username),
+            HttpStatusCode.NotFound,
+            ErrorResponse.ChildNotFound);
+    }
+
+    [Theory]
+    [InlineData("teacher0")]
+    public async Task Test_ClearChildren_ClassNotExist(string username)
+    {
+        await CheckForError(
+            async () => await Client.DeleteAsync(Routes.Classrooms.ClearChildren, username),
+            HttpStatusCode.NotFound,
+            ErrorResponse.ClassroomNotFound);
+    }
+
+    [Theory]
+    [InlineData("teacher2", Constants.Parent1Child1Id)]
+    public async Task Test_RemoveChild_Basic(string username, string childId)
+    {
+        await CheckResponse<ClassroomTeacherResponse>(
+            async () => await Client.DeleteAsync(Routes.Classrooms.RemoveChild(childId), username),
+            HttpStatusCode.OK,
+            content =>
+            {
+                Assert.Single(content.Children);
+                Assert.DoesNotContain(content.Children, c => c.ChildId == childId);
+            });
+        
+        ICollection<Child> children = Context.Classrooms
+            .Include(c => c.Children)
+            .First(c => c.TeacherUsername == username).Children;
+        
+        Assert.Single(children);
+        Assert.DoesNotContain(children, c => c.ChildId == childId);
+    }
+
+    [Theory]
+    [InlineData("teacher2", Constants.Parent5Child1Id)]
+    public async Task Test_RemoveChild_ChildNotInClass(string username, string childId)
+    {
+        await CheckResponse<ClassroomTeacherResponse>(
+            async () => await Client.DeleteAsync(Routes.Classrooms.RemoveChild(childId), username),
+            HttpStatusCode.OK,
+            content =>
+            {
+                Assert.Equal(2, content.Children.Count);
+            });
+        
+        ICollection<Child> children = Context.Classrooms
+            .Include(c => c.Children)
+            .First(c => c.TeacherUsername == username).Children;
+        
+        Assert.Equal(2, children.Count);
+    }
+
+    [Theory]
+    [InlineData("teacher2")]
+    public async Task Test_ClearChildren_Basic(string username)
+    {
+        await CheckResponse<ClassroomTeacherResponse>(
+            async () => await Client.DeleteAsync(Routes.Classrooms.ClearChildren, username),
+            HttpStatusCode.OK,
+            content =>
+            {
+                Assert.Empty(content.Children);
+            });
+
+        Assert.Empty(Context.Classrooms
+            .Include(c => c.Children)
+            .First(c => c.TeacherUsername == username).Children);
     }
 }
