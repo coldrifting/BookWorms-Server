@@ -23,7 +23,12 @@
     "isbn13": "",
     "coverId": 11769478,
     "pageCount": 57,
-    "publishYear": 1964
+    "publishYear": 1964,
+    "similarBooks": [
+      "OL14912086W",
+      "OL8843356W",
+      "OL3368286W"
+    ]
   },
   {
     "bookId": "OL48763W",
@@ -46,7 +51,12 @@
     "isbn13": "",
     "coverId": 819191,
     "pageCount": null,
-    "publishYear": 1981
+    "publishYear": 1981,
+    "similarBooks": [
+      "OL28633459W",
+      "OL8843356W",
+      "OL47935W"
+    ]
   },
   {
     "bookId": "OL47935W",
@@ -67,7 +77,12 @@
     "isbn13": "9781557092694",
     "coverId": 779460,
     "pageCount": 212,
-    "publishYear": 1932
+    "publishYear": 1932,
+    "similarBooks": [
+      "OL8843356W",
+      "OL3368273W",
+      "OL21025297W"
+    ]
   },
   {
     "bookId": "OL8843356W",
@@ -81,7 +96,12 @@
     "isbn13": "9780545084505",
     "coverId": 10758772,
     "pageCount": 46,
-    "publishYear": 2004
+    "publishYear": 2004,
+    "similarBooks": [
+      "OL3368273W",
+      "OL48763W",
+      "OL3368288W"
+    ]
   },
   {
     "bookId": "OL28633459W",
@@ -99,7 +119,12 @@
     "isbn13": "9780545000154",
     "coverId": 6374525,
     "pageCount": null,
-    "publishYear": 2010
+    "publishYear": 2010,
+    "similarBooks": [
+      "OL2191470M",
+      "OL3368286W",
+      "OL48763W"
+    ]
   },
   {
     "bookId": "OL21025297W",
@@ -127,7 +152,12 @@
     "isbn13": "9781589808058",
     "coverId": 10783939,
     "pageCount": 32,
-    "publishYear": 2010
+    "publishYear": 2010,
+    "similarBooks": [
+      "OL47935W",
+      "OL8843356W",
+      "OL892371W"
+    ]
   },
   {
     "bookId": "OL26571192W",
@@ -144,7 +174,12 @@
     "isbn13": "9798855035063",
     "coverId": null,
     "pageCount": 34,
-    "publishYear": 2020
+    "publishYear": 2020,
+    "similarBooks": [
+      "OL8843356W",
+      "OL48763W",
+      "OL3368288W"
+    ]
   },
   {
     "bookId": "OL14912086W",
@@ -165,7 +200,12 @@
     "isbn13": "9780312353599",
     "coverId": 2370729,
     "pageCount": 256,
-    "publishYear": 2007
+    "publishYear": 2007,
+    "similarBooks": [
+      "OL3368273W",
+      "OL8843356W",
+      "OL2191470M"
+    ]
   },
   {
     "bookId": "OL3368286W",
@@ -188,7 +228,12 @@
     "isbn13": "9780060513092",
     "coverId": 26482,
     "pageCount": 176,
-    "publishYear": 1996
+    "publishYear": 1996,
+    "similarBooks": [
+      "OL8843356W",
+      "OL48763W",
+      "OL26571192W"
+    ]
   },
   {
     "bookId": "OL286593W",
@@ -205,7 +250,12 @@
     "isbn13": "9781782692454",
     "coverId": 14557626,
     "pageCount": 192,
-    "publishYear": 2019
+    "publishYear": 2019,
+    "similarBooks": [
+      "OL3368273W",
+      "OL47935W",
+      "OL48763W"
+    ]
   },
   {
     "bookId": "OL3368273W",
@@ -222,7 +272,12 @@
     "isbn13": "",
     "coverId": 24107,
     "pageCount": 105,
-    "publishYear": 1976
+    "publishYear": 1976,
+    "similarBooks": [
+      "OL21025297W",
+      "OL3368288W",
+      "OL892371W"
+    ]
   },
   {
     "bookId": "OL892371W",
@@ -244,7 +299,12 @@
     "isbn13": "",
     "coverId": 277175,
     "pageCount": null,
-    "publishYear": 2003
+    "publishYear": 2003,
+    "similarBooks": [
+      "OL47935W",
+      "OL28633459W",
+      "OL14912086W"
+    ]
   },
   {
     "bookId": "OL2191470M",
@@ -260,6 +320,11 @@
     "isbn13": "",
     "coverId": 383710,
     "pageCount": 40,
-    "publishYear": 1990
+    "publishYear": 1990,
+    "similarBooks": [
+      "OL26571192W",
+      "OL21025297W",
+      "OL3368288W"
+    ]
   }
 ]
