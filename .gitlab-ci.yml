@@ -3,9 +3,8 @@ stages:
     - test
     - security
     - prepare
-    - build-image
+    - deploy-image
     - release
-    - deploy
 
 variables:
     DOTNET_VERSION: "8.0"
@@ -51,7 +50,7 @@ test_job:
     artifacts:
         when: always
         reports:
-            junit: TestResults/*.trx
+            junit: Bookworms-Server-Testing/TestResults/*.trx
         expire_in: 1 month
     dependencies:
         - build_job # test_job depends on artifacts produced by build_job (avoids rebuilding the project)
@@ -106,28 +105,15 @@ construct_tag_job:
             dotenv: variables.env
     resource_group: common
 
-build_image_job:
+build_and_deploy_image_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
-    stage: build-image
+    stage: deploy-image
     image: docker:stable
     dependencies:
         - construct_tag_job
     services:
         - docker:stable-dind
-    script:
-        - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-        - docker build -t bookworms-server:$TAG .
-        - docker push $TAG
-    resource_group: common
-
-deploy_job:
-    rules:
-        - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
-    stage: deploy
-    image: alpine:latest
-    dependencies:
-        - build_image_job
     before_script:
         - |
           # Install open-ssh client
@@ -137,19 +123,17 @@ deploy_job:
           # Add the private key to ssh-agent
           echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -q -
     script:
-        # Pull the latest server image and restart the server service
         - |
+          # Build a new image with the constructed tag
+          docker build -t bookworms-server:$TAG .
+          # Load the new image into the EC2 instance's Docker process
+          docker save bookworms-server:$TAG | ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST sudo docker load
+          # Restart the server service
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST <<- EOF
-            sudo docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-            sudo docker pull $CI_REGISTRY_IMAGE:latest
             sudo systemctl restart bookworms.service
-            
             # Prune any images older than 1 hour
             docker image prune -a --force --filter 'until=1h'
           EOF
-    variables:
-        # Don't pull the repository for this job
-        GIT_STRATEGY: none
     resource_group: common
 
 release_job:
