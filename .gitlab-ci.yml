@@ -2,8 +2,8 @@ stages:
     - build
     - test
     - security
-    - publish
     - prepare
+    - build-image
     - release
     - deploy
 
@@ -73,20 +73,7 @@ dependency_scanning:
 
 # When "trigger-deploy" is included in the commit message
 
-publish_job:
-    rules:
-        - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
-    stage: publish
-    image: mcr.microsoft.com/dotnet/sdk:$DOTNET_VERSION
-    script:
-        - dotnet publish Bookworms-Server -c Release -o out
-    artifacts:
-        paths:
-            - out/
-        expire_in: 1 week
-    resource_group: common
-
-prepare_job:
+construct_tag_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
     stage: prepare
@@ -112,28 +99,26 @@ prepare_job:
         else
             HOTFIX_NUMBER=$(( ${LATEST_TAG##*.} + 1 ))
         fi
-        RELEASE_TAG="v0.$WEEK_NUMBER.$HOTFIX_NUMBER"
+        RELEASE_TAG="0.$WEEK_NUMBER.$HOTFIX_NUMBER"
         echo "TAG=$RELEASE_TAG" >> variables.env
     artifacts:
         reports:
             dotenv: variables.env
     resource_group: common
 
-release_job:
+build_image_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
-    stage: release
-    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    stage: build-image
+    image: docker:stable
     dependencies:
-        - publish_job
-        - prepare_job
+        - construct_tag_job
+    services:
+        - docker:stable-dind
     script:
-        - echo "Creating GitLab release with tag $TAG"
-    release:
-        name: "Release $TAG"
-        description: "Created using the release CLI"
-        tag_name: "$TAG"
-        ref: "$CI_COMMIT_SHA"
+        - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+        - docker build -t bookworms-server:$TAG .
+        - docker push $TAG
     resource_group: common
 
 deploy_job:
@@ -142,7 +127,7 @@ deploy_job:
     stage: deploy
     image: alpine:latest
     dependencies:
-        - publish_job
+        - build_image_job
     before_script:
         - |
           # Install open-ssh client
@@ -151,29 +136,34 @@ deploy_job:
           eval $(ssh-agent -s)
           # Add the private key to ssh-agent
           echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -q -
-          # Ensure deployment directory variable has been properly set
-          if [ -z "$DEPLOYMENT_DIR" ]; then
-            echo "ERROR: DEPLOYMENT_DIR variable is not set"
-            exit 1
-          fi
     script:
-        # Replace the build artifacts in the EC2 instance, and restart the server
+        # Pull the latest server image and restart the server service
         - |
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST <<- EOF
-            sudo systemctl stop bookworms.service
-            cd \$(dirname "$DEPLOYMENT_DIR") || {
-              echo "ERROR: Failed to change to parent directory of deployment directory"
-              exit 1
-            }
-            find \$(basename "$DEPLOYMENT_DIR") -mindepth 1 -delete || {
-              echo "ERROR: Failed to clean deployment directory"
-              exit 1
-            }
+            sudo docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+            sudo docker pull $CI_REGISTRY_IMAGE:latest
+            sudo systemctl restart bookworms.service
+            
+            # Prune any images older than 1 hour
+            docker image prune -a --force --filter 'until=1h'
           EOF
-        - scp -r -C out/* $EC2_USER@$EC2_HOST:$DEPLOYMENT_DIR
-        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo systemctl start bookworms.service'
     variables:
         # Don't pull the repository for this job
         GIT_STRATEGY: none
-        DEPLOYMENT_DIR: /var/www/server/
+    resource_group: common
+
+release_job:
+    rules:
+        - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
+    stage: release
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    dependencies:
+        - construct_tag_job
+    script:
+        - echo "Creating GitLab release with tag v$TAG"
+    release:
+        name: "Release $TAG"
+        description: "Created using the release CLI"
+        tag_name: "v$TAG"
+        ref: "$CI_COMMIT_SHA"
     resource_group: common

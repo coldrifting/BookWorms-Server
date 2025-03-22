@@ -64,47 +64,32 @@ public static class Config
 		opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 	}
 	
-    public static void DbContextOptionsBuilder(DbContextOptionsBuilder opt, string? connectionString)
+    public static void DbContextOptionsBuilder(DbContextOptionsBuilder builder, string? connectionString)
     {
-	    opt.UseMySql(connectionString,
+	    builder.UseMySql(connectionString,
 		    ServerVersion.AutoDetect(connectionString),
 		    mySqlOpt => { mySqlOpt.EnablePrimitiveCollectionsSupport(); });
     }
     
     // Application Middleware
     
-	public static void CorsPolicy(CorsPolicyBuilder o)
+	public static void CorsPolicy(CorsPolicyBuilder builder)
 	{
-		o.WithOrigins("https://www.bookworms.app", "https://bookworms.app")
-			.WithExposedHeaders("*")
+		// allow requests from localhost on all ports
+		builder.SetIsOriginAllowed(origin => new Uri(origin).IsLoopback)
 			.AllowAnyMethod()
-			.AllowAnyHeader()
-			.AllowCredentials();
+			.AllowAnyHeader();
 	}
     
     public static void UseShortUrls(this WebApplication app)
     {
-		// Redirect to API or App from base URL depending on if production or development
-        app.Use((context, next) =>
-		{
-			var url = context.Request.Path.Value;
-			if (url is "/" or "/index.html")
-			{
-				context.Request.Path = app.Environment.IsProduction()
-					? "/app/index.html"
-					: "/api/index.html";
-			}
-
-			return next();
-		});
-
 		// Use short urls
 		app.Use((context, next) =>
 		{
 			context.Request.Path = context.Request.Path.Value switch
 			{
-				"/api" or "/api/" or "/api/index.html" => "/swagger/index.html",
-				"/app" or "/app/" or "/app/index.html" => "/app/index.html",
+				"/" or "/index.html" or "/api" or "/api/" or "/api/index.html"
+					=> "/swagger/index.html",
 				_ => context.Request.Path
 			};
 

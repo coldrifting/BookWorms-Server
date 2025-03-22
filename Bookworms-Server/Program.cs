@@ -46,19 +46,20 @@ public class Program
 		if (!app.Environment.IsStaging())
 		{
 			app.UseShortUrls();
-			app.UseHttpsRedirection();
 			app.UseCors(Config.CorsPolicy);
 			app.UseStaticFiles();
 			app.UseAuthentication();
 			app.UseAuthorization();
 			
 			// Generate Swagger json API file (But use static files version for more control over URL)
-			app.UseSwagger(); 
+			app.UseSwagger();
 		}
 		
 		app.UseResponseCaching();
 		app.MapControllers();
 
+		// for quick health checks
+		app.MapGet("/ping", () => "Healthy");
 		app.Run();
 	}
 }
