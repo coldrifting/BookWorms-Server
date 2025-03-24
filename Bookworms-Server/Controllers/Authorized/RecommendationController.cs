@@ -56,7 +56,7 @@ public class RecommendationController(BookwormsDbContext context): AuthControlle
 
         List<string> sameAuthors = sameAuthorsList.SelectMany(authors => authors).Distinct().ToList();
 
-        List<string> formattedSameAuthors = sameAuthors.Select(author => $"\"{author}\"").ToList();
+        List<string> formattedSameAuthors = sameAuthors.Select(author => $"%\"{author}\"%").ToList();
 
         List<string> booksSameAuthors = DbContext.Books
             .Where(book => formattedSameAuthors.Any(author => EF.Functions.Like((string)(object)book.Authors, author)) && !reviewedBooks.Contains(book.BookId))
