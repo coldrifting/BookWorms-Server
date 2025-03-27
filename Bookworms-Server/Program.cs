@@ -53,8 +53,19 @@ public class Program
 			app.UseSwagger();
 			app.UseSwaggerUI(c =>
 			{
+				c.RoutePrefix = "";
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Bookworms API");
-				c.RoutePrefix = "api";
+				
+				c.InjectJavascript("/swagger/scripts/authorization-tweaks.js");
+				c.InjectJavascript("/swagger/scripts/response-tweaks.js");
+
+				c.InjectStylesheet("/swagger/stylesheets/themes/_base.css");
+				c.InjectStylesheet("/swagger/stylesheets/themes/_custom.css");
+				c.InjectStylesheet("/swagger/stylesheets/themes/one-dark.css");
+				c.InjectStylesheet("/swagger/stylesheets/themes/one-light.css");
+
+				c.ConfigObject.TryItOutEnabled = true;
+				c.ConfigObject.DefaultModelsExpandDepth = -1;
 			});
 		}
 		
