@@ -45,14 +45,17 @@ public class Program
 		// Don't bother with static files and other web stuff in Staging, which is only used for running tests
 		if (!app.Environment.IsStaging())
 		{
-			app.UseShortUrls();
 			app.UseCors(Config.CorsPolicy);
 			app.UseStaticFiles();
 			app.UseAuthentication();
 			app.UseAuthorization();
 			
-			// Generate Swagger json API file (But use static files version for more control over URL)
 			app.UseSwagger();
+			app.UseSwaggerUI(c =>
+			{
+				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Bookworms API");
+				c.RoutePrefix = "api";
+			});
 		}
 		
 		app.UseResponseCaching();

@@ -81,22 +81,6 @@ public static class Config
 			.AllowAnyHeader();
 	}
     
-    public static void UseShortUrls(this WebApplication app)
-    {
-		// Use short urls
-		app.Use((context, next) =>
-		{
-			context.Request.Path = context.Request.Path.Value switch
-			{
-				"/" or "/index.html" or "/api" or "/api/" or "/api/index.html"
-					=> "/swagger/index.html",
-				_ => context.Request.Path
-			};
-
-			return next();
-		});
-    }
-    
     public static void MigrateDatabase(this WebApplication app, bool seedDatabase = false)
     {
 		if (!app.Environment.IsProduction())
