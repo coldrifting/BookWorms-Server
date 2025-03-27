@@ -390,7 +390,8 @@ public static class SwaggerExamples
         {
             return new(
                 "Goal_Title",
-                DateOnly.Parse("2025-02-19"),
+                DateOnly.Parse("2025-01-23"),
+                DateOnly.Parse("2025-02-27"),
                 null);
         }
     }
@@ -401,7 +402,8 @@ public static class SwaggerExamples
         {
             return new(
                 "New_Goal_Title",
-                DateOnly.Parse("2025-02-20"),
+                DateOnly.Parse("2025-01-23"),
+                DateOnly.Parse("2025-02-27"),
                 5);
         }
     }

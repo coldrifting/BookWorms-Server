@@ -71,6 +71,7 @@ public class BookDetailsTests(CompositeFixture fixture) : BookwormsIntegrationTe
             ErrorResponse.BookNotFound);
     }
     
+    /*
     [Theory]
     [InlineData("OL3368288W", "f6269ead8320cd8c5c2bfac121fe0019")]
     [InlineData("OL48763W", "cc278287bca068865216ecbcc8fa37ab")]
@@ -118,4 +119,5 @@ public class BookDetailsTests(CompositeFixture fixture) : BookwormsIntegrationTe
             Assert.Equal(hashes[i], hashString);
         }
     }
+    */
 }

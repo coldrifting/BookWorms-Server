@@ -72,12 +72,12 @@ public class ChildGoalController(BookwormsDbContext context) : AuthControllerBas
             ? new ChildGoalCompletion(
                 childId,
                 payload.Title,
-                DateOnly.FromDateTime(DateTime.Today),
+                payload.StartDate,
                 payload.EndDate)
             : new ChildGoalNumBooks(
                 childId,
                 payload.Title,
-                DateOnly.FromDateTime(DateTime.Today),
+                payload.StartDate,
                 payload.EndDate,
                 payload.TargetNumBooks.Value);
 
@@ -163,6 +163,7 @@ public class ChildGoalController(BookwormsDbContext context) : AuthControllerBas
         }
     
         goal.Title = payload.NewTitle ?? goal.Title;
+        goal.StartDate = payload.NewStartDate ?? goal.StartDate;
         goal.EndDate = payload.NewEndDate ?? goal.EndDate;
     
         if (goal is ChildGoalNumBooks goalNumBooks)

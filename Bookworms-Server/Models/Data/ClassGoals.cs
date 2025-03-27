@@ -9,12 +9,14 @@ public record ClassGoalNumBooksData(int TargetNumBooks, double? AverageBooksRead
 
 public record ClassGoalAddRequest(
     string Title,
+    DateOnly StartDate,
     DateOnly EndDate,
     [Range(1, int.MaxValue, ErrorMessage = "{0} must be a greater than 0")]
     int? TargetNumBooks = 2);
 
 public record ClassGoalEditRequest(
     string? NewTitle,
+    DateOnly? NewStartDate,
     DateOnly? NewEndDate,
     [Range(1, int.MaxValue, ErrorMessage = "{0} must be a greater than 0")]
     int? NewTargetNumBooks = 2);

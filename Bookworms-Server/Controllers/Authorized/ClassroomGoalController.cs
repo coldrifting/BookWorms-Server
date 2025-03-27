@@ -76,12 +76,12 @@ public class ClassroomGoalController(BookwormsDbContext context) : AuthControlle
             ? new ClassGoalCompletion(
                 classroom.ClassroomCode,
                 payload.Title,
-                DateOnly.FromDateTime(DateTime.Today),
+                payload.StartDate,
                 payload.EndDate)
             : new ClassGoalNumBooks(
                 classroom.ClassroomCode,
                 payload.Title,
-                DateOnly.FromDateTime(DateTime.Today),
+                payload.StartDate,
                 payload.EndDate,
                 payload.TargetNumBooks.Value);
 
@@ -199,6 +199,7 @@ public class ClassroomGoalController(BookwormsDbContext context) : AuthControlle
         }
 
         goal.Title = payload.NewTitle ?? goal.Title;
+        goal.StartDate = payload.NewStartDate ?? goal.StartDate;
         goal.EndDate = payload.NewEndDate ?? goal.EndDate;
 
         if (goal is ClassGoalNumBooks goalNumBooks)

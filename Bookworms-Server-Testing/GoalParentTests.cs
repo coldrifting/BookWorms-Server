@@ -13,8 +13,8 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
 {
     private const string SomeGoalId = "goalId";
     private const string SomeChildId = "childId";
-    private static readonly ChildGoalAddRequest ChildGoalAddCompletionRequest = new ("Completion Goal", DateOnly.Parse("2025-05-01"));
-    private static readonly ChildGoalEditRequest ChildGoalEditCompletionRequest = new ("Edit Goal Completion", DateOnly.Parse("2025-05-01"), null);
+    private static readonly ChildGoalAddRequest ChildGoalAddCompletionRequest = new ("Completion Goal", DateOnly.Parse("2025-04-01"), DateOnly.Parse("2025-05-01"));
+    private static readonly ChildGoalEditRequest ChildGoalEditCompletionRequest = new ("Edit Goal Completion", DateOnly.Parse("2025-04-01"), DateOnly.Parse("2025-05-01"), null);
     
     [Fact]
     public async Task Test_ChildGoalRoutes_NotLoggedIn()
@@ -157,7 +157,7 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("parent3", "2bc5b2a4771d7f")]
     public async Task Test_AddGoal(string parentUsername, string childId)
     {
-        ChildGoalAddRequest requestCompletion = new("CompletionGoal", DateOnly.Parse("2025-01-01"));
+        ChildGoalAddRequest requestCompletion = new("CompletionGoal", DateOnly.Parse("2024-12-01"), DateOnly.Parse("2025-01-01"));
         var goalId1 = await CheckResponse<ChildGoalCompletionResponse, string>(
             async () => await Client.PostPayloadAsync(Routes.ChildGoals.Add(childId), requestCompletion, parentUsername),
             HttpStatusCode.OK,
@@ -173,7 +173,7 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
         Assert.Equal("CompletionGoal", cg1.Title);
         Assert.Single(this.Context.Children.Include(child => child.Goals).First(c => c.ChildId == childId).Goals);
         
-        ChildGoalAddRequest requestNumBooks = new("NumBooksGoal", DateOnly.Parse("2025-02-02"), 5);
+        ChildGoalAddRequest requestNumBooks = new("NumBooksGoal", DateOnly.Parse("2025-04-02"), DateOnly.Parse("2025-02-02"), 5);
         var goalId2 = await CheckResponse<ChildGoalNumBooksResponse, string>(
             async () => await Client.PostPayloadAsync(Routes.ChildGoals.Add(childId), requestNumBooks, parentUsername),
             HttpStatusCode.OK,
@@ -221,11 +221,35 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [Theory]
     [InlineData("parent3", "2bc5b325697a55", "4aa30cf4a23193", "2023-02-17")]
     [InlineData("parent2", "2bc5b121b46b4a", "4aa48b3a078e81", "2013-10-04")]
+    public async Task Test_EditGoalStartDate(string parentUsername, string childId, string goalId, string newStartDate)
+    {
+        int numChildGoals = this.Context.ChildGoals.Count(c => c.ChildId == childId);
+        
+        ChildGoalEditRequest editRequest = new(null, DateOnly.Parse(newStartDate), null, null);
+        
+        await CheckResponse<GenericGoalChildResponse>(
+            async () => await Client.PutPayloadAsync(Routes.ChildGoals.Edit(childId, goalId), editRequest, parentUsername),
+            HttpStatusCode.OK,
+            content =>
+            {
+                Assert.Equal(goalId, content.GoalId);
+                Assert.Equal(DateOnly.Parse(newStartDate), content.StartDate);
+            });
+
+        Assert.Equal(numChildGoals, this.Context.Children.Include(child => child.Goals).First(c => c.ChildId == childId).Goals.Count);
+        ChildGoal? g = await Context.ChildGoals.FindAsync(goalId);
+        Assert.NotNull(g);
+        Assert.Equal(DateOnly.Parse(newStartDate), g.StartDate);
+    }
+    
+    [Theory]
+    [InlineData("parent3", "2bc5b325697a55", "4aa30cf4a23193", "2023-02-17")]
+    [InlineData("parent2", "2bc5b121b46b4a", "4aa48b3a078e81", "2013-10-04")]
     public async Task Test_EditGoalEndDate(string parentUsername, string childId, string goalId, string newEndDate)
     {
         int numChildGoals = this.Context.ChildGoals.Count(c => c.ChildId == childId);
         
-        ChildGoalEditRequest editRequest = new(null, DateOnly.Parse(newEndDate), null);
+        ChildGoalEditRequest editRequest = new(null, null, DateOnly.Parse(newEndDate), null);
         
         await CheckResponse<GenericGoalChildResponse>(
             async () => await Client.PutPayloadAsync(Routes.ChildGoals.Edit(childId, goalId), editRequest, parentUsername),
@@ -249,7 +273,7 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     {
         int numChildGoals = this.Context.ChildGoals.Count(c => c.ChildId == childId);
         
-        ChildGoalEditRequest editRequest = new(null, null, targetNumBooks);
+        ChildGoalEditRequest editRequest = new(null, null, null, targetNumBooks);
         
         await CheckResponse<GenericGoalChildResponse>(
             async () => await Client.PutPayloadAsync(Routes.ChildGoals.Edit(childId, goalId), editRequest, username),

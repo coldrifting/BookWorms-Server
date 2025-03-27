@@ -7,12 +7,14 @@ namespace BookwormsServer.Models.Data;
 
 public record ChildGoalAddRequest(
     string Title,
+    DateOnly StartDate,
     DateOnly EndDate,
     [Range(1, int.MaxValue, ErrorMessage = "{0} must be a greater than 0")]
     int? TargetNumBooks = null);
 
 public record ChildGoalEditRequest(
     string? NewTitle,
+    DateOnly? NewStartDate,
     DateOnly? NewEndDate,
     [Range(1, int.MaxValue, ErrorMessage = "{0} must be a greater than 0")]
     int? NewTargetNumBooks = 2);

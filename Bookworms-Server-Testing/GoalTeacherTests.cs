@@ -12,8 +12,8 @@ namespace BookwormsServerTesting;
 public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
 {
     private const string SomeGoalId = "goalId";
-    private static readonly ClassGoalAddRequest ClassGoalAddCompletionRequest = new ("Completion Goal", DateOnly.Parse("2025-05-01"), null);
-    private static readonly ClassGoalEditRequest ClassGoalEditCompletionRequest = new ("Edit Goal Completion", DateOnly.Parse("2025-05-01"), null);
+    private static readonly ClassGoalAddRequest ClassGoalAddCompletionRequest = new ("Completion Goal", DateOnly.Parse("2025-04-01"), DateOnly.Parse("2025-05-01"), null);
+    private static readonly ClassGoalEditRequest ClassGoalEditCompletionRequest = new ("Edit Goal Completion", DateOnly.Parse("2025-04-01"), DateOnly.Parse("2025-05-01"), null);
 
     [Fact]
     public async Task Test_ClassGoalRoutes_NotLoggedIn()
@@ -197,7 +197,7 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
     [InlineData("teacher2")]
     public async Task Test_AddGoal(string username)
     {
-        ClassGoalAddRequest requestCompletion = new("Complete", DateOnly.Parse("2025-01-01"));
+        ClassGoalAddRequest requestCompletion = new("Complete", DateOnly.Parse("2024-12-01"), DateOnly.Parse("2025-01-01"));
         var goalId1 = await CheckResponse<ClassGoalTeacherResponse, string>(
             async () => await Client.PostPayloadAsync(Routes.ClassGoals.Add, requestCompletion, username),
             HttpStatusCode.OK,
@@ -212,7 +212,7 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
         Assert.Equal("Complete", gc.Title);
         Assert.Equal(10, Context.Classrooms.Include(classroom => classroom.Goals).First(c => c.TeacherUsername == username).Goals.Count);
         
-        ClassGoalAddRequest requestNumBooks = new("NumBooks", DateOnly.Parse("2025-02-02"));
+        ClassGoalAddRequest requestNumBooks = new("NumBooks", DateOnly.Parse("2025-01-02"), DateOnly.Parse("2025-02-02"));
         var goalId2 = await CheckResponse<ClassGoalTeacherResponse, string>(
             async () => await Client.PostPayloadAsync(Routes.ClassGoals.Add, requestNumBooks, username),
             HttpStatusCode.OK,
@@ -256,9 +256,31 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
     [Theory]
     [InlineData("teacher2", "413a8732516249", "2023-02-17")]
     [InlineData("teacher2", "413b1d8ae55090", "2013-10-04")]
+    public async Task Test_EditGoalStartDate(string username, string goalId, string newStartDate)
+    {
+        ClassGoalEditRequest editRequest = new(null, DateOnly.Parse(newStartDate), null, null);
+        
+        await CheckResponse<ClassGoalTeacherResponse>(
+            async () => await Client.PutPayloadAsync(Routes.ClassGoals.Edit(goalId), editRequest, username),
+            HttpStatusCode.OK,
+            content =>
+            {
+                Assert.Equal(goalId, content.GoalId);
+                Assert.Equal(DateOnly.Parse(newStartDate), content.StartDate);
+            });
+
+        Assert.Equal(9, Context.Classrooms.Include(classroom => classroom.Goals).First(c => c.TeacherUsername == username).Goals.Count);
+        ClassGoal? g = await Context.ClassGoals.FindAsync(goalId);
+        Assert.NotNull(g);
+        Assert.Equal(DateOnly.Parse(newStartDate), g.StartDate);
+    }
+    
+    [Theory]
+    [InlineData("teacher2", "413a8732516249", "2023-02-17")]
+    [InlineData("teacher2", "413b1d8ae55090", "2013-10-04")]
     public async Task Test_EditGoalEndDate(string username, string goalId, string newEndDate)
     {
-        ClassGoalEditRequest editRequest = new(null, DateOnly.Parse(newEndDate), null);
+        ClassGoalEditRequest editRequest = new(null, null, DateOnly.Parse(newEndDate), null);
         
         await CheckResponse<ClassGoalTeacherResponse>(
             async () => await Client.PutPayloadAsync(Routes.ClassGoals.Edit(goalId), editRequest, username),
@@ -280,7 +302,7 @@ public class ClassroomGoalTests(CompositeFixture fixture) : BookwormsIntegration
     [InlineData("teacher2", "413b1d8ae65108", 5)]
     public async Task Test_EditGoalTargetNumBooks(string username, string goalId, int targetNumBooks)
     {
-        ClassGoalEditRequest editRequest = new(null, null, targetNumBooks);
+        ClassGoalEditRequest editRequest = new(null, null, null, targetNumBooks);
         
         await CheckResponse<ClassGoalTeacherResponse>(
             async () => await Client.PutPayloadAsync(Routes.ClassGoals.Edit(goalId), editRequest, username),
