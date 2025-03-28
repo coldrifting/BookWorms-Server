@@ -1,15 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using BookwormsServer.Models.Data;
 using Swashbuckle.AspNetCore.Filters;
-
 using BookwormsServer.Utils;
 
 namespace BookwormsServer.Swagger;
 
-
 // Swagger finds these automatically; there's technically no need to explicitly refer to them with
 //   `SwaggerResponseExample` or `SwaggerRequestBodyExample`
-
 
 // Content responses
 
@@ -17,7 +14,7 @@ namespace BookwormsServer.Swagger;
 public static class SwaggerExamples
 {
     // BookDetailsController
-    
+
     public class BookResponseExample : IExamplesProvider<BookResponse>
     {
         public BookResponse GetExamples()
@@ -31,7 +28,7 @@ public static class SwaggerExamples
             );
         }
     }
-    
+
     public class BookResponseExtendedExample : IExamplesProvider<BookResponseExtended>
     {
         public BookResponseExtended GetExamples()
@@ -72,7 +69,7 @@ public static class SwaggerExamples
 
 
     // ChildController
-    
+
     public class ChildEditBodyExample : IExamplesProvider<ChildEditRequest>
     {
         public ChildEditRequest GetExamples()
@@ -88,21 +85,21 @@ public static class SwaggerExamples
             return new(Snowflake.Generate(), "Jackson", 1, 52, DateOnly.Parse("2015-04-15"));
         }
     }
-    
+
     public class ChildListResponseExample : IExamplesProvider<List<ChildResponse>>
     {
         public List<ChildResponse> GetExamples()
         {
             return
             [
-                new(Snowflake.Generate(),"Ashley", 0,  59, DateOnly.Parse("2014-08-23")),
-                new(Snowflake.Generate(),"Miles", 1, null, null),
-                new(Snowflake.Generate(),"Joey", 2, null, DateOnly.Parse("2015-04-15"))
+                new(Snowflake.Generate(), "Ashley", 0, 59, DateOnly.Parse("2014-08-23")),
+                new(Snowflake.Generate(), "Miles", 1, null, null),
+                new(Snowflake.Generate(), "Joey", 2, null, DateOnly.Parse("2015-04-15"))
             ];
         }
     }
 
-    
+
     // ReviewsController
 
     public class ReviewResponseExample : IExamplesProvider<ReviewResponse>
@@ -143,7 +140,7 @@ public static class SwaggerExamples
         }
     }
 
-    
+
     // SearchController
 
     public class BooksResponseExample : IExamplesProvider<List<BookResponse>>
@@ -160,9 +157,9 @@ public static class SwaggerExamples
         }
     }
 
-    
+
     // UserController
-    
+
     public class UserLoginRequestExample : IExamplesProvider<UserLoginRequest>
     {
         public UserLoginRequest GetExamples()
@@ -216,10 +213,10 @@ public static class SwaggerExamples
             return
             [
                 new(BookshelfType.Completed, "Completed", [
-                        new("bookId1", "Title1", ["Author1"], 3.5, 30),
-                        new("bookId2", "Title2", ["Author2"], 4.0, 42),
-                        new("bookId3", "Title3", ["Author3", "Author10"], 2.5, 55)
-                    ]),
+                    new("bookId1", "Title1", ["Author1"], 3.5, 30),
+                    new("bookId2", "Title2", ["Author2"], 4.0, 42),
+                    new("bookId3", "Title3", ["Author3", "Author10"], 2.5, 55)
+                ]),
                 new(BookshelfType.InProgress, "In Progress", []),
                 new(BookshelfType.Custom, "Some other books", [
                     new("bookId1", "Title1", ["Author1"], 3.5, 30)
@@ -237,48 +234,24 @@ public static class SwaggerExamples
         {
             return new(BookshelfType.Custom, "Bookshelf Name",
             [
-                new("bookId1", "Title", ["Author1"], 3.5, 30), 
-                new("bookId2", "Title", ["Author2"], 4.0, 42), 
+                new("bookId1", "Title", ["Author1"], 3.5, 30),
+                new("bookId2", "Title", ["Author2"], 4.0, 42),
                 new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55),
                 new("bookId4", "Title", ["Author4"], 5.0, 21)
             ]);
         }
     }
-    
+
     // Classrooms
-    
+
     public class ClassroomChildResponseExample : IExamplesProvider<ClassroomChildResponse>
     {
         public ClassroomChildResponse GetExamples()
         {
-            return new("ABC123", "Ava's Class", "Mrs. Ava", 1, 
+            return new("ABC123", "Ava's Class", "Mrs. Ava", 1,
                 [
                     new("AnnouncementId1", "New Announcement", "Announcement Body Text", DateTime.Today),
                     new("AnnouncementId2", "Old Announcement", "Old Announcement Body Text", DateTime.Today)
-                ],
-                [
-                new(BookshelfType.Classroom, "Reading List", 
-                [
-                    new("bookId1", "Title", ["Author1"], 3.5, 30)
-                ]),
-                new(BookshelfType.Classroom, "Advanced Reading",
-                [
-                    new("bookId2", "Title", ["Author2"], 4.0, 42), 
-                    new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
-                ])
-            ]);
-        }
-    }
-    
-    public class ClassroomChildResponseListExample : IExamplesProvider<List<ClassroomChildResponse>>
-    {
-        public List<ClassroomChildResponse> GetExamples()
-        {
-            return
-            [
-                new("ABC123", "Ava's Class", "Mrs. Ava", 2, 
-                [
-                    new("AnnouncementId1", "New Announcement", "Announcement Body Text", DateTime.Today)
                 ],
                 [
                     new(BookshelfType.Classroom, "Reading List",
@@ -290,17 +263,41 @@ public static class SwaggerExamples
                         new("bookId2", "Title", ["Author2"], 4.0, 42),
                         new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
                     ])
-                ]),
-                new("ALP234", "Mustard's Class", "Mr. Mustard", 1, 
+                ]);
+        }
+    }
+
+    public class ClassroomChildResponseListExample : IExamplesProvider<List<ClassroomChildResponse>>
+    {
+        public List<ClassroomChildResponse> GetExamples()
+        {
+            return
+            [
+                new("ABC123", "Ava's Class", "Mrs. Ava", 2,
                     [
                         new("AnnouncementId1", "New Announcement", "Announcement Body Text", DateTime.Today)
                     ],
                     [
-                    new(BookshelfType.Classroom, "Rad Reading List",
+                        new(BookshelfType.Classroom, "Reading List",
+                        [
+                            new("bookId1", "Title", ["Author1"], 3.5, 30)
+                        ]),
+                        new(BookshelfType.Classroom, "Advanced Reading",
+                        [
+                            new("bookId2", "Title", ["Author2"], 4.0, 42),
+                            new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
+                        ])
+                    ]),
+                new("ALP234", "Mustard's Class", "Mr. Mustard", 1,
                     [
-                        new("bookId1", "Title", ["Author1"], 3.5, 30)
-                    ])
-                ]),
+                        new("AnnouncementId1", "New Announcement", "Announcement Body Text", DateTime.Today)
+                    ],
+                    [
+                        new(BookshelfType.Classroom, "Rad Reading List",
+                        [
+                            new("bookId1", "Title", ["Author1"], 3.5, 30)
+                        ])
+                    ]),
             ];
         }
     }
@@ -314,21 +311,21 @@ public static class SwaggerExamples
                     new("childId1", "Jack", 0, 3, new(2017, 02, 15)),
                     new("childId2", "Wyatt", 1, 45, new(2019, 08, 17)),
                     new("childId3", "Sadie", 2, 72, new(2018, 05, 28))
-                ], 
+                ],
                 [
                     new("AnnouncementId1", "New Announcement", "Announcement Body Text", DateTime.Today)
                 ],
                 [
-                new(BookshelfType.Classroom, "Reading List", 
-                [
-                    new("bookId1", "Title", ["Author1"], 3.5, 30)
-                ]),
-                new(BookshelfType.Classroom, "Advanced Reading",
-                [
-                    new("bookId2", "Title", ["Author2"], 4.0, 42), 
-                    new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
-                ])
-            ]);
+                    new(BookshelfType.Classroom, "Reading List",
+                    [
+                        new("bookId1", "Title", ["Author1"], 3.5, 30)
+                    ]),
+                    new(BookshelfType.Classroom, "Advanced Reading",
+                    [
+                        new("bookId2", "Title", ["Author2"], 4.0, 42),
+                        new("bookId3", "Title", ["Author3", "Author10"], 2.5, 55)
+                    ])
+                ]);
         }
     }
 
@@ -337,9 +334,9 @@ public static class SwaggerExamples
         public ClassroomAnnouncementResponse GetExamples()
         {
             return new(
-                "AnnouncementId1", 
-                "New Announcement", 
-                "Announcement Body Text", 
+                "AnnouncementId1",
+                "New Announcement",
+                "Announcement Body Text",
                 DateTime.Today);
         }
     }
@@ -348,19 +345,19 @@ public static class SwaggerExamples
     {
         public List<ClassroomAnnouncementResponse> GetExamples()
         {
-            return [
+            return
+            [
                 new(
-                    "AnnouncementId1", 
-                    "New Announcement", 
-                    "Announcement Body Text", 
+                    "AnnouncementId1",
+                    "New Announcement",
+                    "Announcement Body Text",
                     DateTime.Today),
                 new(
-                    "AnnouncementId2", 
-                    "Another Announcement", 
-                    "Some more Body Text", 
+                    "AnnouncementId2",
+                    "Another Announcement",
+                    "Some more Body Text",
                     DateTime.Today)
             ];
-            
         }
     }
 
@@ -369,7 +366,7 @@ public static class SwaggerExamples
         public ClassroomAnnouncementAddRequest GetExamples()
         {
             return new(
-                "__announcement_title__", 
+                "__announcement_title__",
                 "__announcement_body__");
         }
     }
@@ -379,125 +376,50 @@ public static class SwaggerExamples
         public ClassroomAnnouncementEditRequest GetExamples()
         {
             return new(
-                "__announcement_title_or_NULL_", 
+                "__announcement_title_or_NULL_",
                 "__announcement_body_or_NULL_");
         }
     }
 
-    public class ClassGoalAddRequestExample : IExamplesProvider<ClassGoalAddRequest>
+    public class GoalAddRequestExample : IExamplesProvider<GoalAddRequest>
     {
-        public ClassGoalAddRequest GetExamples()
+        public GoalAddRequest GetExamples()
         {
             return new(
+                GoalType.Classroom,
+                GoalMetric.MinutesRead,
                 "Goal_Title",
                 DateOnly.Parse("2025-01-23"),
                 DateOnly.Parse("2025-02-27"),
-                null);
+                60);
         }
     }
 
-    public class ClassGoalEditRequestExample : IExamplesProvider<ClassGoalEditRequest>
+    public class GoalEditRequestExample : IExamplesProvider<GoalEditRequest>
     {
-        public ClassGoalEditRequest GetExamples()
+        public GoalEditRequest GetExamples()
+        {
+            return new(GoalMetric: GoalMetric.BooksRead);
+        }
+    }
+
+    public class GoalResponseExample : IExamplesProvider<GoalResponse>
+    {
+        public GoalResponse GetExamples()
         {
             return new(
-                "New_Goal_Title",
+                "goalId",
+                GoalType.Classroom,
+                GoalMetric.MinutesRead,
+                "Goal_Title",
                 DateOnly.Parse("2025-01-23"),
                 DateOnly.Parse("2025-02-27"),
-                5);
-        }
-    }
-
-    public class ClassGoalLogEditRequestExample : IExamplesProvider<ClassGoalLogEditRequest>
-    {
-        public ClassGoalLogEditRequest GetExamples()
-        {
-            return new(
-                0.5f,
-                20,
-                3);
-        }
-    }
-
-    public class ClassGoalTeacherResponseExample : IExamplesProvider<ClassGoalTeacherResponse>
-    {
-        public ClassGoalTeacherResponse GetExamples()
-        {
-            return new(
-                "GoalId1",
-                "Goal Completion 1",
-                DateOnly.Parse("2025-02-20"),
-                DateOnly.Parse("2025-04-30"),
-                1,
-                5,
-                null,
-                new(5, 2.5));
-        }
-    }
-
-    public class ClassGoalListResponseExample : IExamplesProvider<List<ClassGoalTeacherResponse>>
-    {
-        public List<ClassGoalTeacherResponse> GetExamples()
-        {
-            return
-            [
-                new(
-                    "GoalId1",
-                    "Goal Completion 1",
-                    DateOnly.Parse("2025-02-20"),
-                    DateOnly.Parse("2025-04-30"),
-                    1,
-                    5,
-                    new(3),
-                    null),
-                new(
-                    "GoalId2",
-                    "Goal Completion 2",
-                    DateOnly.Parse("2025-02-20"),
-                    DateOnly.Parse("2025-04-30"),
-                    20,
-                    31,
-                    new(null),
-                    null),
-                new(
-                    "GoalId3",
-                    "Goal NumBooks 1",
-                    DateOnly.Parse("2025-02-20"),
-                    DateOnly.Parse("2025-04-30"),
-                    14,
-                    28,
-                    null,
-                    new(5, 3.5)),
-                new(
-                    "GoalId4",
-                    "Goal NumBooks 2",
-                    DateOnly.Parse("2025-02-20"),
-                    DateOnly.Parse("2025-04-30"),
-                    3,
-                    7,
-                    null,
-                    new(4, null))
-            ];
-        }
-    }
-
-    public class ClassGoalDetailedTeacherResponseExample : IExamplesProvider<ClassGoalDetailedTeacherResponse>
-    {
-        public ClassGoalDetailedTeacherResponse GetExamples()
-        {
-            return new(
-                "GoalId1",
-                "Goal Completion 1",
-                DateOnly.Parse("2025-02-20"),
-                DateOnly.Parse("2025-04-30"),
-                1,
-                5,
-                new(3),
-                null,
-                [
-                    new("Child 1", 0, true),
-                    new("Child 2", 1, false)
-                ]);
+                60,
+                15,
+                new(4, 2, [
+                    new("Alice", 1, 40),
+                    new("Bob", 2, 20)
+                ]));
         }
     }
 }

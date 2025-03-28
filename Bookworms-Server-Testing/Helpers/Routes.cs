@@ -14,6 +14,27 @@ public static class Routes
             $"/children/{childId}/edit";
         public static string Remove(string childId) =>
             $"/children/{childId}/remove";
+        
+        public static class Goals
+        {
+            public static string All(string childId) => 
+                $"/children/{childId}/goals/all";
+            
+            public static string Add(string childId) => 
+                $"/children/{childId}/goals/add";
+            
+            public static string Details(string childId, string goalId) => 
+                $"/children/{childId}/goals/{goalId}/details";
+            
+            public static string Log(string childId, string goalId, int progress) => 
+                $"/children/{childId}/goals/{goalId}/log?progress={progress}";
+            
+            public static string Edit(string childId, string goalId) => 
+                $"/children/{childId}/goals/{goalId}/edit";
+            
+            public static string Delete(string childId, string goalId) => 
+                $"/children/{childId}/goals/{goalId}/delete";
+        }
     }
 
     public static class Bookshelves
@@ -70,7 +91,25 @@ public static class Routes
 
         public static string BookshelfRemoveBook(string bookshelfName, string bookId) =>
             $"/homeroom/shelves/{bookshelfName}/remove?bookId={bookId}";
-        
+
+        public static class Goals
+        {
+            public static string All() =>
+                "/homeroom/goals/all";
+
+            public static string Add() =>
+                "/homeroom/goals/add";
+
+            public static string Details(string goalId, bool extended = false) =>
+                $"/homeroom/goals/{goalId}/details?extended={extended}";
+
+            public static string Edit(string goalId) =>
+                $"/homeroom/goals/{goalId}/edit";
+
+            public static string Delete(string goalId) =>
+                $"/homeroom/goals/{goalId}/delete";
+        }
+
         public static string RemoveChild(string childId) => $"/homeroom/children/remove?childId={childId}";
         public const string ClearChildren = "/homeroom/children/clear";
     }
@@ -82,27 +121,6 @@ public static class Routes
         public const string Clear = "/homeroom/announcements/clear";
         public static string Edit(string announcementId) => $"/homeroom/announcements/{announcementId}/edit";
         public static string Delete(string announcementId) => $"/homeroom/announcements/{announcementId}/delete";
-    }
-
-    public static class ClassGoals
-    {
-        public const string All = "/homeroom/goals";
-        public const string Add = "/homeroom/goals/add";
-        public static string Edit(string goalId) => $"/homeroom/goals/{goalId}/edit";
-        public static string Delete(string goalId) => $"/homeroom/goals/{goalId}/delete";
-        public static string Details(string goalId) => $"/homeroom/goals/{goalId}/details";
-        public static string DetailsAll(string goalId) => $"/homeroom/goals/{goalId}/details/all";
-    }
-
-    public static class ChildGoals
-    {
-        public static string All(string childId) => $"/children/{childId}/goals";
-        public static string Add(string childId) => $"/children/{childId}/goals/add";
-        public static string Edit(string childId, string goalId) => $"/children/{childId}/goals/{goalId}/edit";
-        public static string Delete(string childId, string goalId) => $"/children/{childId}/goals/{goalId}/delete";
-        public static string Details(string childId, string goalId) => $"/children/{childId}/goals/{goalId}/details";
-        
-        public static string UpdateProgress(string childId, string goalId) => $"/children/{childId}/goals/{goalId}/updateProgress";
     }
 
     public static string Search(

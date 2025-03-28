@@ -24,7 +24,7 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
     [ForeignKey(nameof(TeacherUsername))] 
     public Teacher Teacher { get; set; } = null!;
     
-    public ICollection<ClassGoal> Goals { get; set; } = null!;
+    public ICollection<GoalClassBase> Goals { get; set; } = null!;
     public ICollection<ClassroomBookshelf> Bookshelves { get; set; } = null!;
     public ICollection<ClassroomAnnouncement> Announcements { get; set; } = null!;
 

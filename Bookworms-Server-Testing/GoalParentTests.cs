@@ -13,18 +13,45 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
 {
     private const string SomeGoalId = "goalId";
     private const string SomeChildId = "childId";
-    private static readonly ChildGoalAddRequest ChildGoalAddCompletionRequest = new ("Completion Goal", DateOnly.Parse("2025-04-01"), DateOnly.Parse("2025-05-01"));
-    private static readonly ChildGoalEditRequest ChildGoalEditCompletionRequest = new ("Edit Goal Completion", DateOnly.Parse("2025-04-01"), DateOnly.Parse("2025-05-01"), null);
+    
+    private const string ChildCompletionGoalId = "4aa30ee8b6d4e3";
+    private const string ChildBooksReadGoalId = "4aa48f227d01fd";
+    
+    
+    private static readonly GoalAddRequest NewChildBooksReadGoal = new(
+        GoalType.Child, 
+        GoalMetric.BooksRead,
+        "ChildBooksReadGoalTitle", 
+        DateOnly.Parse("2025-01-01"), 
+        DateOnly.Parse("2025-02-02"), 
+        1);
+    
+    private static readonly GoalAddRequest NewClassCompletionGoal = new(
+        GoalType.Classroom, 
+        GoalMetric.Completion,
+        "ClassCompletionGoalTitle", 
+        DateOnly.Parse("2025-01-01"), 
+        DateOnly.Parse("2025-02-02"), 
+        1);
+    
+    private static readonly GoalAddRequest NewClassAggregateMinutesRead = new(
+        GoalType.ClassroomAggregate, 
+        GoalMetric.MinutesRead,
+        "ClassAggregateMinutesReadGoalTitle", 
+        DateOnly.Parse("2025-01-01"), 
+        DateOnly.Parse("2025-02-02"), 
+        1);
     
     [Fact]
     public async Task Test_ChildGoalRoutes_NotLoggedIn()
     {
         await CheckForErrorBatch([
-                async () => await Client.GetAsync(Routes.ChildGoals.All(SomeChildId)),
-                async () => await Client.PostPayloadAsync(Routes.ChildGoals.Add(SomeChildId), new {}),
-                async () => await Client.PutPayloadAsync(Routes.ChildGoals.Edit(SomeChildId, SomeGoalId), new {}),
-                async () => await Client.DeleteAsync(Routes.ChildGoals.Delete(SomeChildId, SomeGoalId)),
-                async () => await Client.GetAsync(Routes.ChildGoals.Details(SomeChildId, SomeGoalId))
+                async () => await Client.GetAsync(Routes.Children.Goals.All(SomeChildId)),
+                async () => await Client.PostPayloadAsync(Routes.Children.Goals.Add(SomeChildId), new {}),
+                async () => await Client.GetAsync(Routes.Children.Goals.Details(SomeGoalId, SomeChildId)),
+                async () => await Client.PutPayloadAsync(Routes.Children.Goals.Edit(SomeGoalId, SomeChildId), new {}),
+                async () => await Client.PutPayloadAsync(Routes.Children.Goals.Log(SomeGoalId, SomeChildId, 5), new {}),
+                async () => await Client.DeleteAsync(Routes.Children.Goals.Delete(SomeGoalId, SomeChildId)),
             ],
             HttpStatusCode.Unauthorized,
             ErrorResponse.Unauthorized);
@@ -33,14 +60,15 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [Theory]
     [InlineData("admin")]
     [InlineData("teacher0")]
-    public async Task Test_ChildGoalRoutes_NotParent(string parentUsername)
+    public async Task Test_ChildGoalRoutes_NotParent(string username)
     {
         await CheckForErrorBatch([
-                async () => await Client.GetAsync(Routes.ChildGoals.All(SomeChildId), parentUsername),
-                async () => await Client.PostPayloadAsync(Routes.ChildGoals.Add(SomeChildId), ChildGoalAddCompletionRequest, parentUsername),
-                async () => await Client.PutPayloadAsync(Routes.ChildGoals.Edit(SomeChildId, SomeGoalId), ChildGoalEditCompletionRequest, parentUsername),
-                async () => await Client.DeleteAsync(Routes.ChildGoals.Delete(SomeChildId, SomeGoalId), parentUsername),
-                async () => await Client.GetAsync(Routes.ChildGoals.Details(SomeChildId, SomeGoalId), parentUsername)
+                async () => await Client.GetAsync(Routes.Children.Goals.All(SomeChildId), username),
+                async () => await Client.PostPayloadAsync(Routes.Children.Goals.Add(SomeChildId), NewChildBooksReadGoal, username),
+                async () => await Client.GetAsync(Routes.Children.Goals.Details(SomeChildId, ChildCompletionGoalId), username),
+                async () => await Client.PutPayloadAsync(Routes.Children.Goals.Edit(SomeChildId, ChildBooksReadGoalId), new GoalEditRequest(Title: "Title"), username),
+                async () => await Client.PutAsync(Routes.Children.Goals.Log(SomeChildId, SomeGoalId, 5), username),
+                async () => await Client.DeleteAsync(Routes.Children.Goals.Delete(SomeChildId, SomeGoalId), username)
             ],
             HttpStatusCode.Forbidden,
             ErrorResponse.UserNotParent);
@@ -48,67 +76,78 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     
     [Theory]
     [InlineData("parent3", "2bc5b2a4771d7f")]
-    public async Task Test_ChildGoalRoutes_NoGoalsCreated(string parentUsername, string childId)
+    public async Task Test_ChildGoalRoutes_NoGoalsCreated(string username, string childId)
     {
         await CheckForErrorBatch([
-                async () => await Client.PutPayloadAsync(Routes.ChildGoals.Edit(childId, SomeGoalId), new {}, parentUsername),
-                async () => await Client.DeleteAsync(Routes.ChildGoals.Delete(childId, SomeGoalId), parentUsername),
-                async () => await Client.GetAsync(Routes.ChildGoals.Details(childId, SomeGoalId), parentUsername)
+                async () => await Client.PutPayloadAsync(Routes.Children.Goals.Edit(childId, SomeGoalId), new GoalEditRequest(Title: "Title"), username),
+                async () => await Client.DeleteAsync(Routes.Children.Goals.Delete(childId, SomeGoalId), username),
+                async () => await Client.GetAsync(Routes.Children.Goals.Details(childId, SomeGoalId), username)
             ],
             HttpStatusCode.NotFound,
             ErrorResponse.GoalNotFound);
     }
     
     [Theory]
-    [InlineData("parent3", "2bc5b325697a55", "4aa310dc9dd437")]
-    public async Task Test_ChildGoalRoutes_GoalFromOtherChild(string parentUsername, string childId, string goalId)
+    [InlineData("parent2", "2bc5b3b701b2ee", "4aa310dc9dd437")]
+    public async Task Test_ChildGoalRoutes_GoalFromOtherChild(string username, string childId, string goalId)
     {
         await CheckForErrorBatch([
-                async () => await Client.PutPayloadAsync(Routes.ChildGoals.Edit(childId, goalId), new {}, parentUsername),
-                async () => await Client.DeleteAsync(Routes.ChildGoals.Delete(childId, goalId), parentUsername),
-                async () => await Client.GetAsync(Routes.ChildGoals.Details(childId, goalId), parentUsername),
+                async () => await Client.PutPayloadAsync(Routes.Children.Goals.Edit(childId, goalId), new GoalEditRequest(Title: "Title"), username),
+                async () => await Client.PutAsync(Routes.Children.Goals.Log(childId, goalId, 5), username),
+                async () => await Client.DeleteAsync(Routes.Children.Goals.Delete(childId, goalId), username),
+                async () => await Client.GetAsync(Routes.Children.Goals.Details(childId, goalId), username),
             ],
             HttpStatusCode.NotFound,
-            ErrorResponse.GoalNotFound);
+            ErrorResponse.ChildNotFound);
     }
 
     [Theory]
-    [InlineData("parent1", "2bc5ae6239c988", "parent3", "2bc5b325697a55")]
-    public async Task Test_AllChildGoals_Basic(string parentUsername1, string childId1, string parentUsername2, string childId2)
+    [InlineData("parent2", Constants.Parent1Child1Id)]
+    public async Task Test_AllGoals_WrongChild(string username, string childId)
     {
-        await CheckResponse<AllGoalOverviewResponse>(async () => await Client.GetAsync(Routes.ChildGoals.All(childId1), parentUsername1), HttpStatusCode.OK,
+        await CheckForError(
+            async () => await Client.GetAsync(Routes.Children.Goals.All(childId),
+                username),
+            HttpStatusCode.NotFound,
+            ErrorResponse.ChildNotFound
+        );
+    }
+    
+    [Theory]
+    [InlineData("parent1", "2bc5ae6239c988", "parent3", "2bc5b325697a55")]
+    public async Task Test_AllChildGoals_Basic(string username1, string childId1, string username2, string childId2)
+    {
+        await CheckResponse<List<GoalResponse>>(async () => await Client.GetAsync(Routes.Children.Goals.All(childId1), username1), HttpStatusCode.OK,
             content =>
             {
-                Assert.Single(content.CompletionGoals);
-                Assert.Single(content.NumBookGoals);
-                Assert.Equal(5, content.ClassCompletionGoals.Count);
-                Assert.Equal(4, content.ClassNumBooksGoals.Count);
                 
-                Assert.Contains(content.CompletionGoals, c => c is { GoalId: "4aa30907023f3b", Progress: 0.0f, Duration: 0 });
-                Assert.Contains(content.NumBookGoals, c => c is { GoalId: "4aa48941faee41", TargetNumBooks: 2, NumBooks: 0 });
+                Assert.Equal(6, content.Count(g => g.GoalMetric == GoalMetric.Completion));
+                Assert.Equal(5, content.Count(g => g.GoalMetric == GoalMetric.BooksRead));
                 
-                Assert.Contains(content.ClassCompletionGoals, c => c is { GoalId: "413a8732533462", Progress: 1.0f, Duration: 25 });
-                Assert.Contains(content.ClassCompletionGoals, c => c is { GoalId: "413a8732545964", Progress: 0.15f, Duration: 25 });
-                Assert.Contains(content.ClassCompletionGoals, c => c is { GoalId: "413a8732584729", Progress: 0.0f, Duration: 0 });
-                Assert.Contains(content.ClassCompletionGoals, c => c is { GoalId: "413a8732516249", Progress: 0.0f, Duration: 0 });
-                Assert.Contains(content.ClassCompletionGoals, c => c is { GoalId: "413a8732581806", Progress: 0.0f, Duration: 0 });
+                Assert.Equal(11, content.Count);
                 
-                Assert.Contains(content.ClassNumBooksGoals, c => c is { GoalId: "413b1d8ae564c2", TargetNumBooks: 1, NumBooks: 2 });
-                Assert.Contains(content.ClassNumBooksGoals, c => c is { GoalId: "413b1d8ae99498", TargetNumBooks: 3, NumBooks: 3 });
-                Assert.Contains(content.ClassNumBooksGoals, c => c is { GoalId: "413b1d8ae65108", TargetNumBooks: 2, NumBooks: 0 });
-                Assert.Contains(content.ClassNumBooksGoals, c => c is { GoalId: "413b1d8ae55090", TargetNumBooks: 2, NumBooks: 0 });
+                Assert.Contains(content, g => g is { GoalType: GoalType.Child, GoalMetric: GoalMetric.Completion, GoalId: "4aa30907023f3b", Progress: 0 });
+                Assert.Contains(content, g => g is { GoalType: GoalType.Child, GoalMetric: GoalMetric.BooksRead, GoalId: "4aa48941faee41", Target: 2, Progress: 0 });
+                
+                Assert.Contains(content, g => g is { GoalType: GoalType.Classroom, GoalMetric: GoalMetric.Completion, GoalId: "413a8732533462", Progress: 37100 });
+                Assert.Contains(content, g => g is { GoalType: GoalType.Classroom, GoalMetric: GoalMetric.Completion, GoalId: "413a8732545964", Progress: 37057 });
+                Assert.Contains(content, g => g is { GoalType: GoalType.Classroom, GoalMetric: GoalMetric.Completion, GoalId: "413a8732584729", Progress: 12050 });
+                Assert.Contains(content, g => g is { GoalType: GoalType.Classroom, GoalMetric: GoalMetric.Completion, GoalId: "413a8732516249", Progress: 12025 });
+                Assert.Contains(content, g => g is { GoalType: GoalType.Classroom, GoalMetric: GoalMetric.Completion, GoalId: "413a8732581806", Progress: 0 });
+                
+                Assert.Contains(content, g => g is { GoalType: GoalType.Classroom, GoalMetric: GoalMetric.BooksRead, GoalId: "413b1d8ae564c2", Target: 1, Progress: 1 });
+                Assert.Contains(content, g => g is { GoalType: GoalType.Classroom, GoalMetric: GoalMetric.BooksRead, GoalId: "413b1d8ae99498", Target: 3, Progress: 2 });
+                Assert.Contains(content, g => g is { GoalType: GoalType.Classroom, GoalMetric: GoalMetric.BooksRead, GoalId: "413b1d8ae65108", Target: 2, Progress: 1 });
+                Assert.Contains(content, g => g is { GoalType: GoalType.Classroom, GoalMetric: GoalMetric.BooksRead, GoalId: "413b1d8ae55090", Target: 2, Progress: 0 });
             });
         
-        await CheckResponse<AllGoalOverviewResponse>(async () => await Client.GetAsync(Routes.ChildGoals.All(childId2), parentUsername2), HttpStatusCode.OK,
+        await CheckResponse<List<GoalResponse>>(async () => await Client.GetAsync(Routes.Children.Goals.All(childId2), username2), HttpStatusCode.OK,
             content =>
             {
-                Assert.Single(content.CompletionGoals);
-                Assert.Single(content.NumBookGoals);
-                Assert.Empty(content.ClassCompletionGoals);
-                Assert.Empty(content.ClassNumBooksGoals);
+                Assert.Equal(2, content.Count);
                 
-                Assert.Contains(content.CompletionGoals, c => c is { GoalId: "4aa30cf4a23193", Progress: 0.5f, Duration: 2 });
-                Assert.Contains(content.NumBookGoals, c => c is { GoalId: "4aa48d2e0e7a77", TargetNumBooks: 2, NumBooks: 2 });
+                Assert.Equal(1, content.Count(g => g is { GoalType: GoalType.Child, GoalMetric: GoalMetric.Completion, GoalId: "4aa30cf4a23193", Progress: 2050 }));
+                Assert.Equal(1, content.Count(g => g is { GoalType: GoalType.Child, GoalMetric: GoalMetric.BooksRead, GoalId: "4aa48d2e0e7a77", Target: 2, Progress: 2 }));
             });
     }
     
@@ -116,78 +155,139 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     // Goal Details (all 12 test child goals)
     
     [Theory]
-    [InlineData("parent1", "2bc5ae6239c988", "4aa30907023f3b", 0.0f, 0, null, null)]
-    [InlineData("parent2", "2bc5b121b46b4a", "4aa30b00417f9f", 0.0f, 5, null, null)]
-    [InlineData("parent3", "2bc5b325697a55", "4aa30cf4a23193", 0.5f, 2, null, null)]
-    [InlineData("parent4", "2bc5b4544b34e7", "4aa30ee8b6d4e3", 0.5f, 20, null, null)]
-    [InlineData("parent3", "2bc5b3b701b2ee", "4aa310dc9dd437", 1.0f, 2, null, null)]
-    [InlineData("parent5", "2bc5b4ec4f452c", "4aa312d0e19e10", 1.0f, 20, null, null)]
-    [InlineData("parent1", "2bc5ae6239c988", "4aa48941faee41", null, null, 2, 0)]
-    [InlineData("parent2", "2bc5b121b46b4a", "4aa48b3a078e81", null, null, 2, 1)]
-    [InlineData("parent3", "2bc5b325697a55", "4aa48d2e0e7a77", null, null, 2, 2)]
-    [InlineData("parent4", "2bc5b4544b34e7", "4aa48f227d01fd", null, null, 0, 0)]
-    [InlineData("parent3", "2bc5b3b701b2ee", "4aa49116545ede", null, null, 10, 10)]
-    [InlineData("parent5", "2bc5b4ec4f452c", "4aa4930a9675ae", null, null, 20, 20)]
-    public async Task Test_Details(string username, string childId, string goalId, float? progress, int? duration, int? numBooks, int? targetNumBooks )
+    [InlineData("parent1", "2bc5ae6239c988", "4aa30907023f3b", GoalMetric.Completion, 0)]
+    [InlineData("parent2", "2bc5b121b46b4a", "4aa30b00417f9f", GoalMetric.Completion, 5000)]
+    [InlineData("parent3", "2bc5b325697a55", "4aa30cf4a23193", GoalMetric.Completion, 2050)]
+    [InlineData("parent4", "2bc5b4544b34e7", "4aa30ee8b6d4e3", GoalMetric.Completion, 4050)]
+    [InlineData("parent3", "2bc5b3b701b2ee", "4aa310dc9dd437", GoalMetric.Completion, 2001)]
+    [InlineData("parent5", "2bc5b4ec4f452c", "4aa312d0e19e10", GoalMetric.Completion, 20001)]
+    [InlineData("parent1", "2bc5ae6239c988", "4aa48941faee41", GoalMetric.BooksRead, 0, 2)]
+    [InlineData("parent2", "2bc5b121b46b4a", "4aa48b3a078e81", GoalMetric.BooksRead, 1, 2)]
+    [InlineData("parent3", "2bc5b325697a55", "4aa48d2e0e7a77", GoalMetric.BooksRead, 2, 2)]
+    [InlineData("parent4", "2bc5b4544b34e7", "4aa48f227d01fd", GoalMetric.BooksRead, 0, 20)]
+    [InlineData("parent3", "2bc5b3b701b2ee", "4aa49116545ede", GoalMetric.BooksRead, 10, 20)]
+    [InlineData("parent5", "2bc5b4ec4f452c", "4aa4930a9675ae", GoalMetric.BooksRead, 20, 20)]
+    public async Task Test_Details(string username, string childId, string goalId, GoalMetric goalMetric, int progress, int target = 0 )
     {
-        await CheckResponse<GenericGoalChildResponse>(
-            async () => await Client.GetAsync(Routes.ChildGoals.Details(childId, goalId), username),
+        await CheckResponse<GoalResponse>(
+            async () => await Client.GetAsync(Routes.Children.Goals.Details(childId, goalId), username),
             HttpStatusCode.OK,
             content =>
             {
+                Assert.Equal(GoalType.Child, content.GoalType);
                 Assert.Equal(goalId, content.GoalId);
-                switch (content)
-                {
-                    case ChildGoalCompletionResponse contentCompletion:
-                        Assert.Equal(progress, contentCompletion.Progress);
-                        Assert.Equal(duration, contentCompletion.Duration);
-                        break;
-                    case ChildGoalNumBooksResponse contentNumBooks:
-                        Assert.Equal(targetNumBooks, contentNumBooks.TargetNumBooks);
-                        Assert.Equal(numBooks, contentNumBooks.NumBooks);
-                        break;
-                }
+                Assert.Equal(goalMetric, content.GoalMetric);
+                Assert.Equal(progress, content.Progress);
+                Assert.Equal(target, content.Target);
             });
     }
     
     
     // New Goal
+
+    [Theory]
+    [InlineData("parent2", Constants.Parent1Child1Id)]
+    public async Task Test_AddGoal_WrongChild(string username, string childId)
+    {
+        await CheckForError(
+            async () => await Client.PostPayloadAsync(Routes.Children.Goals.Add(childId),
+                new GoalAddRequest(GoalType.Child,
+                    GoalMetric.Completion,
+                    "Title",
+                    DateOnly.Parse("2025-01-01"),
+                    DateOnly.Parse("2025-02-02"),
+                    1),
+                username),
+            HttpStatusCode.NotFound,
+            ErrorResponse.ChildNotFound
+        );
+    }
+    
+    [Theory]
+    [InlineData("parent2", Constants.Parent2Child1Id)]
+    public async Task Test_AddGoal_WrongGoalType(string username, string childId)
+    {
+        await CheckForError(
+            async () => await Client.PostPayloadAsync(Routes.Children.Goals.Add(childId),
+                new GoalAddRequest(GoalType.Classroom,
+                    GoalMetric.Completion,
+                    "Title",
+                    DateOnly.Parse("2025-01-01"),
+                    DateOnly.Parse("2025-02-02"),
+                    1),
+                username),
+            HttpStatusCode.BadRequest,
+            ErrorResponse.GoalTypeInvalid
+        );
+        
+        await CheckForError(
+            async () => await Client.PostPayloadAsync(Routes.Children.Goals.Add(childId),
+                new GoalAddRequest(GoalType.ClassroomAggregate,
+                    GoalMetric.Completion,
+                    "Title",
+                    DateOnly.Parse("2025-01-01"),
+                    DateOnly.Parse("2025-02-02"),
+                    1),
+                username),
+            HttpStatusCode.BadRequest,
+            ErrorResponse.GoalTypeInvalid
+        );
+    }
     
     [Theory]
     [InlineData("parent3", "2bc5b2a4771d7f")]
-    public async Task Test_AddGoal(string parentUsername, string childId)
+    public async Task Test_AddGoal(string username, string childId)
     {
-        ChildGoalAddRequest requestCompletion = new("CompletionGoal", DateOnly.Parse("2024-12-01"), DateOnly.Parse("2025-01-01"));
-        var goalId1 = await CheckResponse<ChildGoalCompletionResponse, string>(
-            async () => await Client.PostPayloadAsync(Routes.ChildGoals.Add(childId), requestCompletion, parentUsername),
+        const string completionGoalTitle = "CompletionGoal";
+        const string booksGoalTitle = "NumBooksGoal";
+        const int numBooksTarget = 5;
+        DateOnly startDate = DateOnly.Parse("2024-12-01");
+        DateOnly endDate = DateOnly.Parse("2025-01-01");
+        
+        GoalAddRequest requestCompletion = new(GoalType.Child, GoalMetric.Completion, completionGoalTitle, startDate, endDate, 0);
+        string goalId1 = await CheckResponse<GoalResponse, string>(
+            async () => await Client.PostPayloadAsync(Routes.Children.Goals.Add(childId), requestCompletion, username),
             HttpStatusCode.OK,
             content =>
             {
-                Assert.Equal("CompletionGoal", content.Title);
-                Assert.Equal(DateOnly.Parse("2025-01-01"), content.EndDate);
+                Assert.Equal(GoalMetric.Completion, content.GoalMetric);
+                Assert.Equal(completionGoalTitle, content.Title);
+                Assert.Equal(startDate, content.StartDate);
+                Assert.Equal(endDate, content.EndDate);
+                Assert.Equal(0, content.Target);
                 return content.GoalId;
             });
 
-        var cg1 = await Context.ChildGoals.FindAsync(goalId1);
+        Goal? cg1 = await Context.Goals.FindAsync(goalId1);
         Assert.NotNull(cg1);
-        Assert.Equal("CompletionGoal", cg1.Title);
+        Assert.Equal(GoalMetric.Completion, cg1.GoalMetric);
+        Assert.Equal(completionGoalTitle, cg1.Title);
+        Assert.Equal(startDate, cg1.StartDate);
+        Assert.Equal(endDate, cg1.EndDate);
+        Assert.Equal(0, cg1.Target);
         Assert.Single(this.Context.Children.Include(child => child.Goals).First(c => c.ChildId == childId).Goals);
         
-        ChildGoalAddRequest requestNumBooks = new("NumBooksGoal", DateOnly.Parse("2025-04-02"), DateOnly.Parse("2025-02-02"), 5);
-        var goalId2 = await CheckResponse<ChildGoalNumBooksResponse, string>(
-            async () => await Client.PostPayloadAsync(Routes.ChildGoals.Add(childId), requestNumBooks, parentUsername),
+        GoalAddRequest requestNumBooks = new(GoalType.Child, GoalMetric.BooksRead, booksGoalTitle, startDate, endDate, numBooksTarget);
+        string goalId2 = await CheckResponse<GoalResponse, string>(
+            async () => await Client.PostPayloadAsync(Routes.Children.Goals.Add(childId), requestNumBooks, username),
             HttpStatusCode.OK,
             content =>
             {
-                Assert.Equal("NumBooksGoal", content.Title);
-                Assert.Equal(DateOnly.Parse("2025-02-02"), content.EndDate);
-                Assert.Equal(5, content.TargetNumBooks);
+                Assert.Equal(GoalMetric.BooksRead, content.GoalMetric);
+                Assert.Equal(booksGoalTitle, content.Title);
+                Assert.Equal(startDate, content.StartDate);
+                Assert.Equal(endDate, content.EndDate);
+                Assert.Equal(numBooksTarget, content.Target);
                 return content.GoalId;
             });
 
-        var cg2 = await Context.ChildGoals.FindAsync(goalId2);
+        Goal? cg2 = await Context.Goals.FindAsync(goalId2);
         Assert.NotNull(cg2);
-        Assert.Equal("NumBooksGoal", cg2.Title);
+        Assert.Equal(GoalMetric.BooksRead, cg2.GoalMetric);
+        Assert.Equal(booksGoalTitle, cg2.Title);
+        Assert.Equal(startDate, cg2.StartDate);
+        Assert.Equal(endDate, cg2.EndDate);
+        Assert.Equal(numBooksTarget, cg2.Target);
         Assert.Equal(2, this.Context.Children.Include(child => child.Goals).First(c => c.ChildId == childId).Goals.Count);
     }
     
@@ -197,23 +297,23 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [Theory]
     [InlineData("parent3", "2bc5b325697a55", "4aa30cf4a23193", "NewComplete")]
     [InlineData("parent2", "2bc5b121b46b4a", "4aa48b3a078e81", "NewNumBooks")]
-    public async Task Test_EditGoalTitle(string parentUsername, string childId, string goalId, string newTitle)
+    public async Task Test_EditGoalTitle(string username, string childId, string goalId, string newTitle)
     {
-        int numChildGoals = this.Context.ChildGoals.Count(c => c.ChildId == childId);
+        int numChildGoals = this.Context.GoalChildren.Count(c => c.ChildId == childId);
         
-        ChildGoalEditRequest editRequest = new(newTitle, null, null);
+        GoalEditRequest editRequest = new(Title: newTitle);
         
-        await CheckResponse<GenericGoalChildResponse>(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.Edit(childId, goalId), editRequest, parentUsername),
+        await CheckResponse<GoalResponse>(
+            async () => await Client.PutPayloadAsync(Routes.Children.Goals.Edit(childId, goalId), editRequest, username),
             HttpStatusCode.OK,
             content =>
             {
                 Assert.Equal(goalId, content.GoalId);
-                Assert.Equal(newTitle, content.Title);
+                Assert.Equal(newTitle, newTitle);
             });
 
         Assert.Equal(numChildGoals, this.Context.Children.Include(child => child.Goals).First(c => c.ChildId == childId).Goals.Count);
-        ChildGoal? g = await Context.ChildGoals.FindAsync(goalId);
+        GoalChild? g = await Context.GoalChildren.FindAsync(goalId);
         Assert.NotNull(g);
         Assert.Equal(newTitle, g.Title);
     }
@@ -221,14 +321,14 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [Theory]
     [InlineData("parent3", "2bc5b325697a55", "4aa30cf4a23193", "2023-02-17")]
     [InlineData("parent2", "2bc5b121b46b4a", "4aa48b3a078e81", "2013-10-04")]
-    public async Task Test_EditGoalStartDate(string parentUsername, string childId, string goalId, string newStartDate)
+    public async Task Test_EditGoalStartDate(string username, string childId, string goalId, string newStartDate)
     {
-        int numChildGoals = this.Context.ChildGoals.Count(c => c.ChildId == childId);
+        int numChildGoals = this.Context.GoalChildren.Count(c => c.ChildId == childId);
         
-        ChildGoalEditRequest editRequest = new(null, DateOnly.Parse(newStartDate), null, null);
+        GoalEditRequest editRequest = new(StartDate: DateOnly.Parse(newStartDate));
         
-        await CheckResponse<GenericGoalChildResponse>(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.Edit(childId, goalId), editRequest, parentUsername),
+        await CheckResponse<GoalResponse>(
+            async () => await Client.PutPayloadAsync(Routes.Children.Goals.Edit(childId, goalId), editRequest, username),
             HttpStatusCode.OK,
             content =>
             {
@@ -237,7 +337,7 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
             });
 
         Assert.Equal(numChildGoals, this.Context.Children.Include(child => child.Goals).First(c => c.ChildId == childId).Goals.Count);
-        ChildGoal? g = await Context.ChildGoals.FindAsync(goalId);
+        GoalChild? g = await Context.GoalChildren.FindAsync(goalId);
         Assert.NotNull(g);
         Assert.Equal(DateOnly.Parse(newStartDate), g.StartDate);
     }
@@ -245,14 +345,14 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [Theory]
     [InlineData("parent3", "2bc5b325697a55", "4aa30cf4a23193", "2023-02-17")]
     [InlineData("parent2", "2bc5b121b46b4a", "4aa48b3a078e81", "2013-10-04")]
-    public async Task Test_EditGoalEndDate(string parentUsername, string childId, string goalId, string newEndDate)
+    public async Task Test_EditGoalEndDate(string username, string childId, string goalId, string newEndDate)
     {
-        int numChildGoals = this.Context.ChildGoals.Count(c => c.ChildId == childId);
+        int numChildGoals = this.Context.GoalChildren.Count(c => c.ChildId == childId);
         
-        ChildGoalEditRequest editRequest = new(null, null, DateOnly.Parse(newEndDate), null);
+        GoalEditRequest editRequest = new(EndDate: DateOnly.Parse(newEndDate));
         
-        await CheckResponse<GenericGoalChildResponse>(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.Edit(childId, goalId), editRequest, parentUsername),
+        await CheckResponse<GoalResponse>(
+            async () => await Client.PutPayloadAsync(Routes.Children.Goals.Edit(childId, goalId), editRequest, username),
             HttpStatusCode.OK,
             content =>
             {
@@ -261,7 +361,7 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
             });
 
         Assert.Equal(numChildGoals, this.Context.Children.Include(child => child.Goals).First(c => c.ChildId == childId).Goals.Count);
-        ChildGoal? g = await Context.ChildGoals.FindAsync(goalId);
+        GoalChild? g = await Context.GoalChildren.FindAsync(goalId);
         Assert.NotNull(g);
         Assert.Equal(DateOnly.Parse(newEndDate), g.EndDate);
     }
@@ -269,33 +369,25 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [Theory]
     [InlineData("parent3", "2bc5b325697a55", "4aa30cf4a23193", 5)]
     [InlineData("parent2", "2bc5b121b46b4a", "4aa48b3a078e81", 7)]
-    public async Task Test_EditGoalTargetNumBooks(string username, string childId, string goalId, int targetNumBooks)
+    public async Task Test_EditGoalTargetNumBooks(string username, string childId, string goalId, int newTarget)
     {
-        int numChildGoals = this.Context.ChildGoals.Count(c => c.ChildId == childId);
+        int numChildGoals = this.Context.GoalChildren.Count(c => c.ChildId == childId);
         
-        ChildGoalEditRequest editRequest = new(null, null, null, targetNumBooks);
+        GoalEditRequest editRequest = new(Target: newTarget);
         
-        await CheckResponse<GenericGoalChildResponse>(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.Edit(childId, goalId), editRequest, username),
+        await CheckResponse<GoalResponse>(
+            async () => await Client.PutPayloadAsync(Routes.Children.Goals.Edit(childId, goalId), editRequest, username),
             HttpStatusCode.OK,
             content =>
             {
                 Assert.Equal(goalId, content.GoalId);
-                if (content is ChildGoalNumBooksResponse numBooksContent)
-                {
-                    Assert.Equal(targetNumBooks, numBooksContent.TargetNumBooks);
-                }
+                Assert.Equal(newTarget, content.Target);
             });
 
         Assert.Equal(numChildGoals, this.Context.Children.Include(child => child.Goals).First(c => c.ChildId == childId).Goals.Count);
-        ChildGoal? g = await Context.ChildGoals.FindAsync(goalId);
+        GoalChild? g = await Context.GoalChildren.FindAsync(goalId);
         Assert.NotNull(g);
-
-        // Should succeed but do nothing if goal type is completion metric
-        if (g is ChildGoalNumBooks nbg)
-        {
-            Assert.Equal(targetNumBooks, nbg.TargetNumBooks);
-        }
+        Assert.Equal(newTarget, g.Target);
     }
     
     
@@ -304,26 +396,13 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [Theory]
     [InlineData("parent3", "2bc5b325697a55", "4aa30cf4a23193")]
     [InlineData("parent3", "2bc5b325697a55", "4aa48d2e0e7a77")]
-    public async Task Test_DeleteGoal(string parentUsername, string childId, string goalId)
+    public async Task Test_DeleteGoal(string username, string childId, string goalId)
     {
-        int numClassGoals = this.Context.Children
-            .Include(child => child.Classrooms)
-            .ThenInclude(classroom => classroom.Goals)
-            .FirstOrDefault(child => child.ChildId == childId)!
-            .Classrooms.SelectMany(c => c.Goals).Count();
+        await CheckResponse(
+            async () => await Client.DeleteAsync(Routes.Children.Goals.Delete(childId, goalId), username),
+            HttpStatusCode.NoContent);
         
-        await CheckResponse<AllGoalOverviewResponse>(
-            async () => await Client.DeleteAsync(Routes.ChildGoals.Delete(childId, goalId), parentUsername),
-            HttpStatusCode.OK,
-            content =>
-            {
-                Assert.Equal(1, content.CompletionGoals.Count + content.NumBookGoals.Count);
-                Assert.DoesNotContain(content.CompletionGoals, c => c.GoalId == goalId);
-                Assert.DoesNotContain(content.NumBookGoals, c => c.GoalId == goalId);
-                Assert.Equal(numClassGoals, content.ClassCompletionGoals.Count + content.ClassNumBooksGoals.Count);
-            });
-        
-        Assert.Null(await Context.ChildGoals.FindAsync(goalId));
+        Assert.Null(await Context.Goals.FindAsync(goalId));
     }
     
     
@@ -333,19 +412,9 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData(Constants.InvalidChildId, "InvalidGoalId")]
     public async Task Test_UpdateGoalLog_NotLoggedIn(string childId, string goalId)
     {
-        await CheckForError(async () => await Client.PutAsync(Routes.ChildGoals.UpdateProgress(childId, goalId)),
+        await CheckForError(async () => await Client.PutAsync(Routes.Children.Goals.Log(childId, goalId, 1)),
             HttpStatusCode.Unauthorized,
             ErrorResponse.Unauthorized);
-    }
-    
-    [Theory]
-    [InlineData("admin", Constants.InvalidChildId, "InvalidGoalId")]
-    [InlineData("teacher1", Constants.InvalidChildId, "InvalidGoalId")]
-    public async Task Test_UpdateGoalLog_NotParent(string username, string childId, string goalId)
-    {
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), new {}, username),
-            HttpStatusCode.Forbidden,
-            ErrorResponse.UserNotParent);
     }
     
     [Theory]
@@ -353,7 +422,7 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("parent2", Constants.Parent1Child1Id, "InvalidGoalId")]
     public async Task Test_UpdateGoalLog_ChildNotExistOrWrongParent(string username, string childId, string goalId)
     {
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), new {}, username),
+        await CheckForError(async () => await Client.PutAsync(Routes.Children.Goals.Log(childId, goalId, 1),  username),
             HttpStatusCode.NotFound,
             ErrorResponse.ChildNotFound);
     }
@@ -362,7 +431,25 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("parent1", Constants.Parent1Child1Id, "InvalidGoalId")]
     public async Task Test_UpdateGoalLog_GoalNotExist(string username, string childId, string goalId)
     {
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), new {},  username),
+        await CheckForError(async () => await Client.PutAsync(Routes.Children.Goals.Log(childId, goalId, 1),  username),
+            HttpStatusCode.NotFound,
+            ErrorResponse.GoalNotFound);
+    }
+    
+    [Theory]
+    [InlineData("parent3", Constants.Parent1Child1Id, "InvalidGoalId")]
+    public async Task Test_UpdateGoalLog_WrongChild(string username, string childId, string goalId)
+    {
+        await CheckForError(async () => await Client.PutAsync(Routes.Children.Goals.Log(childId, goalId, 1),  username),
+            HttpStatusCode.NotFound,
+            ErrorResponse.ChildNotFound);
+    }
+    
+    [Theory]
+    [InlineData("parent2", "2bc5b21dcd7110", "4aa30b00417f9f")]
+    public async Task Test_UpdateGoalLog_SameParentWrongChild(string username, string childId, string goalId)
+    {
+        await CheckForError(async () => await Client.PutAsync(Routes.Children.Goals.Log(childId, goalId, 1),  username),
             HttpStatusCode.NotFound,
             ErrorResponse.GoalNotFound);
     }
@@ -372,62 +459,13 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("parent1", Constants.Parent1Child1Id, "413a8732581806")] // class goal
     public async Task Test_UpdateGoalLog_NewCompletion(string username, string childId, string goalId)
     {
-        ClassGoalLogEditRequest request = new(NumBooks: 5);
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoMissing);
-        
-        request = new(Progress: 0);
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoMissing);
-        
-        request = new(Duration: 0);
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoMissing);
-        
-        request = new(Progress: 0, Duration: 0);
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoInvalid);
-        
-        request = new(Progress: 0, Duration: 1);
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoInvalid);
-        
-        request = new(Progress: 1, Duration: 0);
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoInvalid);
-        
-        request = new(Progress: 1);
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoMissing);
-        
-        request = new(Duration: 10);
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoMissing);
-        
-        request = new(Progress: 0.5f, Duration: 10);
         await CheckResponse<bool>(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
+            async () => await Client.PutAsync(Routes.Children.Goals.Log(childId, goalId, 10_050), username),
             HttpStatusCode.OK,
             Assert.False);
         
-        request = new(Progress: 1f, Duration: 10);
         await CheckResponse<bool>(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.OK,
-            Assert.True);
-        
-        // Should ignore extra fields
-        request = new(NumBooks: 5, Progress: 1f, Duration: 10);
-        await CheckResponse<bool>(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
+            async () => await Client.PutAsync(Routes.Children.Goals.Log(childId, goalId, 25_100), username),
             HttpStatusCode.OK,
             Assert.True);
     }
@@ -437,50 +475,19 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     [InlineData("parent1", Constants.Parent1Child1Id, "413b1d8ae65108")] // class goal
     public async Task Test_UpdateGoalLog_NewNumBooks(string username, string childId, string goalId)
     {
-        GoalProgressUpdateRequest request = new(Progress: 1);
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoMissing);
-        
-        request = new(NumBooks: 0);
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoInvalid);
-        
-        request = new(Duration: 10);
-        await CheckForError(async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoMissing);
-        
-        request = new(Progress: 0.5f, Duration: 10);
-        await CheckForError(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalEditInfoMissing);
-        
-        request = new(NumBooks: 1);
         await CheckResponse<bool>(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
+            async () => await Client.PutAsync(Routes.Children.Goals.Log(childId, goalId, 1), username),
             HttpStatusCode.OK,
             Assert.False);
         
-        request = new(NumBooks: 2);
         await CheckResponse<bool>(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
+            async () => await Client.PutAsync(Routes.Children.Goals.Log(childId, goalId, 2), username),
             HttpStatusCode.OK,
             Assert.True);
         
-        request = new(NumBooks: 3);
         await CheckResponse<bool>(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
+            async () => await Client.PutAsync(Routes.Children.Goals.Log(childId, goalId, 3), username),
             HttpStatusCode.OK,
             Assert.True);
-        
-        // Should ignore extra fields
-        request = new(NumBooks: 1, Progress: 1f, Duration: 10);
-        await CheckResponse<bool>(
-            async () => await Client.PutPayloadAsync(Routes.ChildGoals.UpdateProgress(childId, goalId), request, username),
-            HttpStatusCode.OK,
-            Assert.False);
     }
 }

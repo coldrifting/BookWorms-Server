@@ -110,7 +110,7 @@ public class ClassroomParentController(BookwormsDbContext context) : AuthControl
     {
         if (CurrentUser is not Parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         if (CurrentUserChild(childId) is not {} child)

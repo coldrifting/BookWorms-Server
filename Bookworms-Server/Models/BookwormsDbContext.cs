@@ -30,17 +30,12 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     public DbSet<ClassroomBookshelfBook> ClassroomBookshelfBooks { get; set; }
     public DbSet<ClassroomAnnouncement> ClassroomAnnouncements { get; set; }
 
-    public DbSet<ClassGoal> ClassGoals { get; set; }
-    public DbSet<ClassGoalCompletion> ClassGoalCompletions { get; set; }
-    public DbSet<ClassGoalNumBooks> ClassGoalNumBooks { get; set; }
-    
-    public DbSet<ClassGoalLog> ClassGoalLogs { get; set; }
-    public DbSet<ClassGoalLogCompletion> ClassGoalLogCompletions { get; set; }
-    public DbSet<ClassGoalLogNumBooks> ClassGoalLogNumBooks { get; set; }
-    
-    public DbSet<ChildGoal> ChildGoals { get; set; }
-    public DbSet<ChildGoalCompletion> ChildGoalCompletions { get; set; }
-    public DbSet<ChildGoalNumBooks> ChildGoalNumBooks { get; set; }
+    public DbSet<Goal> Goals { get; set; }
+    public DbSet<GoalChild> GoalChildren { get; set; }
+    public DbSet<GoalClassBase> GoalClassesBase { get; set; }
+    public DbSet<GoalClass> GoalClasses { get; set; }
+    public DbSet<GoalClassAggregate> GoalClassAggregates { get; set; }
+    public DbSet<GoalClassLog> GoalClassLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -146,14 +141,11 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	    Seed<ClassroomBookshelf>();
 	    Seed<ClassroomBookshelfBook>();
 	    Seed<ClassroomAnnouncement>();
-
-	    Seed<ClassGoalCompletion>();
-	    Seed<ClassGoalNumBooks>();
-	    Seed<ClassGoalLogCompletion>();
-	    Seed<ClassGoalLogNumBooks>();
-
-	    Seed<ChildGoalCompletion>();
-	    Seed<ChildGoalNumBooks>();
+	    
+        Seed<GoalChild>();
+        Seed<GoalClass>();
+        Seed<GoalClassAggregate>();
+        Seed<GoalClassLog>();
 	    
 	    // Fix any inconsistencies that result from inserting directly into DB
 	    foreach (Book book in Books.Include(b => b.Reviews))
@@ -173,9 +165,8 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	                           DELETE FROM ChildBookshelfBooks;
 	                           DELETE FROM ChildBookshelves;
 	                           DELETE FROM Children;
-	                           DELETE FROM ChildGoals;
-	                           DELETE FROM ClassGoalLogs;
-	                           DELETE FROM ClassGoals;
+	                           DELETE FROM Goals;
+	                           DELETE FROM GoalClassLogs;
 	                           DELETE FROM ClassroomAnnouncements;
 	                           DELETE FROM ClassroomBookshelfBooks;
 	                           DELETE FROM ClassroomBookshelves;

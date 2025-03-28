@@ -81,8 +81,8 @@ public record ErrorResponse(string Error, string Description)
     public static ErrorResponse GoalNotFound => new("Goal Not Found",
         "Could not find the requested goal");
 
-    public static ErrorResponse GoalEditInfoMissing => new("Goal Edit Info Missing",
-        "A required field was left null. Please ensure the correct info was added for the requested goal type.");
+    public static ErrorResponse GoalTypeInvalid => new("Goal Type Invalid",
+        "The provided goal type is not valid for this route");
 
     public static ErrorResponse GoalEditInfoInvalid => new("Goal Edit Info Invalid",
         "Provided values can not be 0");

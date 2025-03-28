@@ -23,7 +23,7 @@ public class ChildDetailsController(BookwormsDbContext context) : AuthController
     {
         return CurrentUser is Parent
             ? Ok(CurrentUserChildren().Select(c => c.ToResponse()).ToList())
-            : StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            : Forbidden(ErrorResponse.UserNotParent);
     }
 
 
@@ -46,7 +46,7 @@ public class ChildDetailsController(BookwormsDbContext context) : AuthController
     {
         if (CurrentUser is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         Child child = new(childName, parent.Username);
@@ -86,7 +86,7 @@ public class ChildEditController(BookwormsDbContext context) : AuthControllerBas
     {
         if (CurrentUser is not Parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         if (CurrentUserChild(childId) is not { } child)
@@ -136,7 +136,7 @@ public class ChildEditController(BookwormsDbContext context) : AuthControllerBas
     {
         if (CurrentUser is not Parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         if (CurrentUserChild(childId) is not { } child)

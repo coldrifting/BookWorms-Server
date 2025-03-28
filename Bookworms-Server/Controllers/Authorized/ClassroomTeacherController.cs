@@ -26,7 +26,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         Classroom? classroom = GetClassroomRelations(teacher);
@@ -55,7 +55,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         if (GetClassroom(teacher) is not null)
@@ -97,7 +97,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         if (GetClassroomRelations(teacher) is not { } classroom)
@@ -129,7 +129,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         if (GetClassroomRelations(teacher) is not { } classroom)
@@ -160,7 +160,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         if (GetClassroom(teacher) is not {} classroom)
@@ -193,7 +193,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         if (GetClassroomRelations(teacher) is not { } classroom)
@@ -233,7 +233,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         if (GetClassroomRelations(teacher) is not { } classroom)
@@ -276,7 +276,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         if (GetClassroomRelations(teacher) is not {} classroom)
@@ -318,7 +318,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         if (GetClassroomRelations(teacher) is not { } classroom)
@@ -359,7 +359,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         if (GetClassroomRelations(teacher) is not { } classroom)
@@ -395,7 +395,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         if (GetClassroomRelations(teacher) is not { } classroom)
@@ -431,7 +431,7 @@ public class ClassroomTeacherController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Teacher teacher)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotTeacher);
+            return Forbidden(ErrorResponse.UserNotTeacher);
         }
 
         if (GetClassroomRelations(teacher) is not { } classroom)

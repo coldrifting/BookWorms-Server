@@ -22,5 +22,11 @@
     "classroomName": "WELCOME TO THE WORLD OF TOMORROW",
     "teacherUsername": "teacher4",
     "classIcon": 4
+  },
+  {
+    "classroomCode": "ZZYZX2",
+    "classroomName": "You know what it is",
+    "teacherUsername": "teacher6",
+    "classIcon": 5
   }
 ]

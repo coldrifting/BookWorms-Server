@@ -1,0 +1,124 @@
+﻿[
+  {
+    "goalId": "4aa30907023f3b",
+    "childId": "2bc5ae6239c988",
+    "title": "Zero Progress Zero Duration",
+    "goalMetric": "Completion",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 0,
+    "progress": 0
+  },
+  {
+    "goalId": "4aa30b00417f9f",
+    "childId": "2bc5b121b46b4a",
+    "title": "Zero Progress Some Duration",
+    "goalMetric": "Completion",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 0,
+    "progress": 5000
+  },
+  {
+    "goalId": "4aa30cf4a23193",
+    "childId": "2bc5b325697a55",
+    "title": "Half Progress Low Duration",
+    "goalMetric": "Completion",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 0,
+    "progress": 2050
+  },
+  {
+    "goalId": "4aa30ee8b6d4e3",
+    "childId": "2bc5b4544b34e7",
+    "title": "Half Progress Some Duration",
+    "goalMetric": "Completion",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 0,
+    "progress": 4050
+  },
+  {
+    "goalId": "4aa310dc9dd437",
+    "childId": "2bc5b3b701b2ee",
+    "title": "One Progress Low Duration",
+    "goalMetric": "Completion",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 0,
+    "progress": 2001
+  },
+  {
+    "goalId": "4aa312d0e19e10",
+    "childId": "2bc5b4ec4f452c",
+    "title": "One Progress Some Duration",
+    "goalMetric": "Completion",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 0,
+    "progress": 20001
+  },
+  
+  
+  {
+    "goalId": "4aa48941faee41",
+    "childId": "2bc5ae6239c988",
+    "goalMetric": "BooksRead",
+    "title": "Low Target Zero Progress",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 2,
+    "progress": 0
+  },
+  {
+    "goalId": "4aa48b3a078e81",
+    "childId": "2bc5b121b46b4a",
+    "goalMetric": "BooksRead",
+    "title": "Low Target Some Progress",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 2,
+    "progress": 1
+  },
+  {
+    "goalId": "4aa48d2e0e7a77",
+    "childId": "2bc5b325697a55",
+    "goalMetric": "BooksRead",
+    "title": "Low Target Full Progress",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 2,
+    "progress": 2
+  },
+  {
+    "goalId": "4aa48f227d01fd",
+    "childId": "2bc5b4544b34e7",
+    "goalMetric": "BooksRead",
+    "title": "High Target Zero Progress",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 20,
+    "progress": 0
+  },
+  {
+    "goalId": "4aa49116545ede",
+    "childId": "2bc5b3b701b2ee",
+    "goalMetric": "BooksRead",
+    "title": "High Target Some Progress",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 20,
+    "progress": 10
+  },
+  {
+    "goalId": "4aa4930a9675ae",
+    "childId": "2bc5b4ec4f452c",
+    "goalMetric": "BooksRead",
+    "title": "High Target Full Progress",
+    "startDate": "2025-03-01",
+    "endDate": "2025-04-01",
+    "target": 20,
+    "progress": 20
+  }
+]

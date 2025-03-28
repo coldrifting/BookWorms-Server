@@ -30,7 +30,7 @@ public class RecommendationController(BookwormsDbContext context): AuthControlle
         {
             if (CurrentUser is not Parent)
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+                return Forbidden(ErrorResponse.UserNotParent);
             }
             if (CurrentUserChild(childId) is not {})
             {
@@ -94,7 +94,7 @@ public class RecommendationController(BookwormsDbContext context): AuthControlle
         {
             if (CurrentUser is not Parent)
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+                return Forbidden(ErrorResponse.UserNotParent);
             }
             if (CurrentUserChild(childId) is not {})
             {

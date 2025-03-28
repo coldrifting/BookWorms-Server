@@ -48,4 +48,12 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Controllers\Authorized\ClassroomGoalController.cs" />
+    <Compile Remove="Models\Data\ChildGoals.cs" />
+    <Compile Remove="Models\Data\ClassGoals.cs" />
+    <Compile Remove="Models\Entities\ChildGoal.cs" />
+    <Compile Remove="Models\Entities\ClassGoal.cs" />
+  </ItemGroup>
+
 </Project>

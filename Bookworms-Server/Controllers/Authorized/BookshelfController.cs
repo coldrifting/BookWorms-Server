@@ -31,7 +31,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     {
         if (CurrentUser is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         Child? child = GetChildWithAllBookshelves(childId, parent);
@@ -74,7 +74,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     {
         if (CurrentUser is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         Child? child = GetChildWithSpecifiedBookshelves(childId, parent, bookshelfType, includeBooks:true);
@@ -114,7 +114,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     {
         if (CurrentUser is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         if (bookshelfName is "Completed" or "In Progress")
@@ -161,7 +161,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     {
         if (CurrentUser is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         if (GetChildWithSpecifiedBookshelves(childId, parent, BookshelfType.Custom) is not { } child)
@@ -223,7 +223,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
         
         if (CurrentUser is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         if (GetChildWithSpecifiedBookshelves(childId, parent, bookshelfType, includeBooks:true) is not { } child)
@@ -291,7 +291,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
 
         if (CurrentUser is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         if (GetChildWithSpecifiedBookshelves(childId, parent, bookshelfType, includeBooks:true) is not { } child)
@@ -342,7 +342,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
         
         if (CurrentUser is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         if (GetChildWithSpecifiedBookshelves(childId, parent, bookshelfType, includeBooks:true) is not { } child)
@@ -381,7 +381,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     {
         if (CurrentUser is not Parent parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         if (GetChildWithSpecifiedBookshelves(childId, parent, BookshelfType.Custom) is not { } child)

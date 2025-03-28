@@ -48,4 +48,9 @@ public class AuthControllerBase : ControllerBase
     {
         return DbContext.Children.Where(child => child.ParentUsername == CurrentUser.Username).ToList();
     }
+
+    protected IActionResult Forbidden(object? value)
+    {
+        return StatusCode(StatusCodes.Status403Forbidden, value);
+    }
 }
