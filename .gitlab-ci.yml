@@ -15,10 +15,7 @@ variables:
 experiment:
     stage: exp
     script:
-        |
-        echo "Original: $CI_REGISTRY"
-        REGISTRY_NO_PORT=$(echo $CI_REGISTRY | cut -d':' -f1)
-        echo "Without port: $REGISTRY_NO_PORT"
+        - echo $CI_REGISTRY_IMAGE
 
 
 # When Merge Request is opened
