@@ -14,12 +14,10 @@ variables:
 # EXPERIMENT
 experiment:
     stage: exp
+    variables:
+        IMAGE_NAME: $CI_SERVER_HOST/$CI_PROJECT_PATH
     script:
-        - echo $CI_SERVER_HOST
-        - echo $CI_SERVER_NAME
-        - echo $CI_PROJECT_NAMESPACE
-        - echo $CI_PROJECT_PATH
-        - echo $CI_REGISTRY_IMAGE
+        - echo $IMAGE_NAME
 
 
 # When Merge Request is opened
