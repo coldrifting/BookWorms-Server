@@ -76,6 +76,8 @@ dependency_scanning:
 construct_tag_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
+        - if: $CI_COMMIT_TAG # Don't let tags created by this pipeline trigger pipelines of their own
+          when: never
     stage: prepare
     image: alpine:latest
     before_script:
@@ -109,6 +111,8 @@ construct_tag_job:
 build_image_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
+        - if: $CI_COMMIT_TAG
+          when: never
     stage: build-image
     image: docker:stable
     dependencies:
@@ -130,6 +134,8 @@ build_image_job:
 deploy_image_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
+        - if: $CI_COMMIT_TAG
+          when: never
     stage: deploy-image
     image: alpine:latest
     dependencies:
@@ -161,6 +167,8 @@ deploy_image_job:
 release_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
+        - if: $CI_COMMIT_TAG
+          when: never
     stage: release
     image: registry.gitlab.com/gitlab-org/release-cli:latest
     dependencies:
