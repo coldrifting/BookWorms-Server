@@ -13,8 +13,6 @@ variables:
 
 # EXPERIMENT
 experiment:
-    rules:
-        - if: '$RUN_EXP'
     stage: exp
     script:
         - echo $CI_REGISTRY
