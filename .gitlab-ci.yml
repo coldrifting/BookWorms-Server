@@ -3,6 +3,7 @@ stages:
     - test
     - security
     - prepare
+    - build-image
     - deploy-image
     - release
 
@@ -75,6 +76,8 @@ dependency_scanning:
 construct_tag_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
+        - if: $CI_COMMIT_TAG # Don't let tags created by this pipeline trigger pipelines of their own
+          when: never
     stage: prepare
     image: alpine:latest
     before_script:
@@ -105,10 +108,12 @@ construct_tag_job:
             dotenv: variables.env
     resource_group: common
 
-build_and_deploy_image_job:
+build_image_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
-    stage: deploy-image
+        - if: $CI_COMMIT_TAG
+          when: never
+    stage: build-image
     image: docker:stable
     dependencies:
         - construct_tag_job
@@ -119,6 +124,25 @@ build_and_deploy_image_job:
         DOCKER_HOST: "tcp://docker:2375"
         DOCKER_TLS_CERTDIR: ""
         DOCKER_DRIVER: overlay2
+        IMAGE_NAME: $CI_SERVER_HOST/$CI_PROJECT_PATH
+    script:
+        - REGISTRY_NO_PORT=$(echo $CI_REGISTRY | cut -d':' -f1)
+        - echo "$CI_REGISTRY_PASSWORD" | docker login $REGISTRY_NO_PORT -u $CI_REGISTRY_USER --password-stdin
+        - docker build -t $IMAGE_NAME:$TAG .
+        - docker push $IMAGE_NAME:$TAG
+
+deploy_image_job:
+    rules:
+        - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
+        - if: $CI_COMMIT_TAG
+          when: never
+    stage: deploy-image
+    image: alpine:latest
+    dependencies:
+        - construct_tag_job
+        - build_image_job
+    variables:
+        IMAGE_NAME: $CI_SERVER_HOST/$CI_PROJECT_PATH
     before_script:
         - |
           # Install open-ssh client
@@ -129,12 +153,11 @@ build_and_deploy_image_job:
           echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -q -
     script:
         - |
-          # Build a new image with the constructed tag
-          docker build -t bookworms-server:$TAG .
-          # Load the new image into the EC2 instance's Docker process
-          docker save bookworms-server:$TAG | ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST sudo docker load
-          # Restart the server service
+          # Pull the new image and restart the server service
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST <<- EOF
+            REGISTRY_NO_PORT=$(echo $CI_REGISTRY | cut -d':' -f1)
+            echo "$CI_REGISTRY_PASSWORD" | sudo docker login $REGISTRY_NO_PORT -u $CI_REGISTRY_USER --password-stdin
+            sudo docker pull $IMAGE_NAME:$TAG
             sudo systemctl restart bookworms.service
             # Prune any images older than 1 hour
             sudo docker image prune -a --force --filter 'until=1h'
@@ -144,6 +167,8 @@ build_and_deploy_image_job:
 release_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
+        - if: $CI_COMMIT_TAG
+          when: never
     stage: release
     image: registry.gitlab.com/gitlab-org/release-cli:latest
     dependencies:
