@@ -15,6 +15,10 @@ variables:
 experiment:
     stage: exp
     script:
+        - echo $CI_SERVER_HOST
+        - echo $CI_SERVER_NAME
+        - echo $CI_PROJECT_NAMESPACE
+        - echo $CI_PROJECT_PATH
         - echo $CI_REGISTRY_IMAGE
 
 
