@@ -1,4 +1,5 @@
 stages:
+    - exp
     - build
     - test
     - security
@@ -8,6 +9,15 @@ stages:
 
 variables:
     DOTNET_VERSION: "8.0"
+
+
+# EXPERIMENT
+experiment:
+    rules:
+        - if: '$RUN_EXP'
+    stage: exp
+    script:
+        - echo $CI_REGISTRY
 
 
 # When Merge Request is opened
