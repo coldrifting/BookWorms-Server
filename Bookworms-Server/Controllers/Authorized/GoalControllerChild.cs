@@ -9,8 +9,18 @@ namespace BookwormsServer.Controllers;
 [Route("/children/{childId}/goals/{goalId}/[action]")]
 public class GoalControllerChild(BookwormsDbContext context) : AuthControllerBase(context)
 {
+    /// <summary>
+    /// Gets all goals for the selected child
+    /// </summary>
+    /// <response code="200">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a parent</response>
+    /// <response code="404">The child does not exist, or is not managed by this parent</response>
     [HttpGet]
     [Route("/children/{childId}/goals/[action]")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GoalResponse>))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult All(string childId)
     {
         if (CurrentUser is not Parent)
@@ -36,10 +46,21 @@ public class GoalControllerChild(BookwormsDbContext context) : AuthControllerBas
 
         return Ok(allGoals);
     }
-
-
+    
+    /// <summary>
+    /// Adds a new goal for the selected child
+    /// </summary>
+    /// <response code="200">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a parent</response>
+    /// <response code="404">The child does not exist, or is not managed by this parent</response>
+    /// <response code="422">The parent has attempted to add a classroom goal</response>
     [HttpPost]
     [Route("/children/{childId}/goals/[action]")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GoalResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     public IActionResult Add(string childId, GoalAddRequest payload)
     {
         if (CurrentUser is not Parent)
@@ -54,7 +75,7 @@ public class GoalControllerChild(BookwormsDbContext context) : AuthControllerBas
 
         if (payload.GoalType is GoalType.Classroom or GoalType.ClassroomAggregate)
         {
-            return BadRequest(ErrorResponse.GoalTypeInvalid);
+            return UnprocessableEntity(ErrorResponse.GoalTypeInvalid);
         }
 
         var newChildGoal = new GoalChild(
@@ -70,7 +91,14 @@ public class GoalControllerChild(BookwormsDbContext context) : AuthControllerBas
 
         return Ok(newChildGoal.ToResponse());
     }
-
+    
+    /// <summary>
+    /// Gets details about a requested goal, if the goal exists
+    /// </summary>
+    /// <response code="200">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a parent</response>
+    /// <response code="404">The child or goal does not exist, or does not have access to the requested goal</response>
     [HttpGet]
     public IActionResult Details(string childId, string goalId)
     {
@@ -92,7 +120,20 @@ public class GoalControllerChild(BookwormsDbContext context) : AuthControllerBas
         return Ok(goal.ToResponse());
     }
     
+    /// <summary>
+    /// Logs a child's progress towards a goal, if the goal exists
+    /// </summary>
+    /// <remarks>
+    /// Returns true if the child has completed the goal
+    /// </remarks>
+    /// <response code="200">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a parent</response>
+    /// <response code="404">The child or goal does not exist, or does not have access to the requested goal</response>
     [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Log(string childId, string goalId, int progress)
     {
         if (CurrentUser is not Parent)
@@ -144,7 +185,17 @@ public class GoalControllerChild(BookwormsDbContext context) : AuthControllerBas
         return Ok(log2.IsCompleted);
     }
     
+    /// <summary>
+    /// Edits a child goal, if it exists
+    /// </summary>
+    /// <response code="200">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a parent</response>
+    /// <response code="404">The child or goal does not exist, or does not have access to the requested goal</response>
     [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GoalResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Edit(string childId, string goalId, GoalEditRequest payload)
     {
         if (CurrentUser is not Parent)
@@ -173,7 +224,18 @@ public class GoalControllerChild(BookwormsDbContext context) : AuthControllerBas
         return Ok(goalChild.ToResponse());
     }
     
+    /// <summary>
+    /// Deletes a child goal, if it exists
+    /// </summary>
+    /// <response code="204">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a parent</response>
+    /// <response code="404">The child or goal does not exist, or does not have access to the requested goal</response>
     [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     public IActionResult Delete(string childId, string goalId)
     {
         if (CurrentUser is not Parent)

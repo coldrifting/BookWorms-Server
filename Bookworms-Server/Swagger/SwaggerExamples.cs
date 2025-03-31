@@ -399,7 +399,12 @@ public static class SwaggerExamples
     {
         public GoalEditRequest GetExamples()
         {
-            return new(GoalMetric: GoalMetric.BooksRead);
+            return new(
+                GoalMetric.BooksRead,
+                "_new_title_",
+                DateOnly.Parse("2025-01-23"),
+                DateOnly.Parse("2025-02-27"),
+                20);
         }
     }
 

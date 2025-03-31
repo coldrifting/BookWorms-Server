@@ -25,23 +25,7 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
         DateOnly.Parse("2025-01-01"), 
         DateOnly.Parse("2025-02-02"), 
         1);
-    
-    private static readonly GoalAddRequest NewClassCompletionGoal = new(
-        GoalType.Classroom, 
-        GoalMetric.Completion,
-        "ClassCompletionGoalTitle", 
-        DateOnly.Parse("2025-01-01"), 
-        DateOnly.Parse("2025-02-02"), 
-        1);
-    
-    private static readonly GoalAddRequest NewClassAggregateMinutesRead = new(
-        GoalType.ClassroomAggregate, 
-        GoalMetric.MinutesRead,
-        "ClassAggregateMinutesReadGoalTitle", 
-        DateOnly.Parse("2025-01-01"), 
-        DateOnly.Parse("2025-02-02"), 
-        1);
-    
+
     [Fact]
     public async Task Test_ChildGoalRoutes_NotLoggedIn()
     {
@@ -204,32 +188,20 @@ public class GoalParentTests(CompositeFixture fixture) : BookwormsIntegrationTes
     }
     
     [Theory]
-    [InlineData("parent2", Constants.Parent2Child1Id)]
-    public async Task Test_AddGoal_WrongGoalType(string username, string childId)
+    [InlineData("parent2", Constants.Parent2Child1Id, GoalType.Classroom)]
+    [InlineData("parent2", Constants.Parent2Child1Id, GoalType.ClassroomAggregate)]
+    public async Task Test_AddGoal_WrongGoalType(string username, string childId, GoalType goalType)
     {
         await CheckForError(
             async () => await Client.PostPayloadAsync(Routes.Children.Goals.Add(childId),
-                new GoalAddRequest(GoalType.Classroom,
+                new GoalAddRequest(goalType,
                     GoalMetric.Completion,
                     "Title",
                     DateOnly.Parse("2025-01-01"),
                     DateOnly.Parse("2025-02-02"),
                     1),
                 username),
-            HttpStatusCode.BadRequest,
-            ErrorResponse.GoalTypeInvalid
-        );
-        
-        await CheckForError(
-            async () => await Client.PostPayloadAsync(Routes.Children.Goals.Add(childId),
-                new GoalAddRequest(GoalType.ClassroomAggregate,
-                    GoalMetric.Completion,
-                    "Title",
-                    DateOnly.Parse("2025-01-01"),
-                    DateOnly.Parse("2025-02-02"),
-                    1),
-                username),
-            HttpStatusCode.BadRequest,
+            HttpStatusCode.UnprocessableContent,
             ErrorResponse.GoalTypeInvalid
         );
     }

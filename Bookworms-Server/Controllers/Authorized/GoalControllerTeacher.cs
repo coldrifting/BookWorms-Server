@@ -9,8 +9,18 @@ namespace BookwormsServer.Controllers;
 [Route("/homeroom/goals/{goalId}/[action]")]
 public class GoalControllerTeacher(BookwormsDbContext context) : AuthControllerBase(context)
 {
+    /// <summary>
+    /// Gets all goals from the logged-in teacher's classroom
+    /// </summary>
+    /// <response code="200">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a teacher</response>
+    /// <response code="404">The teacher does not have a classroom</response>
     [HttpGet]
     [Route("/homeroom/goals/all")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GoalResponse>))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult All()
     {
         if (CurrentUser is not Teacher teacher)
@@ -34,8 +44,20 @@ public class GoalControllerTeacher(BookwormsDbContext context) : AuthControllerB
         return Ok(classGoalsTeacher);
     }
 
+    /// <summary>
+    /// Adds a goal to the logged-in teacher's classroom
+    /// </summary>
+    /// <response code="200">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a teacher</response>
+    /// <response code="404">The teacher does not have a classroom</response>
+    /// <response code="422">The teacher has attempted to add a child goal</response>
     [HttpPost]
     [Route("/homeroom/goals/add")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GoalResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     public IActionResult Add(GoalAddRequest payload)
     {
         if (CurrentUser is not Teacher teacher)
@@ -50,7 +72,7 @@ public class GoalControllerTeacher(BookwormsDbContext context) : AuthControllerB
 
         if (payload.GoalType is GoalType.Child)
         {
-            return BadRequest(ErrorResponse.GoalTypeInvalid);
+            return UnprocessableEntity(ErrorResponse.GoalTypeInvalid);
         }
         
         GoalClassBase newClassGoal = payload.GoalType == GoalType.Classroom
@@ -81,7 +103,17 @@ public class GoalControllerTeacher(BookwormsDbContext context) : AuthControllerB
         return Ok(returnGoal.ToTeacherResponse());
     }
 
+    /// <summary>
+    /// Gets details about a specific goal from the logged-in teacher's classroom
+    /// </summary>
+    /// <response code="200">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a teacher</response>
+    /// <response code="404">The teacher does not have a classroom, or the goal does not exist</response>
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GoalResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Details(string goalId, [FromQuery] bool extended = false)
     {
         if (CurrentUser is not Teacher teacher)
@@ -108,7 +140,17 @@ public class GoalControllerTeacher(BookwormsDbContext context) : AuthControllerB
         return Ok(goalClass.ToTeacherResponse(extended));
     }
 
+    /// <summary>
+    /// Edits a goal in the logged-in teacher's classroom
+    /// </summary>
+    /// <response code="200">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a teacher</response>
+    /// <response code="404">The teacher does not have a classroom, or the goal does not exist</response>
     [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GoalResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Edit(string goalId, GoalEditRequest payload)
     {
         if (CurrentUser is not Teacher teacher)
@@ -143,7 +185,19 @@ public class GoalControllerTeacher(BookwormsDbContext context) : AuthControllerB
         return Ok(goalClass.ToTeacherResponse());
     }
 
+
+    /// <summary>
+    /// Deletes a goal from the logged-in teacher's classroom
+    /// </summary>
+    /// <response code="204">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a teacher</response>
+    /// <response code="404">The teacher does not have a classroom, or the goal does not exist</response>
     [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     public IActionResult Delete(string goalId)
     {
         if (CurrentUser is not Teacher teacher)

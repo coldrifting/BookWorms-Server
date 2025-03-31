@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ namespace BookwormsServer.Controllers;
 [Authorize]
 [ApiController]
 [Produces("application/json")]
+[ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
 public class AuthControllerBase : ControllerBase
 {
     protected AuthControllerBase(BookwormsDbContext context)

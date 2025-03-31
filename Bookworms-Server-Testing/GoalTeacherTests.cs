@@ -228,7 +228,7 @@ public class GoalTeacherTests(CompositeFixture fixture) : BookwormsIntegrationTe
                     DateOnly.Parse("2025-01-01"), 
                     DateOnly.Parse("2025-02-02"), 
                     5), username),
-            HttpStatusCode.BadRequest,
+            HttpStatusCode.UnprocessableEntity,
             ErrorResponse.GoalTypeInvalid);
     }
     
@@ -388,8 +388,6 @@ public class GoalTeacherTests(CompositeFixture fixture) : BookwormsIntegrationTe
         await Client.PostAsync(Routes.Classrooms.Join(Constants.Parent1Child1Id, classCode), "parent1");
         await Client.PutAsync(Routes.Children.Goals.Log(Constants.Parent1Child1Id, goalId, 10), "parent1");
 
-        var x =  Context.ClassroomChildren.ToList();
-            
         await CheckResponse<GoalResponse>(
             async () => await Client.GetAsync(Routes.Classrooms.Goals.Details(goalId, true), username),
             HttpStatusCode.OK,
