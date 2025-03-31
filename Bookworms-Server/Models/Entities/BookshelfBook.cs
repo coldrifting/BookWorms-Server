@@ -12,20 +12,16 @@ public class CompletedBookshelfBook
     {
     }
 
-    public CompletedBookshelfBook(int bookshelfId, string bookId, double starRating)
+    public CompletedBookshelfBook(int bookshelfId, string bookId)
     {
         BookshelfId = bookshelfId;
         BookId = bookId;
-        StarRating = starRating;
     }
     
     public int BookshelfId { get; set; }
     
     [StringLength(20)]
     public required string BookId { get; set; }
-
-    [Range(0, 5, ErrorMessage = "Star rating must be between {0} and {1}.")]
-    public double StarRating { get; set; }
 
     // Navigation
     

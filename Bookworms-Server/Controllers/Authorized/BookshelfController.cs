@@ -192,7 +192,6 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     /// <param name="childId">The ID of the child to use for this route</param>
     /// <param name="bookshelfName">The name of the bookshelf to insert a book into</param>
     /// <param name="bookId">The id of the book to insert</param>
-    /// <param name="starRating">The child's star rating of the book, if inserting into Completed</param>
     /// <returns>The bookshelf name and a list of all the books it contains</returns>
     /// <response code="200">The book was inserted successfully</response>
     /// <response code="401">The user is not logged in</response>
@@ -206,7 +205,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
-    public IActionResult Insert(string childId, string bookshelfName, [FromQuery] string bookId, [FromQuery] double? starRating = null)
+    public IActionResult Insert(string childId, string bookshelfName, [FromQuery] string bookId)
     {
         BookshelfType bookshelfType = bookshelfName switch
         {
@@ -214,12 +213,6 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
             "In Progress" => BookshelfType.InProgress,
             _ => BookshelfType.Custom
         };
-
-        // Okay to ignore star rating if it's provided in error, but not if it's not provided when needed
-        if (bookshelfType is BookshelfType.Completed && starRating is null)
-        {
-            return UnprocessableEntity(ErrorResponse.StarRatingRequired);
-        }
         
         if (CurrentUser is not Parent parent)
         {
@@ -251,8 +244,7 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
                 DbContext.CompletedBookshelfBooks.Add(new()
                 {
                     BookshelfId = bookshelf.BookshelfId,
-                    BookId = book.BookId,
-                    StarRating = (double)starRating!
+                    BookId = book.BookId
                 });
                 child.InProgress!.Books.Remove(book);
             }

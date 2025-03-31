@@ -301,9 +301,6 @@ namespace BookwormsServer.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
-                    b.Property<double>("StarRating")
-                        .HasColumnType("double");
-
                     b.HasKey("BookshelfId", "BookId");
 
                     b.HasIndex("BookId");
