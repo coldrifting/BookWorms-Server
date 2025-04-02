@@ -135,7 +135,7 @@ public class ClassroomAnnouncementTests(CompositeFixture fixture) : BookwormsInt
             content =>
             {
                 Assert.Equal(numRemaining, content.Count);
-                Assert.Contains(content, c => c.AnnoucementId == containedId && c.Title == containedTitle && c.Body == containedBody);
+                Assert.Contains(content, c => c.AnnouncementId == containedId && c.Title == containedTitle && c.Body == containedBody);
             });
     }
 
