@@ -11,7 +11,7 @@ public record ClassroomAnnouncementEditRequest(
     );
 
 public record ClassroomAnnouncementResponse(
-    string AnnoucementId,
+    string AnnouncementId,
     string Title,
     string Body,
     DateTime Time
