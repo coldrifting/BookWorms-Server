@@ -11,7 +11,7 @@ public class ClassAnnouncementController(BookwormsDbContext context) : AuthContr
     /// <summary>
     /// Gets a list of all announcements for this teacher's classroom
     /// </summary>
-    /// <returns>A list of annoucements</returns>
+    /// <returns>A list of announcements</returns>
     /// <response code="200">Success</response>
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a teacher</response>
@@ -38,14 +38,14 @@ public class ClassAnnouncementController(BookwormsDbContext context) : AuthContr
     }
     
     /// <summary>
-    /// Creates a new annoucement for this teacher's classroom
+    /// Creates a new announcement for this teacher's classroom
     /// </summary>
-    /// <returns>The newly created annoucement details</returns>
+    /// <returns>The newly created announcement details</returns>
     /// <response code="200">Success</response>
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a teacher</response>
     /// <response code="404">The teacher has not set up a classroom</response>
-    [HttpPut]
+    [HttpPost]
     [Route("/homeroom/announcements/[action]")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ClassroomAnnouncementResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -71,9 +71,9 @@ public class ClassAnnouncementController(BookwormsDbContext context) : AuthContr
     }
     
     /// <summary>
-    /// Edits an annoucement in this teacher's classroom
+    /// Edits an announcement in this teacher's classroom
     /// </summary>
-    /// <returns>The edited annoucement details</returns>
+    /// <returns>The edited announcement details</returns>
     /// <response code="200">Success</response>
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a teacher</response>
@@ -111,9 +111,9 @@ public class ClassAnnouncementController(BookwormsDbContext context) : AuthContr
     }
     
     /// <summary>
-    /// Deletes an annoucement in this teacher's classroom
+    /// Deletes an announcement in this teacher's classroom
     /// </summary>
-    /// <returns>The edited annoucement details</returns>
+    /// <returns>The edited announcement details</returns>
     /// <response code="204">Success</response>
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a teacher</response>
@@ -149,9 +149,9 @@ public class ClassAnnouncementController(BookwormsDbContext context) : AuthContr
     }
     
     /// <summary>
-    /// Deletes all annoucements in this teacher's classroom
+    /// Deletes all announcements in this teacher's classroom
     /// </summary>
-    /// <returns>The edited annoucement details</returns>
+    /// <returns>The edited announcement details</returns>
     /// <response code="204">Success</response>
     /// <response code="401">The user is not logged in</response>
     /// <response code="403">The user is not a teacher</response>

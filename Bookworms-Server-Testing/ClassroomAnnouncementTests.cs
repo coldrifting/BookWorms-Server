@@ -19,7 +19,7 @@ public class ClassroomAnnouncementTests(CompositeFixture fixture) : BookwormsInt
             ErrorResponse.Unauthorized);
         
         await CheckForError(
-            async () => await Client.PutPayloadAsync(Routes.ClassAnnouncements.Add, 
+            async () => await Client.PostPayloadAsync(Routes.ClassAnnouncements.Add, 
                 new ClassroomAnnouncementAddRequest("Title", "Body")),
             HttpStatusCode.Unauthorized,
             ErrorResponse.Unauthorized);
@@ -52,7 +52,7 @@ public class ClassroomAnnouncementTests(CompositeFixture fixture) : BookwormsInt
             ErrorResponse.UserNotTeacher);
         
         await CheckForError(
-            async () => await Client.PutPayloadAsync(Routes.ClassAnnouncements.Add, 
+            async () => await Client.PostPayloadAsync(Routes.ClassAnnouncements.Add, 
                 new ClassroomAnnouncementAddRequest("Title", "Body"), username),
             HttpStatusCode.Forbidden,
             ErrorResponse.UserNotTeacher);
@@ -84,7 +84,7 @@ public class ClassroomAnnouncementTests(CompositeFixture fixture) : BookwormsInt
             ErrorResponse.ClassroomNotFound);
         
         await CheckForError(
-            async () => await Client.PutPayloadAsync(Routes.ClassAnnouncements.Add, 
+            async () => await Client.PostPayloadAsync(Routes.ClassAnnouncements.Add, 
                 new ClassroomAnnouncementAddRequest("Title", "Body"), username),
             HttpStatusCode.NotFound,
             ErrorResponse.ClassroomNotFound);
@@ -146,7 +146,7 @@ public class ClassroomAnnouncementTests(CompositeFixture fixture) : BookwormsInt
     public async Task Test_TeacherClassroomAnnouncement_Add_Basic(string username, string newTitle, string newBody, int numRemaining)
     {
         await CheckResponse<ClassroomAnnouncementResponse>(
-            async () => await Client.PutPayloadAsync(Routes.ClassAnnouncements.Add, 
+            async () => await Client.PostPayloadAsync(Routes.ClassAnnouncements.Add, 
                 new ClassroomAnnouncementAddRequest(newTitle, newBody), username),
             HttpStatusCode.OK,
             content =>
