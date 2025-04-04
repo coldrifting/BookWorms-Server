@@ -70,14 +70,14 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
 
-    public ClassroomChildResponse ToResponseChild()
+    public ClassroomChildResponse ToResponseChild(string childId)
     {
         return new(
             ClassroomCode,
             ClassroomName,
             Teacher.LastName,
             ClassIcon,
-            Announcements.Select(announcement => announcement.ToChildResponse()).ToList(),
+            Announcements.Select(announcement => announcement.ToChildResponse(childId)).ToList(),
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
 }

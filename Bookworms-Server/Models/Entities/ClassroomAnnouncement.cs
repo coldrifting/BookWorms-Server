@@ -28,17 +28,17 @@ public class ClassroomAnnouncement(string classCode, string title, string body, 
     [ForeignKey(nameof(ClassCode))] 
     public Classroom Classroom { get; set; } = null!;
     
-    public ICollection<ClassroomChild> ClassroomChildren { get; set; } = null!;
+    public ICollection<ClassroomChild> ChildrenRead { get; set; } = null!;
 
     public ClassroomAnnouncementResponse ToTeacherResponse()
     {
         return new(AnnouncementId, Title, Body, Time);
     }
 
-    public ClassroomAnnouncementResponse ToChildResponse()
+    public ClassroomAnnouncementResponse ToChildResponse(string childId)
     {
-        // TODO
-        return new(AnnouncementId, Title, Body, Time, false);
+        bool isRead = ChildrenRead.Any(c => c.ChildId == childId);
+        return new(AnnouncementId, Title, Body, Time, isRead);
     }
 }
 

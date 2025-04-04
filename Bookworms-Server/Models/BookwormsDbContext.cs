@@ -113,7 +113,7 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 
 	    modelBuilder.Entity<ClassroomChild>()
 		    .HasMany(classroomChild => classroomChild.Announcements)
-		    .WithMany(announce => announce.ClassroomChildren)
+		    .WithMany(announce => announce.ChildrenRead)
 		    .UsingEntity<ClassroomAnnouncementsRead>();
     }
     
