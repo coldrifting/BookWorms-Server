@@ -28,7 +28,9 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     public DbSet<ClassroomChild> ClassroomChildren { get; set; }
     public DbSet<ClassroomBookshelf> ClassroomBookshelves { get; set; }
     public DbSet<ClassroomBookshelfBook> ClassroomBookshelfBooks { get; set; }
+    
     public DbSet<ClassroomAnnouncement> ClassroomAnnouncements { get; set; }
+    public DbSet<ClassroomAnnouncementsRead> ClassroomAnnouncementsRead { get; set; }
 
     public DbSet<Goal> Goals { get; set; }
     public DbSet<GoalChild> GoalChildren { get; set; }
@@ -108,6 +110,11 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 		    .HasMany(child => child.Classrooms)
 		    .WithMany(classroom => classroom.Children)
 		    .UsingEntity<ClassroomChild>();
+
+	    modelBuilder.Entity<ClassroomChild>()
+		    .HasMany(classroomChild => classroomChild.Announcements)
+		    .WithMany(announce => announce.ClassroomChildren)
+		    .UsingEntity<ClassroomAnnouncementsRead>();
     }
     
     private readonly JsonSerializerOptions _jso = new()

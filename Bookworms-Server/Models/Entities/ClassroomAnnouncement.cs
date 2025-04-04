@@ -2,12 +2,13 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using BookwormsServer.Models.Data;
 using BookwormsServer.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookwormsServer.Models.Entities;
 
+[PrimaryKey(nameof(this.AnnouncementId), nameof(this.ClassCode))]
 public class ClassroomAnnouncement(string classCode, string title, string body, DateTime time)
 {
-    [Key]
     [StringLength(14)]
     [Column(TypeName="char")]
     public string AnnouncementId { get; set; } = Snowflake.Generate();
@@ -26,9 +27,37 @@ public class ClassroomAnnouncement(string classCode, string title, string body, 
     // Navigation
     [ForeignKey(nameof(ClassCode))] 
     public Classroom Classroom { get; set; } = null!;
+    
+    public ICollection<ClassroomChild> ClassroomChildren { get; set; } = null!;
 
-    public ClassroomAnnouncementResponse ToResponse()
+    public ClassroomAnnouncementResponse ToTeacherResponse()
     {
         return new(AnnouncementId, Title, Body, Time);
     }
+
+    public ClassroomAnnouncementResponse ToChildResponse()
+    {
+        // TODO
+        return new(AnnouncementId, Title, Body, Time, false);
+    }
+}
+
+[PrimaryKey(nameof(AnnouncementId), nameof(ChildId))]
+public class ClassroomAnnouncementsRead(string announcementId, string classCode, string childId)
+{
+    [StringLength(14), Column(TypeName="char")]
+    public string AnnouncementId { get; set; } = announcementId;
+    
+    [StringLength(6), Column(TypeName = "char")]
+    public string ClassCode { get; set; } = classCode;
+    
+    [StringLength(14), Column(TypeName = "char")]
+    public string ChildId { get; set; } = childId;
+    
+    // Navigation
+    [ForeignKey(nameof(AnnouncementId) + "," + nameof(ClassCode))]
+    public ClassroomAnnouncement Announcement { get; set; } = null!;
+    
+    [ForeignKey(nameof(ClassCode) + "," + nameof(ChildId))]
+    public ClassroomChild ClassroomChild { get; set; } = null!;
 }

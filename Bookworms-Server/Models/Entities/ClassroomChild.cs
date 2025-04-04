@@ -27,4 +27,6 @@ public record ClassroomChild
     
     [ForeignKey(nameof(ChildId))]
     public Child Child { get; set; } = null!;
+    
+    public ICollection<ClassroomAnnouncement> Announcements { get; set; } = null!;
 }

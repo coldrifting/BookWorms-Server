@@ -190,15 +190,14 @@ namespace BookwormsServer.Migrations
                         .HasMaxLength(14)
                         .HasColumnType("char");
 
+                    b.Property<string>("ClassCode")
+                        .HasMaxLength(6)
+                        .HasColumnType("varchar(6)");
+
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("varchar(1024)");
-
-                    b.Property<string>("ClassCode")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("varchar(6)");
 
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime(6)");
@@ -208,11 +207,35 @@ namespace BookwormsServer.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
 
-                    b.HasKey("AnnouncementId");
+                    b.HasKey("AnnouncementId", "ClassCode");
 
                     b.HasIndex("ClassCode");
 
                     b.ToTable("ClassroomAnnouncements");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomAnnouncementsRead", b =>
+                {
+                    b.Property<string>("AnnouncementId")
+                        .HasMaxLength(14)
+                        .HasColumnType("char");
+
+                    b.Property<string>("ChildId")
+                        .HasMaxLength(14)
+                        .HasColumnType("char");
+
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("char");
+
+                    b.HasKey("AnnouncementId", "ChildId");
+
+                    b.HasIndex("AnnouncementId", "ClassCode");
+
+                    b.HasIndex("ClassCode", "ChildId");
+
+                    b.ToTable("ClassroomAnnouncementsRead");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomBookshelf", b =>
@@ -650,6 +673,25 @@ namespace BookwormsServer.Migrations
                         .IsRequired();
 
                     b.Navigation("Classroom");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomAnnouncementsRead", b =>
+                {
+                    b.HasOne("BookwormsServer.Models.Entities.ClassroomAnnouncement", "Announcement")
+                        .WithMany()
+                        .HasForeignKey("AnnouncementId", "ClassCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookwormsServer.Models.Entities.ClassroomChild", "ClassroomChild")
+                        .WithMany()
+                        .HasForeignKey("ClassCode", "ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Announcement");
+
+                    b.Navigation("ClassroomChild");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.ClassroomBookshelf", b =>
