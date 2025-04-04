@@ -66,7 +66,7 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
             ClassroomName,
             ClassIcon,
             Children.Select(child => child.ToResponse()).ToList(),
-            Announcements.Select(announcement => announcement.ToResponse()).ToList(),
+            Announcements.Select(announcement => announcement.ToTeacherResponse()).ToList(),
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
 
@@ -77,7 +77,7 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
             ClassroomName,
             Teacher.LastName,
             ClassIcon,
-            Announcements.Select(announcement => announcement.ToResponse()).ToList(),
+            Announcements.Select(announcement => announcement.ToChildResponse()).ToList(),
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
 }
