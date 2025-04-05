@@ -423,6 +423,8 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
             BookshelfType.Completed => includeBooks
                 ? query.Include(child => child.Completed!)
                     .ThenInclude(completed => completed.Books)
+                    .Include(child => child.InProgress!)
+                    .ThenInclude(completed => completed.Books)
                 : query.Include(child => child.Completed!),
             BookshelfType.InProgress => includeBooks
                 ? query.Include(child => child.InProgress!)
