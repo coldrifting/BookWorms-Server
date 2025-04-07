@@ -38,8 +38,34 @@ public class SearchController(BookwormsDbContext dbContext) : ControllerBase
     {
         const int maxBooksToReturn = 30;
         
-        IQueryable<Book> q = dbContext.Books.AsQueryable();
+        IQueryable<Book> q;
 
+        if (query is not null)
+        {
+            q = dbContext.Books
+                    .FromSql($"""
+                        SELECT * FROM Books
+                        WHERE MATCH(Title, Description, Subjects, Authors)
+                        AGAINST({query} IN NATURAL LANGUAGE MODE)
+                        ORDER BY MATCH(Title, Description, Subjects, Authors)
+                        AGAINST({query}) DESC
+                        """);
+        }
+        else
+        {
+            q = dbContext.Books.AsQueryable();
+            
+            if (title is not null)
+            {
+                q = q.Where(b => EF.Functions.Like(b.Title, $"%{title}%"));
+            }
+
+            if (author is not null)
+            {
+                q = q.Where(b => EF.Functions.Like((string)(object)b.Authors, $"%{author}%"));
+            }
+        }
+        
         if (ratingMin is not null)
         {
             q = q.Where(b => b.StarRating >= ratingMin);
@@ -54,36 +80,16 @@ public class SearchController(BookwormsDbContext dbContext) : ControllerBase
         {
             q = q.Where(b => b.Level <= levelMax);
         }
-
-        if (query is not null)
-        {
-            q = q.Where(b => EF.Functions.Like(b.Title, $"%{query}%") ||
-                             EF.Functions.Like((string)(object)b.Authors, $"%{query}%"));
-        }
-        else
-        {
-            if (title is not null)
-            {
-                q = q.Where(b => EF.Functions.Like(b.Title, $"%{title}%"));
-            }
-
-            if (author is not null)
-            {
-                q = q.Where(b => EF.Functions.Like((string)(object)b.Authors, $"%{author}%"));
-            }
-        }
-
         
         if (subjects.Count > 0)
         {
             // Interpolated string in EF/LINQ lambda is not supported, so we have to use plain old concatenation
             q = q.Where(b => subjects.Any(subject => EF.Functions.Like((string)(object)b.Subjects, "%" + subject + "%")));
         }
-
-        List<Book> books = q.ToList();
         
-        List<BookResponse> bookResponseList = books.Select(book => book.ToResponse())
+        List<BookResponse> bookResponseList = q
             .Take(maxBooksToReturn)
+            .Select(book => book.ToResponse())
             .ToList();
         
         return Task.FromResult<IActionResult>(Ok(bookResponseList));

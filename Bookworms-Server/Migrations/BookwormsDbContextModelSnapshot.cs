@@ -30,14 +30,14 @@ namespace BookwormsServer.Migrations
 
                     b.Property<string>("Authors")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int?>("CoverId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Isbn10")
                         .IsRequired()
@@ -69,7 +69,7 @@ namespace BookwormsServer.Migrations
 
                     b.Property<string>("Subjects")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("TimeAdded")
                         .HasColumnType("datetime(0)");
@@ -80,6 +80,9 @@ namespace BookwormsServer.Migrations
                         .HasColumnType("varchar(256)");
 
                     b.HasKey("BookId");
+
+                    b.HasIndex("Title", "Description", "Subjects", "Authors")
+                        .HasAnnotation("MySql:FullTextIndex", true);
 
                     b.ToTable("Books");
                 });

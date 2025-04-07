@@ -23,11 +23,11 @@ namespace BookwormsServer.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Title = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Authors = table.Column<string>(type: "longtext", nullable: false)
+                    Authors = table.Column<string>(type: "text", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: false)
+                    Description = table.Column<string>(type: "text", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Subjects = table.Column<string>(type: "longtext", nullable: false)
+                    Subjects = table.Column<string>(type: "text", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Isbn10 = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -500,6 +500,12 @@ namespace BookwormsServer.Migrations
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_Title_Description_Subjects_Authors",
+                table: "Books",
+                columns: new[] { "Title", "Description", "Subjects", "Authors" })
+                .Annotation("MySql:FullTextIndex", true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ChildBookshelfBooks_BookId",

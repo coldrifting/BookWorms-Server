@@ -39,6 +39,15 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+	    // FULLTEXT index on Books table
+	    modelBuilder.Entity<Book>(entity =>
+	    {
+		    entity.HasKey(e => e.BookId);
+
+		    entity.HasIndex(e => new { e.Title, e.Description, e.Subjects, e.Authors })
+			    .IsFullText();
+	    });
+	    
 	    // [CompletedBookshelf] M----M [Book]   using CompletedBookshelfBook
 	    modelBuilder.Entity<CompletedBookshelf>()
 		    .HasMany(completedBookshelf => completedBookshelf.Books)
