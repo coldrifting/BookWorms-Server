@@ -2,121 +2,121 @@
   {
     "bookshelfId": 1,
     "bookId": "OL28633459W",
-    "starRating": 1.0
+    "completionDate": "2025-03-15"
   },
   {
     "bookshelfId": 1,
     "bookId": "OL8843356W",
-    "starRating": 2.5
+    "completionDate": "2025-03-16"
   },
   {
     "bookshelfId": 1,
     "bookId": "OL3368288W",
-    "starRating": 4.0
+    "completionDate": "2025-03-17"
   },
   {
     "bookshelfId": 2,
     "bookId": "OL3368273W",
-    "starRating": 1.0
+    "completionDate": "2025-03-18"
   },
   {
     "bookshelfId": 2,
     "bookId": "OL892371W",
-    "starRating": 4.0
+    "completionDate": "2025-03-19"
   },
   {
     "bookshelfId": 2,
     "bookId": "OL47935W",
-    "starRating": 0.5
+    "completionDate": "2025-03-20"
   },
   {
     "bookshelfId": 3,
     "bookId": "OL892371W",
-    "starRating": 5.0
+    "completionDate": "2025-03-21"
   },
   {
     "bookshelfId": 3,
     "bookId": "OL8843356W",
-    "starRating": 5.0
+    "completionDate": "2025-03-22"
   },
   {
     "bookshelfId": 3,
     "bookId": "OL286593W",
-    "starRating": 5.0
+    "completionDate": "2025-03-23"
   },
   {
     "bookshelfId": 4,
     "bookId": "OL3368273W",
-    "starRating": 0.0
+    "completionDate": "2025-03-24"
   },
   {
     "bookshelfId": 4,
     "bookId": "OL3368286W",
-    "starRating": 3.0
+    "completionDate": "2025-03-25"
   },
   {
     "bookshelfId": 4,
     "bookId": "OL892371W",
-    "starRating": 1.5
+    "completionDate": "2025-03-26"
   },
   {
     "bookshelfId": 5,
     "bookId": "OL2191470M",
-    "starRating": 1.5
+    "completionDate": "2025-03-27"
   },
   {
     "bookshelfId": 5,
     "bookId": "OL3368273W",
-    "starRating": 1.5
+    "completionDate": "2025-03-28"
   },
   {
     "bookshelfId": 5,
     "bookId": "OL26571192W",
-    "starRating": 3.0
+    "completionDate": "2025-03-29"
   },
   {
     "bookshelfId": 6,
     "bookId": "OL3368273W",
-    "starRating": 4.5
+    "completionDate": "2025-03-30"
   },
   {
     "bookshelfId": 6,
     "bookId": "OL28633459W",
-    "starRating": 4.0
+    "completionDate": "2025-03-31"
   },
   {
     "bookshelfId": 6,
     "bookId": "OL286593W",
-    "starRating": 4.0
+    "completionDate": "2025-04-01"
   },
   {
     "bookshelfId": 7,
     "bookId": "OL8843356W",
-    "starRating": 3.5
+    "completionDate": "2025-04-02"
   },
   {
     "bookshelfId": 7,
     "bookId": "OL47935W",
-    "starRating": 3.0
+    "completionDate": "2025-04-03"
   },
   {
     "bookshelfId": 7,
     "bookId": "OL28633459W",
-    "starRating": 3.5
+    "completionDate": "2025-04-04"
   },
   {
     "bookshelfId": 8,
     "bookId": "OL28633459W",
-    "starRating": 4.0
+    "completionDate": "2025-04-05"
   },
   {
     "bookshelfId": 8,
     "bookId": "OL21025297W",
-    "starRating": 0.0
+    "completionDate": "2025-04-06"
   },
   {
     "bookshelfId": 8,
     "bookId": "OL286593W",
-    "starRating": 0.0
+    "completionDate": "2025-04-07"
   }
 ]

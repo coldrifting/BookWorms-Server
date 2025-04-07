@@ -8,11 +8,12 @@ public enum BookshelfType
     Classroom
 } 
 
-public class BookshelfResponse(BookshelfType type, string name, List<BookResponsePreview> books)
+public class BookshelfResponse(BookshelfType type, string name, List<BookResponse> books, List<BookCompletionData>? completions = null)
 {
     public BookshelfType Type { get; } = type;
     public string Name { get; } = name;
-    public List<BookResponsePreview> Books { get; } = books;
+    public List<BookResponse> Books { get; } = books;
+    public List<BookCompletionData>? Completions { get; set; } = completions;
 
     public override bool Equals(object? other)
     {

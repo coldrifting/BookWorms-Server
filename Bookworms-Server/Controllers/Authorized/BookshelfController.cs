@@ -244,7 +244,8 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
                 DbContext.CompletedBookshelfBooks.Add(new()
                 {
                     BookshelfId = bookshelf.BookshelfId,
-                    BookId = book.BookId
+                    BookId = book.BookId,
+                    CompletionDate = DateOnly.FromDateTime(DateTime.Now),
                 });
                 child.InProgress!.Books.Remove(book);
             }
@@ -400,6 +401,8 @@ public class BookshelfController(BookwormsDbContext context) : AuthControllerBas
         return this.DbContext.Children
             .Include(child => child.Completed)
             .ThenInclude(bookshelf => bookshelf!.Books)
+            .Include(child => child.Completed)
+            .ThenInclude(bookshelf => bookshelf!.CompletedBookshelfBooks)
             .Include(child => child.InProgress)
             .ThenInclude(bookshelf => bookshelf!.Books)
             .Include(child => child.Bookshelves)

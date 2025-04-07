@@ -73,17 +73,6 @@ public class Book(string bookId, string title, List<string> authors, string desc
             : null;
     }
     
-    public BookResponsePreview ToResponsePreview()
-    {
-        return new(
-            BookId,
-            Title,
-            Authors,
-            StarRating,
-            Level
-        );
-    }
-    
     public BookResponse ToResponse()
     {
         return new(

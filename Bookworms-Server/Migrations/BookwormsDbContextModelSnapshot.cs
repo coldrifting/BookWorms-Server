@@ -327,6 +327,9 @@ namespace BookwormsServer.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
+                    b.Property<DateOnly>("CompletionDate")
+                        .HasColumnType("date");
+
                     b.HasKey("BookshelfId", "BookId");
 
                     b.HasIndex("BookId");
@@ -766,7 +769,7 @@ namespace BookwormsServer.Migrations
                         .IsRequired();
 
                     b.HasOne("BookwormsServer.Models.Entities.CompletedBookshelf", "Bookshelf")
-                        .WithMany()
+                        .WithMany("CompletedBookshelfBooks")
                         .HasForeignKey("BookshelfId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -918,6 +921,11 @@ namespace BookwormsServer.Migrations
                     b.Navigation("Bookshelves");
 
                     b.Navigation("Goals");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.CompletedBookshelf", b =>
+                {
+                    b.Navigation("CompletedBookshelfBooks");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.User", b =>

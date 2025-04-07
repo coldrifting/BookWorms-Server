@@ -55,10 +55,15 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 		    .HasMany(completedBookshelf => completedBookshelf.Books)
 		    .WithMany(book => book.CompletedBookshelves)
 		    .UsingEntity<CompletedBookshelfBook>();
+
+	    modelBuilder.Entity<CompletedBookshelf>()
+		    .HasMany(completedBookshelf => completedBookshelf.CompletedBookshelfBooks)
+		    .WithOne(b => b.Bookshelf)
+		    .HasForeignKey(b => b.BookshelfId);
 	    
 	    modelBuilder.Entity<CompletedBookshelfBook>()
 		    .HasOne(cbb => cbb.Bookshelf)
-		    .WithMany()
+		    .WithMany(b => b.CompletedBookshelfBooks)
 		    .HasForeignKey(cbb => cbb.BookshelfId);
 	    
 	    modelBuilder.Entity<CompletedBookshelfBook>()

@@ -12,16 +12,19 @@ public class CompletedBookshelfBook
     {
     }
 
-    public CompletedBookshelfBook(int bookshelfId, string bookId)
+    public CompletedBookshelfBook(int bookshelfId, string bookId, DateOnly? completionDate = null)
     {
         BookshelfId = bookshelfId;
         BookId = bookId;
+        CompletionDate = completionDate ?? DateOnly.FromDateTime(DateTime.Now);
     }
     
     public int BookshelfId { get; set; }
     
     [StringLength(20)]
     public required string BookId { get; set; }
+
+    public DateOnly CompletionDate { get; set; }
 
     // Navigation
     

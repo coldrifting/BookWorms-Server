@@ -216,6 +216,10 @@ public static class SwaggerExamples
                     new("bookId1", "Title1", ["Author1"], 3.5, 30),
                     new("bookId2", "Title2", ["Author2"], 4.0, 42),
                     new("bookId3", "Title3", ["Author3", "Author10"], 2.5, 55)
+                ], [
+                    new("bookId1", DateOnly.Parse("2025-04-01")),
+                    new("bookId2", DateOnly.Parse("2025-03-31")),
+                    new("bookId3", DateOnly.Parse("2025-02-14"))
                 ]),
                 new(BookshelfType.InProgress, "In Progress", []),
                 new(BookshelfType.Custom, "Some other books", [

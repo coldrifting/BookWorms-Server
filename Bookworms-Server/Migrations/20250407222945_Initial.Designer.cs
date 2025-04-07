@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookwormsServer.Migrations
 {
     [DbContext(typeof(BookwormsDbContext))]
-    [Migration("20250407200307_Initial")]
+    [Migration("20250407222945_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -329,6 +329,9 @@ namespace BookwormsServer.Migrations
                     b.Property<string>("BookId")
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
+
+                    b.Property<DateOnly>("CompletionDate")
+                        .HasColumnType("date");
 
                     b.HasKey("BookshelfId", "BookId");
 
@@ -769,7 +772,7 @@ namespace BookwormsServer.Migrations
                         .IsRequired();
 
                     b.HasOne("BookwormsServer.Models.Entities.CompletedBookshelf", "Bookshelf")
-                        .WithMany()
+                        .WithMany("CompletedBookshelfBooks")
                         .HasForeignKey("BookshelfId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -921,6 +924,11 @@ namespace BookwormsServer.Migrations
                     b.Navigation("Bookshelves");
 
                     b.Navigation("Goals");
+                });
+
+            modelBuilder.Entity("BookwormsServer.Models.Entities.CompletedBookshelf", b =>
+                {
+                    b.Navigation("CompletedBookshelfBooks");
                 });
 
             modelBuilder.Entity("BookwormsServer.Models.Entities.User", b =>

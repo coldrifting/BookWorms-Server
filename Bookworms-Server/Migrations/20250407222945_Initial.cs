@@ -393,7 +393,8 @@ namespace BookwormsServer.Migrations
                 {
                     BookshelfId = table.Column<int>(type: "int", nullable: false),
                     BookId = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CompletionDate = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {

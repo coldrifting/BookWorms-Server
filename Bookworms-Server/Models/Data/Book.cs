@@ -21,10 +21,7 @@ public record BookResponseExtended(
     int PublishYear,
     int? PageCount,
     List<ReviewResponse> Reviews);
-
-public record BookResponsePreview(
-    string BookId, 
-    string Title, 
-    List<string> Authors,
-    double? Rating,
-    int? Level);
+    
+public record BookCompletionData(
+    string BookId,
+    DateOnly CompletedDate);
