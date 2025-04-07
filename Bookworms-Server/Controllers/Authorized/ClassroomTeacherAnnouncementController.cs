@@ -34,7 +34,7 @@ public class ClassAnnouncementController(BookwormsDbContext context) : AuthContr
             return NotFound(ErrorResponse.ClassroomNotFound);
         }
 
-        return Ok(classroom.Announcements.Select(a => a.ToResponse()));
+        return Ok(classroom.Announcements.Select(a => a.ToTeacherResponse()));
     }
     
     /// <summary>
@@ -67,7 +67,7 @@ public class ClassAnnouncementController(BookwormsDbContext context) : AuthContr
         classroom.Announcements.Add(announcement);
         DbContext.SaveChanges();
 
-        return Ok(announcement.ToResponse());
+        return Ok(announcement.ToTeacherResponse());
     }
     
     /// <summary>
@@ -107,7 +107,7 @@ public class ClassAnnouncementController(BookwormsDbContext context) : AuthContr
         
         DbContext.SaveChanges();
 
-        return Ok(announcement.ToResponse());
+        return Ok(announcement.ToTeacherResponse());
     }
     
     /// <summary>

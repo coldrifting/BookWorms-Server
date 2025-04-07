@@ -14,5 +14,6 @@ public record ClassroomAnnouncementResponse(
     string AnnouncementId,
     string Title,
     string Body,
-    DateTime Time
+    DateTime Time,
+    bool? IsRead = null
     );

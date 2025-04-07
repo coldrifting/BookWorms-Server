@@ -263,7 +263,7 @@ namespace BookwormsServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClassroomAnnouncements", x => x.AnnouncementId);
+                    table.PrimaryKey("PK_ClassroomAnnouncements", x => new { x.AnnouncementId, x.ClassCode });
                     table.ForeignKey(
                         name: "FK_ClassroomAnnouncements_Classrooms_ClassCode",
                         column: x => x.ClassCode,
@@ -466,6 +466,35 @@ namespace BookwormsServer.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "ClassroomAnnouncementsRead",
+                columns: table => new
+                {
+                    AnnouncementId = table.Column<string>(type: "char(14)", maxLength: 14, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ChildId = table.Column<string>(type: "char(14)", maxLength: 14, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClassCode = table.Column<string>(type: "char(6)", maxLength: 6, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClassroomAnnouncementsRead", x => new { x.AnnouncementId, x.ChildId });
+                    table.ForeignKey(
+                        name: "FK_ClassroomAnnouncementsRead_ClassroomAnnouncements_Announceme~",
+                        columns: x => new { x.AnnouncementId, x.ClassCode },
+                        principalTable: "ClassroomAnnouncements",
+                        principalColumns: new[] { "AnnouncementId", "ClassCode" },
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ClassroomAnnouncementsRead_ClassroomChildren_ClassCode_Child~",
+                        columns: x => new { x.ClassCode, x.ChildId },
+                        principalTable: "ClassroomChildren",
+                        principalColumns: new[] { "ClassroomCode", "ChildId" },
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "GoalClassLogs",
                 columns: table => new
                 {
@@ -526,6 +555,16 @@ namespace BookwormsServer.Migrations
                 name: "IX_ClassroomAnnouncements_ClassCode",
                 table: "ClassroomAnnouncements",
                 column: "ClassCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClassroomAnnouncementsRead_AnnouncementId_ClassCode",
+                table: "ClassroomAnnouncementsRead",
+                columns: new[] { "AnnouncementId", "ClassCode" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClassroomAnnouncementsRead_ClassCode_ChildId",
+                table: "ClassroomAnnouncementsRead",
+                columns: new[] { "ClassCode", "ChildId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClassroomBookshelfBooks_BookId",
@@ -614,7 +653,7 @@ namespace BookwormsServer.Migrations
                 name: "ChildBookshelfBooks");
 
             migrationBuilder.DropTable(
-                name: "ClassroomAnnouncements");
+                name: "ClassroomAnnouncementsRead");
 
             migrationBuilder.DropTable(
                 name: "ClassroomBookshelfBooks");
@@ -636,6 +675,9 @@ namespace BookwormsServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "ChildBookshelves");
+
+            migrationBuilder.DropTable(
+                name: "ClassroomAnnouncements");
 
             migrationBuilder.DropTable(
                 name: "ClassroomBookshelves");

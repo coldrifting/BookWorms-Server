@@ -66,18 +66,18 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
             ClassroomName,
             ClassIcon,
             Children.Select(child => child.ToResponse()).ToList(),
-            Announcements.Select(announcement => announcement.ToResponse()).ToList(),
+            Announcements.Select(announcement => announcement.ToTeacherResponse()).ToList(),
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
 
-    public ClassroomChildResponse ToResponseChild()
+    public ClassroomChildResponse ToResponseChild(string childId)
     {
         return new(
             ClassroomCode,
             ClassroomName,
             Teacher.LastName,
             ClassIcon,
-            Announcements.Select(announcement => announcement.ToResponse()).ToList(),
+            Announcements.Select(announcement => announcement.ToChildResponse(childId)).ToList(),
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
 }
