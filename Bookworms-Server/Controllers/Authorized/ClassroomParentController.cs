@@ -165,7 +165,7 @@ public class ClassroomParentController(BookwormsDbContext context) : AuthControl
             return NotFound(ErrorResponse.ClassroomAnnouncementNotFound);
         }
         
-        if (DbContext.ClassroomAnnouncements.Find(announcement.AnnouncementId, child.ChildId) is null)
+        if (DbContext.ClassroomAnnouncementsRead.Find(announcement.AnnouncementId, child.ChildId) is null)
         {
             DbContext.ClassroomAnnouncementsRead.Add(new(announcement.AnnouncementId, announcement.ClassCode, child.ChildId));
             DbContext.SaveChanges();
