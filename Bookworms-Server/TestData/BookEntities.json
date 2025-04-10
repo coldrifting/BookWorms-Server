@@ -24,6 +24,7 @@
     "coverId": 11769478,
     "pageCount": 57,
     "publishYear": 1964,
+    "level": 34,
     "starRating": 2.9,
     "similarBooks": [
       "OL14912086W",
@@ -53,6 +54,7 @@
     "coverId": 819191,
     "pageCount": null,
     "publishYear": 1981,
+    "level": 35,
     "starRating": 2.75,
     "similarBooks": [
       "OL28633459W",
@@ -80,6 +82,7 @@
     "coverId": 779460,
     "pageCount": 212,
     "publishYear": 1932,
+    "level": 38,
     "starRating": 2.67,
     "similarBooks": [
       "OL8843356W",
@@ -107,6 +110,7 @@
     "coverId": 10758772,
     "pageCount": 46,
     "publishYear": 2004,
+    "level": 30,
     "starRating": 3.7,
     "similarBooks": [
       "OL3368273W",
@@ -131,6 +135,7 @@
     "coverId": 6374525,
     "pageCount": null,
     "publishYear": 2010,
+    "level": 22,
     "starRating": 2.1,
     "similarBooks": [
       "OL2191470M",
@@ -165,6 +170,7 @@
     "coverId": 10783939,
     "pageCount": 32,
     "publishYear": 2010,
+    "level": 19,
     "starRating": 3.17,
     "similarBooks": [
       "OL47935W",
@@ -188,6 +194,7 @@
     "coverId": null,
     "pageCount": 34,
     "publishYear": 2020,
+    "level": 16,
     "starRating": 1.83,
     "similarBooks": [
       "OL8843356W",
@@ -215,6 +222,7 @@
     "coverId": 2370729,
     "pageCount": 256,
     "publishYear": 2007,
+    "level": 36,
     "starRating": 2.88,
     "similarBooks": [
       "OL3368273W",
@@ -244,6 +252,7 @@
     "coverId": 26482,
     "pageCount": 176,
     "publishYear": 1996,
+    "level": 28,
     "starRating": 3,
     "similarBooks": [
       "OL8843356W",
@@ -267,6 +276,7 @@
     "coverId": 14557626,
     "pageCount": 192,
     "publishYear": 2019,
+    "level": 16,
     "starRating": 2.88,
     "similarBooks": [
       "OL3368273W",
@@ -290,6 +300,7 @@
     "coverId": 24107,
     "pageCount": 105,
     "publishYear": 1976,
+    "level": 18,
     "starRating": 1,
     "similarBooks": [
       "OL21025297W",
@@ -318,6 +329,7 @@
     "coverId": 277175,
     "pageCount": null,
     "publishYear": 2003,
+    "level": 30,
     "starRating": 3.2,
     "similarBooks": [
       "OL47935W",

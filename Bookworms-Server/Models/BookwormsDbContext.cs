@@ -167,6 +167,8 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
         Seed<GoalClass>();
         Seed<GoalClassAggregate>();
         Seed<GoalClassLog>();
+
+        Seed<DifficultyRating>();
 	    
 	    // Fix any inconsistencies that result from inserting directly into DB
 	    foreach (Book book in Books.Include(b => b.Reviews))
@@ -186,6 +188,7 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	                           DELETE FROM ChildBookshelfBooks;
 	                           DELETE FROM ChildBookshelves;
 	                           DELETE FROM Children;
+	                           DELETE FROM DifficultyRatings;
 	                           DELETE FROM Goals;
 	                           DELETE FROM GoalClassLogs;
 	                           DELETE FROM ClassroomAnnouncements;

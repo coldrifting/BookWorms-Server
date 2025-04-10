@@ -100,6 +100,9 @@ public class GoalControllerChild(BookwormsDbContext context) : AuthControllerBas
     /// <response code="403">The user is not a parent</response>
     /// <response code="404">The child or goal does not exist, or does not have access to the requested goal</response>
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GoalResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public IActionResult Details(string childId, string goalId)
     {
         if (CurrentUser is not Parent)
@@ -235,7 +238,6 @@ public class GoalControllerChild(BookwormsDbContext context) : AuthControllerBas
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     public IActionResult Delete(string childId, string goalId)
     {
         if (CurrentUser is not Parent)

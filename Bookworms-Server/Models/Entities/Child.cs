@@ -96,7 +96,7 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
         double daysPastThree = today.DayNumber - thirdBirthday.DayNumber;
         
         // Percentage of the way between 3 yrs old and 18 yrs old
-        return (int?)Math.Round(daysPastThree / fifteenYears);
+        return (int?)Math.Round(daysPastThree / fifteenYears * 100);
     }
 }
 

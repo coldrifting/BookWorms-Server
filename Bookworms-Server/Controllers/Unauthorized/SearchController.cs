@@ -42,14 +42,32 @@ public class SearchController(BookwormsDbContext dbContext) : ControllerBase
 
         if (query is not null)
         {
-            q = dbContext.Books
-                    .FromSql($"""
-                        SELECT * FROM Books
-                        WHERE MATCH(Title, Description, Subjects, Authors)
-                        AGAINST({query} IN NATURAL LANGUAGE MODE)
-                        ORDER BY MATCH(Title, Description, Subjects, Authors)
-                        AGAINST({query}) DESC
-                        """);
+            // 1. Select using the match score thing. Keep only those with scores greater than 0.5, and order by score
+            // 2. Select using literal text match against title and author. Include those if the first query returned nothing
+            q = dbContext.Books.FromSql($"""
+                WITH
+                    ScoredBooks AS (
+                        SELECT Books.*,
+                               MATCH(Title, Description, Subjects, Authors) AGAINST({query} IN NATURAL LANGUAGE MODE) AS score
+                        FROM Books
+                        HAVING score > 0.5
+                        ORDER BY score DESC
+                    )
+                    
+                SELECT BookId, Title, Authors, Description, Subjects, Isbn10, Isbn13, CoverId, PageCount, PublishYear, Level, LevelIsLocked, StarRating, TimeAdded, SimilarBooks
+                FROM ScoredBooks
+                
+                UNION
+                
+                SELECT *
+                FROM Books
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM ScoredBooks
+                ) 
+                AND Title LIKE CONCAT('%', {query}, '%')
+                OR Authors LIKE CONCAT('%', {query}, '%')
+                """);
         }
         else
         {

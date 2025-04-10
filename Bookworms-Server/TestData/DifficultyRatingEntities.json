@@ -1,0 +1,158 @@
+﻿[
+  {
+    "bookId": "OL14912086W",
+    "childId": "2bc5b121b46b4a",
+    "readingLevelAtRatingTime": 21,
+    "rating": 5
+  },
+  {
+    "bookId": "OL14912086W",
+    "childId": "2bc5b325697a55",
+    "readingLevelAtRatingTime": 45,
+    "rating": 4
+  },
+  {
+    "bookId": "OL14912086W",
+    "childId": "2bc5b4544b34e7",
+    "readingLevelAtRatingTime": 28,
+    "rating": 5
+  },
+  {
+    "bookId": "OL21025297W",
+    "childId": "2bc5b121b46b4a",
+    "readingLevelAtRatingTime": 21,
+    "rating": 2
+  },
+  {
+    "bookId": "OL21025297W",
+    "childId": "2bc5b3b701b2ee",
+    "readingLevelAtRatingTime": 15,
+    "rating": 3
+  },
+  {
+    "bookId": "OL21025297W",
+    "childId": "2bc5b4544b34e7",
+    "readingLevelAtRatingTime": 28,
+    "rating": 2
+  },
+  {
+    "bookId": "OL26571192W",
+    "childId": "2bc5b121b46b4a",
+    "readingLevelAtRatingTime": 21,
+    "rating": 2
+  },
+  {
+    "bookId": "OL26571192W",
+    "childId": "2bc5b3b701b2ee",
+    "readingLevelAtRatingTime": 15,
+    "rating": 3
+  },
+  {
+    "bookId": "OL28633459W",
+    "childId": "2bc5b121b46b4a",
+    "readingLevelAtRatingTime": 21,
+    "rating": 4
+  },
+  {
+    "bookId": "OL28633459W",
+    "childId": "2bc5b3b701b2ee",
+    "readingLevelAtRatingTime": 15,
+    "rating": 5
+  },
+  {
+    "bookId": "OL286593W",
+    "childId": "2bc5b121b46b4a",
+    "readingLevelAtRatingTime": 21,
+    "rating": 3
+  },
+  {
+    "bookId": "OL286593W",
+    "childId": "2bc5b3b701b2ee",
+    "readingLevelAtRatingTime": 15,
+    "rating": 2
+  },
+  {
+    "bookId": "OL3368273W",
+    "childId": "2bc5b121b46b4a",
+    "readingLevelAtRatingTime": 21,
+    "rating": 2
+  },
+  {
+    "bookId": "OL3368273W",
+    "childId": "2bc5b3b701b2ee",
+    "readingLevelAtRatingTime": 15,
+    "rating": 4
+  },
+  {
+    "bookId": "OL3368286W",
+    "childId": "2bc5b325697a55",
+    "readingLevelAtRatingTime": 45,
+    "rating": 2
+  },
+  {
+    "bookId": "OL3368286W",
+    "childId": "2bc5b3b701b2ee",
+    "readingLevelAtRatingTime": 15,
+    "rating": 3
+  },
+  {
+    "bookId": "OL3368288W",
+    "childId": "2bc5b325697a55",
+    "readingLevelAtRatingTime": 45,
+    "rating": 2
+  },
+  {
+    "bookId": "OL3368288W",
+    "childId": "2bc5b4544b34e7",
+    "readingLevelAtRatingTime": 28,
+    "rating": 2
+  },
+  {
+    "bookId": "OL47935W",
+    "childId": "2bc5b325697a55",
+    "readingLevelAtRatingTime": 45,
+    "rating": 3
+  },
+  {
+    "bookId": "OL47935W",
+    "childId": "2bc5b4544b34e7",
+    "readingLevelAtRatingTime": 28,
+    "rating": 4
+  },
+  {
+    "bookId": "OL48763W",
+    "childId": "2bc5b325697a55",
+    "readingLevelAtRatingTime": 45,
+    "rating": 2
+  },
+  {
+    "bookId": "OL48763W",
+    "childId": "2bc5b4544b34e7",
+    "readingLevelAtRatingTime": 28,
+    "rating": 3
+  },
+  {
+    "bookId": "OL8843356W",
+    "childId": "2bc5b325697a55",
+    "readingLevelAtRatingTime": 45,
+    "rating": 1
+  },
+  {
+    "bookId": "OL8843356W",
+    "childId": "2bc5b4544b34e7",
+    "readingLevelAtRatingTime": 28,
+    "rating": 1
+  },
+  {
+    "bookId": "OL892371W",
+    "childId": "2bc5b325697a55",
+    "readingLevelAtRatingTime": 45,
+    "rating": 1
+  },
+  {
+    "bookId": "OL892371W",
+    "childId": "2bc5b4544b34e7",
+    "readingLevelAtRatingTime": 28,
+    "rating": 1
+  }
+]
