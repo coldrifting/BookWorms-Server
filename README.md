@@ -4,7 +4,7 @@ This repository contains all the code for the backend server of the BookWorms ca
 
 ### About
 
-This server is written in C# using the ASP.NET framework. It uses the related Microsoft Entity Framework Core for constructing and managing a MySQL database. For more information on understanding and using the program, consult the [Wiki](https://capstone.cs.utah.edu/bookworms/bookworms-server/-/wikis/home).
+This server is written in C# using the ASP.NET framework. It uses the related Microsoft Entity Framework Core for constructing and managing a MySQL database. For more information on understanding and using the program, consult the [Wiki](https://github.com/coldrifting/BookWorms-Server/wiki).
 
 ### Contributors
 
