@@ -1,0 +1,23 @@
+﻿[
+  {
+    "ClassCode": "ABC123",
+    "AnnouncementId": "Announce1",
+    "Title": "Announcement 1",
+    "Body": "Some Text 1",
+    "Time": "2025-03-05T13:00:00"
+  },
+  {
+    "ClassCode": "BBB222",
+    "AnnouncementId": "Announce2",
+    "Title": "Announcement 2",
+    "Body": "Some Text 2",
+    "Time": "2025-03-05T10:00:00"
+  },
+  {
+    "ClassCode": "BBB222",
+    "AnnouncementId": "Announce3",
+    "Title": "Announcement 3",
+    "Body": "Some Text 3",
+    "Time": "2025-02-27T18:45:00"
+  }
+]

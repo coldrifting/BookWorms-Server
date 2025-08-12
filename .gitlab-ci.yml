@@ -2,10 +2,9 @@ stages:
     - build
     - test
     - security
-    - publish
     - prepare
+    - deploy-image
     - release
-    - deploy
 
 variables:
     DOTNET_VERSION: "8.0"
@@ -51,7 +50,7 @@ test_job:
     artifacts:
         when: always
         reports:
-            junit: TestResults/*.trx
+            junit: Bookworms-Server-Testing/TestResults/*.trx
         expire_in: 1 month
     dependencies:
         - build_job # test_job depends on artifacts produced by build_job (avoids rebuilding the project)
@@ -73,22 +72,11 @@ dependency_scanning:
 
 # When "trigger-deploy" is included in the commit message
 
-publish_job:
+construct_tag_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
-    stage: publish
-    image: mcr.microsoft.com/dotnet/sdk:$DOTNET_VERSION
-    script:
-        - dotnet publish Bookworms-Server -c Release -o out
-    artifacts:
-        paths:
-            - out/
-        expire_in: 1 week
-    resource_group: common
-
-prepare_job:
-    rules:
-        - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
+        - if: $CI_COMMIT_TAG # Don't let tags created by this pipeline trigger pipelines of their own
+          when: never
     stage: prepare
     image: alpine:latest
     before_script:
@@ -112,37 +100,29 @@ prepare_job:
         else
             HOTFIX_NUMBER=$(( ${LATEST_TAG##*.} + 1 ))
         fi
-        RELEASE_TAG="v0.$WEEK_NUMBER.$HOTFIX_NUMBER"
+        RELEASE_TAG="0.$WEEK_NUMBER.$HOTFIX_NUMBER"
         echo "TAG=$RELEASE_TAG" >> variables.env
     artifacts:
         reports:
             dotenv: variables.env
     resource_group: common
 
-release_job:
+build_and_deploy_image_job:
     rules:
         - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
-    stage: release
-    image: registry.gitlab.com/gitlab-org/release-cli:latest
+        - if: $CI_COMMIT_TAG
+          when: never
+    stage: deploy-image
+    image: docker:stable
     dependencies:
-        - publish_job
-        - prepare_job
-    script:
-        - echo "Creating GitLab release with tag $TAG"
-    release:
-        name: "Release $TAG"
-        description: "Created using the release CLI"
-        tag_name: "$TAG"
-        ref: "$CI_COMMIT_SHA"
-    resource_group: common
-
-deploy_job:
-    rules:
-        - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
-    stage: deploy
-    image: alpine:latest
-    dependencies:
-        - publish_job
+        - construct_tag_job
+    services:
+        - name: docker:dind
+          command: ["--tls=false"]
+    variables:
+        DOCKER_HOST: "tcp://docker:2375"
+        DOCKER_TLS_CERTDIR: ""
+        DOCKER_DRIVER: overlay2
     before_script:
         - |
           # Install open-ssh client
@@ -151,29 +131,34 @@ deploy_job:
           eval $(ssh-agent -s)
           # Add the private key to ssh-agent
           echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -q -
-          # Ensure deployment directory variable has been properly set
-          if [ -z "$DEPLOYMENT_DIR" ]; then
-            echo "ERROR: DEPLOYMENT_DIR variable is not set"
-            exit 1
-          fi
     script:
-        # Replace the build artifacts in the EC2 instance, and restart the server
         - |
+          # Build a new image with the constructed tag
+          docker build -t bookworms-server:$TAG .
+          # Load the new image into the EC2 instance's Docker process
+          docker save bookworms-server:$TAG | ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST sudo docker load
+          # Restart the server service
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST <<- EOF
-            sudo systemctl stop bookworms.service
-            cd \$(dirname "$DEPLOYMENT_DIR") || {
-              echo "ERROR: Failed to change to parent directory of deployment directory"
-              exit 1
-            }
-            find \$(basename "$DEPLOYMENT_DIR") -mindepth 1 -delete || {
-              echo "ERROR: Failed to clean deployment directory"
-              exit 1
-            }
+            sudo systemctl restart bookworms.service
+            # Prune any images older than 1 hour
+            sudo docker image prune -a --force --filter 'until=1h'
           EOF
-        - scp -r -C out/* $EC2_USER@$EC2_HOST:$DEPLOYMENT_DIR
-        - ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo systemctl start bookworms.service'
-    variables:
-        # Don't pull the repository for this job
-        GIT_STRATEGY: none
-        DEPLOYMENT_DIR: /var/www/server/
+    resource_group: common
+
+release_job:
+    rules:
+        - if: $CI_COMMIT_MESSAGE =~ /trigger-deploy/
+        - if: $CI_COMMIT_TAG
+          when: never
+    stage: release
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    dependencies:
+        - construct_tag_job
+    script:
+        - echo "Creating GitLab release with tag v$TAG"
+    release:
+        name: "Release $TAG"
+        description: "Created using the release CLI"
+        tag_name: "v$TAG"
+        ref: "$CI_COMMIT_SHA"
     resource_group: common

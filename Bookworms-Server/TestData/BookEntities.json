@@ -23,7 +23,14 @@
     "isbn13": "",
     "coverId": 11769478,
     "pageCount": 57,
-    "publishYear": 1964
+    "publishYear": 1964,
+    "level": 34,
+    "starRating": 2.9,
+    "similarBooks": [
+      "OL14912086W",
+      "OL8843356W",
+      "OL3368286W"
+    ]
   },
   {
     "bookId": "OL48763W",
@@ -46,7 +53,14 @@
     "isbn13": "",
     "coverId": 819191,
     "pageCount": null,
-    "publishYear": 1981
+    "publishYear": 1981,
+    "level": 35,
+    "starRating": 2.75,
+    "similarBooks": [
+      "OL28633459W",
+      "OL8843356W",
+      "OL47935W"
+    ]
   },
   {
     "bookId": "OL47935W",
@@ -67,7 +81,14 @@
     "isbn13": "9781557092694",
     "coverId": 779460,
     "pageCount": 212,
-    "publishYear": 1932
+    "publishYear": 1932,
+    "level": 38,
+    "starRating": 2.67,
+    "similarBooks": [
+      "OL8843356W",
+      "OL3368273W",
+      "OL21025297W"
+    ]
   },
   {
     "bookId": "OL8843356W",
@@ -75,13 +96,27 @@
     "authors": [
       "Ellen Sabin"
     ],
-    "description": "",
-    "subjects": [],
+    "description": "The Giving Book: Open the Door to a Lifetime of Giving is a gift book for children ages 6 to 11 - inspiring, teaching and engaging them to give back to the world as it teaches them the joys of community, charity, and volunteering. It is a unique, interactive process that allows parents, teachers or friends to help children understand giving and participate in a stimulating experience. The book combines entertaining narrative with fun learning activities as it invites readers to record their ideas, dreams and wishes for the world - making them the authors of their stories and creating a \"scrapbook\" of their journey into compassion, philanthropy and the power of their actions.",
+    "subjects": [
+      "Juvenile Nonfiction / Activism & Social Justice",
+      "Juvenile Nonfiction / Activity Books / General",
+      "Juvenile Nonfiction / Health & Daily Living / General",
+      "Juvenile Nonfiction / Social Topics / Self-Esteem & Self-Reliance",
+      "Juvenile Nonfiction / Social Topics / Values & Virtues",
+      "Generosity -- Juvenile literature, Inventions -- Juvenile literature"
+    ],
     "isbn10": "0545084504",
     "isbn13": "9780545084505",
     "coverId": 10758772,
     "pageCount": 46,
-    "publishYear": 2004
+    "publishYear": 2004,
+    "level": 30,
+    "starRating": 3.7,
+    "similarBooks": [
+      "OL3368273W",
+      "OL48763W",
+      "OL3368288W"
+    ]
   },
   {
     "bookId": "OL28633459W",
@@ -89,7 +124,7 @@
     "authors": [
       "Holly Lisle"
     ],
-    "description": "",
+    "description": "In the battle between nightlings and humans,it's prophesied that the Sunrider is destinedto unite the magics of the sun and moon forthe good of all. She alone can lead the fightto defeat an immortal evil.Genna is the chosen Sunrider and, under thenightlings' protection, she must learn theancient magics to end the war. When sheescapes a brutal plot by the evil kai lords,Genna finds herself cast into the depths ofthe Sun Wizards' world. With the help of newallies and old friends, Genna must fulfill herfate.Master storyteller Holly Lisle once againtransports readers to the twilit realms ofthe Night Worlds with her lush prose in thisenchanting and gorgeous second tale.",
     "subjects": [
       "Children's fiction",
       "War, fiction",
@@ -99,7 +134,14 @@
     "isbn13": "9780545000154",
     "coverId": 6374525,
     "pageCount": null,
-    "publishYear": 2010
+    "publishYear": 2010,
+    "level": 22,
+    "starRating": 2.1,
+    "similarBooks": [
+      "OL2191470M",
+      "OL3368286W",
+      "OL48763W"
+    ]
   },
   {
     "bookId": "OL21025297W",
@@ -109,7 +151,7 @@
       "Katie Cantrell",
       "Wally Amos"
     ],
-    "description": "",
+    "description": "Little Marc must find a way to win the school talent contest, but first he needs a skill. Inspired by the great Harry Houdini, he chooses magic. Marc's persistence and faith pay off. After dazzling the crowd with one trick after the next, he delivers his best act last. Marc's final surprise shows children the importance of thinking of friends in need and believing in oneself.",
     "subjects": [
       "Children's fiction",
       "Contests, fiction",
@@ -127,7 +169,14 @@
     "isbn13": "9781589808058",
     "coverId": 10783939,
     "pageCount": 32,
-    "publishYear": 2010
+    "publishYear": 2010,
+    "level": 19,
+    "starRating": 3.17,
+    "similarBooks": [
+      "OL47935W",
+      "OL8843356W",
+      "OL892371W"
+    ]
   },
   {
     "bookId": "OL26571192W",
@@ -135,7 +184,7 @@
     "authors": [
       "Cori Doerrfeld"
     ],
-    "description": "",
+    "description": "A sweet, fun-filled follow-up to The Welcome Wagon from acclaimed author Cori Doerrfeld! Every year, the town of Cubby Hill comes together for the Great Giving Festival, celebrating the spirit of giving and community that makes their town such a great place to live.",
     "subjects": [
       "Friendship, fiction",
       "Animals, fiction"
@@ -144,7 +193,14 @@
     "isbn13": "9798855035063",
     "coverId": null,
     "pageCount": 34,
-    "publishYear": 2020
+    "publishYear": 2020,
+    "level": 16,
+    "starRating": 1.83,
+    "similarBooks": [
+      "OL8843356W",
+      "OL48763W",
+      "OL3368288W"
+    ]
   },
   {
     "bookId": "OL14912086W",
@@ -152,7 +208,7 @@
     "authors": [
       "Lisa Rogak"
     ],
-    "description": "",
+    "description": "In A Boy Named Shel, Lisa Rogak tells the full story of a life as antic and adventurous as any of his creations. A man with an incurable case of wanderlust, Shel kept homes on both coasts and many places in between---and enjoyed regular stays in the Playboy Mansion.",
     "subjects": [
       "American Authors",
       "American Humorists",
@@ -165,7 +221,14 @@
     "isbn13": "9780312353599",
     "coverId": 2370729,
     "pageCount": 256,
-    "publishYear": 2007
+    "publishYear": 2007,
+    "level": 36,
+    "starRating": 2.88,
+    "similarBooks": [
+      "OL3368273W",
+      "OL8843356W",
+      "OL2191470M"
+    ]
   },
   {
     "bookId": "OL3368286W",
@@ -173,7 +236,7 @@
     "authors": [
       "Shel Silverstein"
     ],
-    "description": "A collection of humorous poems and drawings.",
+    "description": "A poignant picture book about love and acceptance, perfect for both young readers and lifelong fans. A wondrous book of poems and drawings that will charm young readers. More poems packed with outrageous humor, poetic genius, and signature illustrations. This book features 12 new poems.",
     "subjects": [
       "American poetry",
       "Children's poetry, American",
@@ -188,7 +251,14 @@
     "isbn13": "9780060513092",
     "coverId": 26482,
     "pageCount": 176,
-    "publishYear": 1996
+    "publishYear": 1996,
+    "level": 28,
+    "starRating": 3,
+    "similarBooks": [
+      "OL8843356W",
+      "OL48763W",
+      "OL26571192W"
+    ]
   },
   {
     "bookId": "OL286593W",
@@ -196,7 +266,7 @@
     "authors": [
       "Jose Mauro De Vasconcelos"
     ],
-    "description": "",
+    "description": "A Brazilian classic with a whimsical and heart-rending essence. The misadventures of a precocious 5-year-old in 1920s Rio de Janeiro. Gifted Zezé's family has been down on their luck since his father lost his job. His smarts and imagination are often misdirected into pranks that lead to violent punishment.",
     "subjects": [
       "Brazil, fiction",
       "Children's fiction"
@@ -205,7 +275,14 @@
     "isbn13": "9781782692454",
     "coverId": 14557626,
     "pageCount": 192,
-    "publishYear": 2019
+    "publishYear": 2019,
+    "level": 16,
+    "starRating": 2.88,
+    "similarBooks": [
+      "OL3368273W",
+      "OL47935W",
+      "OL48763W"
+    ]
   },
   {
     "bookId": "OL3368273W",
@@ -213,7 +290,7 @@
     "authors": [
       "Shel Silverstein"
     ],
-    "description": "",
+    "description": "From Shel Silverstein, the celebrated author of The Giving Tree and Where the Sidewalk Ends, comes The Missing Piece, a charming fable that gently probes the nature of quest and fulfillment. It was missing a piece. And it was not happy. What it finds on its search for the missing piece is simply and touchingly told.",
     "subjects": [
       "Fiction",
       "Juvenile fiction"
@@ -222,7 +299,14 @@
     "isbn13": "",
     "coverId": 24107,
     "pageCount": 105,
-    "publishYear": 1976
+    "publishYear": 1976,
+    "level": 18,
+    "starRating": 1,
+    "similarBooks": [
+      "OL21025297W",
+      "OL3368288W",
+      "OL892371W"
+    ]
   },
   {
     "bookId": "OL892371W",
@@ -244,7 +328,14 @@
     "isbn13": "",
     "coverId": 277175,
     "pageCount": null,
-    "publishYear": 2003
+    "publishYear": 2003,
+    "level": 30,
+    "starRating": 3.2,
+    "similarBooks": [
+      "OL47935W",
+      "OL28633459W",
+      "OL14912086W"
+    ]
   },
   {
     "bookId": "OL2191470M",
@@ -260,6 +351,12 @@
     "isbn13": "",
     "coverId": 383710,
     "pageCount": 40,
-    "publishYear": 1990
+    "publishYear": 1990,
+    "starRating": null,
+    "similarBooks": [
+      "OL26571192W",
+      "OL21025297W",
+      "OL3368288W"
+    ]
   }
 ]

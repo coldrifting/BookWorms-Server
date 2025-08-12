@@ -12,7 +12,7 @@ namespace BookwormsServerTesting;
 public class BookDifficultyTests(CompositeFixture fixture) : BookwormsIntegrationTests(fixture)
 {
     [Theory]
-    [InlineData("parent2", Constants.Parent2Child1Id, "OL3368288W", 4)]
+    [InlineData("parent3", Constants.Parent3Child2Id, "OL2191470M", 4)]
     public async Task Test_AddDifficultyRating_UpdatesBook(string username, string childId, string bookId, int rating)
     {
         Child child = (await this.Context.Children.FindAsync(childId))!;
@@ -80,7 +80,7 @@ public class BookDifficultyTests(CompositeFixture fixture) : BookwormsIntegratio
     }
 
     [Theory]
-    [InlineData("parent1", Constants.Parent1Child1Id, "OL3368288W", 4)]
+    [InlineData("parent1", Constants.Parent1Child1Id, "OL2191470M", 4)]
     public async Task Test_AddDifficultyRating_UpdatesNeither(string username, string childId, string bookId, int rating)
     {
         Child child = (await this.Context.Children.FindAsync(childId))!;

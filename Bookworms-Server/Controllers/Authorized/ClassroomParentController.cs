@@ -36,11 +36,13 @@ public class ClassroomParentController(BookwormsDbContext context) : AuthControl
 
         List<ClassroomChildResponse> classes = DbContext.Classrooms
             .Include(c => c.Children)
+            .Include(c => c.Announcements)
+            .ThenInclude(a => a.ChildrenRead)
             .Include(c => c.Bookshelves)
             .ThenInclude(b => b.Books)
             .Include(c => c.Teacher)
             .Where(c => c.Children.Contains(child))
-            .Select(x => x.ToResponseChild())
+            .Select(x => x.ToResponseChild(childId))
             .ToList();
 
         return Ok(classes);
@@ -88,7 +90,7 @@ public class ClassroomParentController(BookwormsDbContext context) : AuthControl
         classroom.Children.Add(child);
         DbContext.SaveChanges();
 
-        return Ok(classroom.ToResponseChild());
+        return Ok(classroom.ToResponseChild(childId));
     }
 
     /// <summary>
@@ -109,7 +111,7 @@ public class ClassroomParentController(BookwormsDbContext context) : AuthControl
     {
         if (CurrentUser is not Parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         if (CurrentUserChild(childId) is not {} child)
@@ -132,7 +134,46 @@ public class ClassroomParentController(BookwormsDbContext context) : AuthControl
 
         return NoContent();
     }
+    
+    /// <summary>
+    /// Marks an announcement as read for the selected child
+    /// </summary>
+    /// <response code="204">Success</response>
+    /// <response code="401">The user is not logged in</response>
+    /// <response code="403">The user is not a parent</response>
+    /// <response code="404">The child or announcement does not exist, or the child does not belong to the current user</response>
+    [HttpPut]
+    [Route("/children/{childId}/classrooms/announcements/{announcementId}/[action]")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    public IActionResult Read(string childId, string announcementId)
+    {
+        if (CurrentUser is not Parent)
+        {
+            return Forbidden(ErrorResponse.UserNotParent);
+        }
 
+        if (CurrentUserChild(childId) is not {} child)
+        {
+            return NotFound(ErrorResponse.ChildNotFound);
+        }
+
+        if (DbContext.ClassroomAnnouncements.First(a => a.AnnouncementId == announcementId) is not { } announcement)
+        {
+            return NotFound(ErrorResponse.ClassroomAnnouncementNotFound);
+        }
+        
+        if (DbContext.ClassroomAnnouncementsRead.Find(announcement.AnnouncementId, child.ChildId) is null)
+        {
+            DbContext.ClassroomAnnouncementsRead.Add(new(announcement.AnnouncementId, announcement.ClassCode, child.ChildId));
+            DbContext.SaveChanges();
+        }
+        
+        return NoContent();
+    }
+    
     // Helper methods
     private Classroom? GetClassroom(string classCode)
     {
@@ -146,6 +187,8 @@ public class ClassroomParentController(BookwormsDbContext context) : AuthControl
         return DbContext.Classrooms
             .Include(classroom => classroom.Teacher)
             .Include(classroom => classroom.Children)
+            .Include(classroom => classroom.Announcements)
+            .ThenInclude(a => a.ChildrenRead)
             .Include(classroom => classroom.Bookshelves)
             .ThenInclude(bookshelf => bookshelf.Books)
             .FirstOrDefault(c => c.ClassroomCode == classCode);

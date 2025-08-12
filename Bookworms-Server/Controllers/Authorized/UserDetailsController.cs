@@ -24,7 +24,7 @@ public class UserDetailsController(BookwormsDbContext context) : AuthControllerB
     {
         return CurrentUser is Admin
             ? Ok(DbContext.Users.Select(user => user.ToResponse()).ToList())
-            : StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotAdmin);
+            : Forbidden(ErrorResponse.UserNotAdmin);
     }
 
     /// <summary>
@@ -95,7 +95,7 @@ public class UserDetailsController(BookwormsDbContext context) : AuthControllerB
         // Delete other accounts
         if (CurrentUser is not Admin)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotAdmin);
+            return Forbidden(ErrorResponse.UserNotAdmin);
         }
         
         User? userToDelete = DbContext.Users.Find(username);

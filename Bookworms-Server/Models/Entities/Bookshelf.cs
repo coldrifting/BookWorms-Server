@@ -26,13 +26,22 @@ public class CompletedBookshelf(string childId) : Bookshelf
     
     [ForeignKey(nameof(ChildId))] 
     public Child Child { get; set; } = null!; // 1:1 - Required reference navigation to principal
+
+    public ICollection<CompletedBookshelfBook> CompletedBookshelfBooks { get; set; } = null!;
     
     public override BookshelfResponse ToResponse(int numBooks = int.MaxValue)
     {
+        List<CompletedBookshelfBook> completion = CompletedBookshelfBooks.Take(numBooks).ToList();
+        List<BookResponse> books = Books
+            .Where(b => completion.Select(x => x.BookId).Contains(b.BookId))
+            .Select(book => book.ToResponse())
+            .ToList();
+
         return new(
             BookshelfType.Completed,
             "Completed",
-            Books.Select(book => book.ToResponsePreview()).Take(numBooks).ToList());
+            books,
+            completion.Select(b => new BookCompletionData(b.BookId, b.CompletionDate)).ToList());
     }
 }
 
@@ -52,7 +61,7 @@ public class InProgressBookshelf(string childId) : Bookshelf
         return new(
             BookshelfType.InProgress,
             "In Progress",
-            Books.Select(book => book.ToResponsePreview()).Take(numBooks).ToList());
+            Books.Select(book => book.ToResponse()).Take(numBooks).ToList());
     }
 }
 
@@ -75,7 +84,7 @@ public class ChildBookshelf(string name, string childId) : Bookshelf
         return new(
             BookshelfType.Custom,
             Name,
-            Books.Select(book => book.ToResponsePreview()).Take(numBooks).ToList());
+            Books.Select(book => book.ToResponse()).Take(numBooks).ToList());
     }
 }
 
@@ -99,6 +108,6 @@ public class ClassroomBookshelf(string name, string classroomCode) : Bookshelf
         return new(
             BookshelfType.Classroom,
             Name,
-            Books.Select(book => book.ToResponsePreview()).Take(numBooks).ToList());
+            Books.Select(book => book.ToResponse()).Take(numBooks).ToList());
     }
 }

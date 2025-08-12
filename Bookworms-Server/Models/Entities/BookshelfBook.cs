@@ -12,11 +12,11 @@ public class CompletedBookshelfBook
     {
     }
 
-    public CompletedBookshelfBook(int bookshelfId, string bookId, double starRating)
+    public CompletedBookshelfBook(int bookshelfId, string bookId, DateOnly? completionDate = null)
     {
         BookshelfId = bookshelfId;
         BookId = bookId;
-        StarRating = starRating;
+        CompletionDate = completionDate ?? DateOnly.FromDateTime(DateTime.Now);
     }
     
     public int BookshelfId { get; set; }
@@ -24,8 +24,7 @@ public class CompletedBookshelfBook
     [StringLength(20)]
     public required string BookId { get; set; }
 
-    [Range(0, 5, ErrorMessage = "Star rating must be between {0} and {1}.")]
-    public double StarRating { get; set; }
+    public DateOnly CompletionDate { get; set; }
 
     // Navigation
     

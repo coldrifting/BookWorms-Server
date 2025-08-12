@@ -14,12 +14,15 @@ public class Book(string bookId, string title, List<string> authors, string desc
     [StringLength(256, ErrorMessage = "Book title cannot be longer than {0} characters.")]
     public string Title { get; set; } = title;
     
+    [Column(TypeName = "text")]
     public List<string> Authors { get; set; } = authors;
     
     // Intentionally unconstrained (nvarchar(max)); descriptions are lengthy
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
+    [Column(TypeName = "text")]
     public string Description { get; set; } = description;
     
+    [Column(TypeName = "text")]
     public List<string> Subjects { get; set; } = [];
     
     [StringLength(10)] 
@@ -68,17 +71,6 @@ public class Book(string bookId, string title, List<string> authors, string desc
         StarRating = Reviews.Count > 0 
             ? Math.Round(Reviews.Average(r => r.StarRating), numDecPlaces) 
             : null;
-    }
-    
-    public BookResponsePreview ToResponsePreview()
-    {
-        return new(
-            BookId,
-            Title,
-            Authors,
-            StarRating,
-            Level
-        );
     }
     
     public BookResponse ToResponse()

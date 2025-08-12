@@ -208,8 +208,8 @@ public class BookSearchTests(CompositeFixture fixture) : BookwormsIntegrationTes
     
     [Theory]
     [InlineData(new [] {""}, "OL8843356W", 13)]
-    [InlineData(new [] {"Fiction"}, "OL2191470M", 11)]
-    [InlineData(new [] {"fiction"}, "OL3368273W", 11)]
+    [InlineData(new [] {"Fiction"}, "OL2191470M", 12)]
+    [InlineData(new [] {"fiction"}, "OL3368273W", 12)]
     [InlineData(new [] {"American"}, "OL14912086W", 3)]
     [InlineData(new [] {"American", "animal"}, "OL26571192W", 4)]
     public async Task Test_SearchSubjectsBasic(string[] subjects, string bookId, int numResults)

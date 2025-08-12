@@ -244,16 +244,6 @@ public class ChildBookshelfTests(CompositeFixture fixture) : BookwormsIntegratio
             HttpStatusCode.UnprocessableEntity,
             ErrorResponse.BookIdInvalid);
     }
-
-    [Theory]
-    [InlineData("parent5", Constants.Parent5Child1Id, "OL3368273W")]
-    public async Task Test_BookshelfInsert_Completed_NoRating_ShouldError(string username, string childId, string bookId)
-    {
-        await CheckForError(
-            () => Client.PutAsync(Routes.Bookshelves.Insert(childId, "Completed", bookId), username),
-            HttpStatusCode.UnprocessableEntity,
-            ErrorResponse.StarRatingRequired);
-    }
     
     [Theory]
     [InlineData("teacher1", Constants.Parent5Child1Id, "Ryn's Empty Bookshelf", "OL3368273W")]

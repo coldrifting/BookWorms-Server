@@ -5,6 +5,7 @@ public record ClassroomTeacherResponse(
     string ClassroomName,
     int ClassIcon,
     List<ChildResponse> Children,
+    List<ClassroomAnnouncementResponse> Announcements,
     List<BookshelfResponse> Bookshelves);
     
 
@@ -13,4 +14,5 @@ public record ClassroomChildResponse(
     string ClassroomName,
     string TeacherName,
     int ClassIcon,
+    List<ClassroomAnnouncementResponse> Announcements,
     List<BookshelfResponse> Bookshelves);

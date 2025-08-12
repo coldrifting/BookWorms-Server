@@ -52,5 +52,14 @@
     "lastName": "Thomas",
     "email": "isabella.thomas@aol.com",
     "userIcon": 1
+  },
+  {
+    "username": "teacher6",
+    "hash": "3LNW0MnWnmwMhZLAlr/LBSRuZtTv265w8vry8eh3doAzYDmBwNOujgp5X31Mbr6cPxrmX88gPyDvtrOnAEttiA==",
+    "salt": "hs0tVpA9exGN/ryWEs170gQw7vsrL5b4BsEQEhy6CySzmFnXCndB8OJyd9X485QHw1dcDxmuZx7NdQ7PJW9psA==",
+    "firstName": "Teach", 
+    "lastName": "Teacherson",
+    "email": "teach.teacherson@yahoo.com",
+    "userIcon": 1
   }
 ]

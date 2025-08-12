@@ -33,7 +33,7 @@ public class DifficultyRatingController(BookwormsDbContext context) : AuthContro
     {
         if (CurrentUser is not Parent)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.UserNotParent);
+            return Forbidden(ErrorResponse.UserNotParent);
         }
 
         if (CurrentUserChild(ratingRequest.ChildId) is not { } child)

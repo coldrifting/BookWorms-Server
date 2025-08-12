@@ -28,30 +28,42 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
     public DbSet<ClassroomChild> ClassroomChildren { get; set; }
     public DbSet<ClassroomBookshelf> ClassroomBookshelves { get; set; }
     public DbSet<ClassroomBookshelfBook> ClassroomBookshelfBooks { get; set; }
+    
+    public DbSet<ClassroomAnnouncement> ClassroomAnnouncements { get; set; }
+    public DbSet<ClassroomAnnouncementsRead> ClassroomAnnouncementsRead { get; set; }
 
-    public DbSet<ClassGoal> ClassGoals { get; set; }
-    public DbSet<ClassGoalCompletion> ClassGoalCompletions { get; set; }
-    public DbSet<ClassGoalNumBooks> ClassGoalNumBooks { get; set; }
-    
-    public DbSet<ClassGoalLog> ClassGoalLogs { get; set; }
-    public DbSet<ClassGoalLogCompletion> ClassGoalLogCompletions { get; set; }
-    public DbSet<ClassGoalLogNumBooks> ClassGoalLogNumBooks { get; set; }
-    
-    public DbSet<ChildGoal> ChildGoals { get; set; }
-    public DbSet<ChildGoalCompletion> ChildGoalCompletions { get; set; }
-    public DbSet<ChildGoalNumBooks> ChildGoalNumBooks { get; set; }
+    public DbSet<Goal> Goals { get; set; }
+    public DbSet<GoalChild> GoalChildren { get; set; }
+    public DbSet<GoalClassBase> GoalClassesBase { get; set; }
+    public DbSet<GoalClass> GoalClasses { get; set; }
+    public DbSet<GoalClassAggregate> GoalClassAggregates { get; set; }
+    public DbSet<GoalClassLog> GoalClassLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+	    // FULLTEXT index on Books table
+	    modelBuilder.Entity<Book>(entity =>
+	    {
+		    entity.HasKey(e => e.BookId);
+
+		    entity.HasIndex(e => new { e.Title, e.Description, e.Subjects, e.Authors })
+			    .IsFullText();
+	    });
+	    
 	    // [CompletedBookshelf] M----M [Book]   using CompletedBookshelfBook
 	    modelBuilder.Entity<CompletedBookshelf>()
 		    .HasMany(completedBookshelf => completedBookshelf.Books)
 		    .WithMany(book => book.CompletedBookshelves)
 		    .UsingEntity<CompletedBookshelfBook>();
+
+	    modelBuilder.Entity<CompletedBookshelf>()
+		    .HasMany(completedBookshelf => completedBookshelf.CompletedBookshelfBooks)
+		    .WithOne(b => b.Bookshelf)
+		    .HasForeignKey(b => b.BookshelfId);
 	    
 	    modelBuilder.Entity<CompletedBookshelfBook>()
 		    .HasOne(cbb => cbb.Bookshelf)
-		    .WithMany()
+		    .WithMany(b => b.CompletedBookshelfBooks)
 		    .HasForeignKey(cbb => cbb.BookshelfId);
 	    
 	    modelBuilder.Entity<CompletedBookshelfBook>()
@@ -112,6 +124,11 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 		    .HasMany(child => child.Classrooms)
 		    .WithMany(classroom => classroom.Children)
 		    .UsingEntity<ClassroomChild>();
+
+	    modelBuilder.Entity<ClassroomChild>()
+		    .HasMany(classroomChild => classroomChild.Announcements)
+		    .WithMany(announce => announce.ChildrenRead)
+		    .UsingEntity<ClassroomAnnouncementsRead>();
     }
     
     private readonly JsonSerializerOptions _jso = new()
@@ -144,14 +161,14 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	    Seed<ClassroomChild>();
 	    Seed<ClassroomBookshelf>();
 	    Seed<ClassroomBookshelfBook>();
+	    Seed<ClassroomAnnouncement>();
+	    
+        Seed<GoalChild>();
+        Seed<GoalClass>();
+        Seed<GoalClassAggregate>();
+        Seed<GoalClassLog>();
 
-	    Seed<ClassGoalCompletion>();
-	    Seed<ClassGoalNumBooks>();
-	    Seed<ClassGoalLogCompletion>();
-	    Seed<ClassGoalLogNumBooks>();
-
-	    Seed<ChildGoalCompletion>();
-	    Seed<ChildGoalNumBooks>();
+        Seed<DifficultyRating>();
 	    
 	    // Fix any inconsistencies that result from inserting directly into DB
 	    foreach (Book book in Books.Include(b => b.Reviews))
@@ -171,9 +188,10 @@ public class BookwormsDbContext(DbContextOptions<BookwormsDbContext> options) : 
 	                           DELETE FROM ChildBookshelfBooks;
 	                           DELETE FROM ChildBookshelves;
 	                           DELETE FROM Children;
-	                           DELETE FROM ChildGoals;
-	                           DELETE FROM ClassGoalLogs;
-	                           DELETE FROM ClassGoals;
+	                           DELETE FROM DifficultyRatings;
+	                           DELETE FROM Goals;
+	                           DELETE FROM GoalClassLogs;
+	                           DELETE FROM ClassroomAnnouncements;
 	                           DELETE FROM ClassroomBookshelfBooks;
 	                           DELETE FROM ClassroomBookshelves;
 	                           DELETE FROM ClassroomChildren;

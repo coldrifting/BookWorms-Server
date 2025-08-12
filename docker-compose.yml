@@ -1,0 +1,25 @@
+﻿services:
+  server:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=bookworms_db_local;User=root;Password=local_password;
+    depends_on: # Ensure db is started before starting server
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4.2
+    environment:
+      MYSQL_ROOT_PASSWORD: local_password
+      MYSQL_DATABASE: bookworms_db_local
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 10s

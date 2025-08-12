@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using BookwormsServer.Models.Data;
 using BookwormsServer.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,8 @@ namespace BookwormsServer.Controllers;
 /// </summary>
 [Authorize]
 [ApiController]
+[Produces("application/json")]
+[ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
 public class AuthControllerBase : ControllerBase
 {
     protected AuthControllerBase(BookwormsDbContext context)
@@ -46,5 +49,10 @@ public class AuthControllerBase : ControllerBase
     protected List<Child> CurrentUserChildren()
     {
         return DbContext.Children.Where(child => child.ParentUsername == CurrentUser.Username).ToList();
+    }
+
+    protected IActionResult Forbidden(object? value)
+    {
+        return StatusCode(StatusCodes.Status403Forbidden, value);
     }
 }

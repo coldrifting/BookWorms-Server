@@ -40,7 +40,7 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
     public InProgressBookshelf? InProgress { get; set; } // 1:1 - Reference navigation to dependent
     public ICollection<ChildBookshelf> Bookshelves { get; set; } = null!;
     
-    public ICollection<ChildGoal> Goals { get; set; } = null!;
+    public ICollection<GoalChild> Goals { get; set; } = null!;
 
 
     public void AdjustReadingLevel(Book book, int difficultyRating)
@@ -96,7 +96,7 @@ public class Child(string name, string parentUsername, DateOnly? dateOfBirth = n
         double daysPastThree = today.DayNumber - thirdBirthday.DayNumber;
         
         // Percentage of the way between 3 yrs old and 18 yrs old
-        return (int?)Math.Round(daysPastThree / fifteenYears);
+        return (int?)Math.Round(daysPastThree / fifteenYears * 100);
     }
 }
 
@@ -120,42 +120,5 @@ public static class ChildExt
             oldLevel,
             child.ReadingLevel
         );
-    }
-
-    public static AllGoalOverviewResponse ToGoalsResponse(this Child child)
-    {
-        List<ChildGoalCompletionResponse> childCompletionGoals = [];
-        List<ChildGoalNumBooksResponse> childNumBooksGoals = [];
-        List<ClassGoalCompletionChildResponse> classCompletionGoals = [];
-        List<ClassGoalNumBooksChildResponse> classNumBooksGoals = [];
-
-        foreach (ChildGoal childGoal in child.Goals)
-        {
-            switch (childGoal)
-            {
-                case ChildGoalCompletion completion:
-                    childCompletionGoals.Add(completion.ToChildResponse());
-                    break;
-                case ChildGoalNumBooks numBooks:
-                    childNumBooksGoals.Add(numBooks.ToChildResponse());
-                    break;
-            }
-        }
-
-        var childClassGoalLogs = child.Classrooms.SelectMany(c => c.Goals);
-        foreach (ClassGoal classGoal in childClassGoalLogs)
-        {
-            switch (classGoal)
-            {
-                case ClassGoalCompletion completion:
-                    classCompletionGoals.Add(completion.ToChildResponse(child.ChildId));
-                    break;
-                case ClassGoalNumBooks numBooks:
-                    classNumBooksGoals.Add(numBooks.ToChildResponse(child.ChildId));
-                    break;
-            }
-        }
-        
-        return new(childCompletionGoals, childNumBooksGoals, classCompletionGoals, classNumBooksGoals);
     }
 }

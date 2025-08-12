@@ -24,9 +24,10 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
     [ForeignKey(nameof(TeacherUsername))] 
     public Teacher Teacher { get; set; } = null!;
     
-    public ICollection<ClassGoal> Goals { get; set; } = null!;
+    public ICollection<GoalClassBase> Goals { get; set; } = null!;
     public ICollection<ClassroomBookshelf> Bookshelves { get; set; } = null!;
-    
+    public ICollection<ClassroomAnnouncement> Announcements { get; set; } = null!;
+
     // Skip-navigation (many-to-many)
     public ICollection<Child> Children { get; set; } = null!;
 
@@ -65,16 +66,18 @@ public class Classroom(string teacherUsername, string classroomName, string? cla
             ClassroomName,
             ClassIcon,
             Children.Select(child => child.ToResponse()).ToList(),
+            Announcements.Select(announcement => announcement.ToTeacherResponse()).ToList(),
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
 
-    public ClassroomChildResponse ToResponseChild()
+    public ClassroomChildResponse ToResponseChild(string childId)
     {
         return new(
             ClassroomCode,
             ClassroomName,
             Teacher.LastName,
             ClassIcon,
+            Announcements.Select(announcement => announcement.ToChildResponse(childId)).ToList(),
             Bookshelves.Select(bookshelf => bookshelf.ToResponse()).ToList());
     }
 }
